@@ -13,7 +13,11 @@ import {
   Globe, 
   Compass, 
   FileText,
-  Activity
+  Activity,
+  IndianRupee,
+  CreditCard,
+  Crown,
+  Printer
 } from 'lucide-react';
 import { 
   getVisitorAnalytics, 
@@ -21,6 +25,12 @@ import {
   VisitorAnalyticsSummary 
 } from '../services/visitorTracker';
 import { exportLeadsCsv } from '../services/authService';
+import { 
+  getRevenueMetrics, 
+  exportOrdersCsv, 
+  RevenueMetrics, 
+  printCommercialInvoice 
+} from '../services/subscriptionService';
 
 interface AdminVisitorInsightsModalProps {
   isOpen: boolean;
@@ -31,11 +41,14 @@ export const AdminVisitorInsightsModal: React.FC<AdminVisitorInsightsModalProps>
   isOpen,
   onClose
 }) => {
+  const [activeTab, setActiveTab] = useState<'traffic' | 'revenue'>('traffic');
   const [data, setData] = useState<VisitorAnalyticsSummary | null>(null);
+  const [revenueData, setRevenueData] = useState<RevenueMetrics | null>(null);
 
   useEffect(() => {
     if (isOpen) {
       setData(getVisitorAnalytics());
+      setRevenueData(getRevenueMetrics());
     }
   }, [isOpen]);
 
@@ -56,15 +69,15 @@ export const AdminVisitorInsightsModal: React.FC<AdminVisitorInsightsModalProps>
             <div>
               <div className="flex items-center space-x-2">
                 <h3 className="text-base font-extrabold text-white">
-                  Visitor Traffic & Lead Analytics
+                  Admin Hub: Traffic & Commercial Analytics
                 </h3>
                 <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-black uppercase px-2 py-0.5 rounded-full flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  Live Telemetry
+                  Live
                 </span>
               </div>
               <p className="text-xs text-slate-300">
-                Anonymous client-side session telemetry, device breakdown & conversion tracking
+                Visitor session telemetry, device breakdown & commercial order ledger
               </p>
             </div>
           </div>
@@ -77,160 +90,303 @@ export const AdminVisitorInsightsModal: React.FC<AdminVisitorInsightsModalProps>
           </button>
         </div>
 
+        {/* Tab Switcher */}
+        <div className="px-6 pt-2.5 border-b border-slate-200 bg-slate-50/70 flex items-center space-x-2">
+          <button
+            onClick={() => setActiveTab('traffic')}
+            className={`pb-2.5 px-3 text-xs font-bold border-b-2 flex items-center space-x-1.5 transition-all ${
+              activeTab === 'traffic'
+                ? 'border-indigo-600 text-indigo-700'
+                : 'border-transparent text-slate-500 hover:text-slate-800'
+            }`}
+          >
+            <TrendingUp className="w-3.5 h-3.5" />
+            <span>Traffic & Telemetry</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('revenue')}
+            className={`pb-2.5 px-3 text-xs font-bold border-b-2 flex items-center space-x-1.5 transition-all ${
+              activeTab === 'revenue'
+                ? 'border-indigo-600 text-indigo-700'
+                : 'border-transparent text-slate-500 hover:text-slate-800'
+            }`}
+          >
+            <Crown className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+            <span>Commercial Revenue & Orders ({revenueData?.recentOrders.length || 0})</span>
+          </button>
+        </div>
+
         {/* Content Body */}
         <div className="p-6 overflow-y-auto space-y-6">
-          {/* Key Metric Tiles */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
-              <div className="flex items-center space-x-1.5 text-slate-500 text-xs font-semibold">
-                <Users className="w-3.5 h-3.5 text-indigo-600" />
-                <span>Unique Visitors</span>
+          {activeTab === 'traffic' ? (
+            /* --- TRAFFIC & TELEMETRY VIEW --- */
+            <>
+              {/* Key Metric Tiles */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
+                  <div className="flex items-center space-x-1.5 text-slate-500 text-xs font-semibold">
+                    <Users className="w-3.5 h-3.5 text-indigo-600" />
+                    <span>Unique Visitors</span>
+                  </div>
+                  <div className="text-2xl font-black text-slate-900 mt-1">
+                    {data.totalUniqueVisitors}
+                  </div>
+                  <div className="text-[10px] text-slate-400 mt-0.5">Identified sessions</div>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
+                  <div className="flex items-center space-x-1.5 text-slate-500 text-xs font-semibold">
+                    <Eye className="w-3.5 h-3.5 text-sky-600" />
+                    <span>Page Views</span>
+                  </div>
+                  <div className="text-2xl font-black text-slate-900 mt-1">
+                    {data.totalPageViews}
+                  </div>
+                  <div className="text-[10px] text-slate-400 mt-0.5">Screen transitions</div>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-emerald-50/50 border border-emerald-200/80">
+                  <div className="flex items-center space-x-1.5 text-emerald-700 text-xs font-semibold">
+                    <FileText className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Leads Captured</span>
+                  </div>
+                  <div className="text-2xl font-black text-emerald-900 mt-1">
+                    {data.totalLeadsCaptured}
+                  </div>
+                  <div className="text-[10px] text-emerald-600 font-medium mt-0.5">Blueprint downloads</div>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-indigo-50/50 border border-indigo-200/80">
+                  <div className="flex items-center space-x-1.5 text-indigo-700 text-xs font-semibold">
+                    <TrendingUp className="w-3.5 h-3.5 text-indigo-600" />
+                    <span>Conversion Rate</span>
+                  </div>
+                  <div className="text-2xl font-black text-indigo-900 mt-1">
+                    {data.conversionRatePercent}%
+                  </div>
+                  <div className="text-[10px] text-indigo-600 font-medium mt-0.5">Visitor-to-lead</div>
+                </div>
               </div>
-              <div className="text-2xl font-black text-slate-900 mt-1">
-                {data.totalUniqueVisitors}
+
+              {/* Device & Form Factor Breakdown */}
+              <div className="p-5 rounded-2xl border border-slate-200 bg-white shadow-2xs space-y-3">
+                <h4 className="text-xs font-black uppercase tracking-wider text-slate-500 flex items-center justify-between">
+                  <span>Device Form Factor Distribution</span>
+                  <span className="text-indigo-600 font-bold lowercase">mobile-first index</span>
+                </h4>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-xs font-bold text-slate-700">
+                    <span className="flex items-center gap-1.5">
+                      <Smartphone className="w-3.5 h-3.5 text-emerald-600" />
+                      Mobile Smartphones
+                    </span>
+                    <span>{data.deviceDistribution.mobile}%</span>
+                  </div>
+                  <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                    <div 
+                      className="bg-emerald-500 h-full rounded-full transition-all"
+                      style={{ width: `${data.deviceDistribution.mobile}%` }}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-xs font-bold text-slate-700">
+                    <span className="flex items-center gap-1.5">
+                      <Monitor className="w-3.5 h-3.5 text-sky-600" />
+                      Desktop & Laptops
+                    </span>
+                    <span>{data.deviceDistribution.desktop}%</span>
+                  </div>
+                  <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                    <div 
+                      className="bg-sky-500 h-full rounded-full transition-all"
+                      style={{ width: `${data.deviceDistribution.desktop}%` }}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-xs font-bold text-slate-700">
+                    <span className="flex items-center gap-1.5">
+                      <Tablet className="w-3.5 h-3.5 text-amber-600" />
+                      Tablets & iPads
+                    </span>
+                    <span>{data.deviceDistribution.tablet}%</span>
+                  </div>
+                  <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                    <div 
+                      className="bg-amber-500 h-full rounded-full transition-all"
+                      style={{ width: `${data.deviceDistribution.tablet}%` }}
+                    />
+                  </div>
+                </div>
               </div>
-              <div className="text-[10px] text-slate-400 mt-0.5">Identified sessions</div>
+
+              {/* Current Visitor Session Metadata */}
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs space-y-2">
+                <div className="flex items-center justify-between font-bold text-slate-800">
+                  <span className="flex items-center gap-1.5">
+                    <Activity className="w-3.5 h-3.5 text-indigo-600" />
+                    Active Session Telemetry
+                  </span>
+                  <span className="font-mono text-[11px] text-slate-500">{data.activeVisitor.id}</span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-slate-600 text-[11px]">
+                  <div><strong>OS:</strong> {data.activeVisitor.os}</div>
+                  <div><strong>Browser:</strong> {data.activeVisitor.browser}</div>
+                  <div><strong>Resolution:</strong> {data.activeVisitor.screenResolution}</div>
+                  <div><strong>Referrer:</strong> {data.activeVisitor.referrer}</div>
+                </div>
+              </div>
+
+              {/* CRM & Telemetry Download Actions */}
+              <div className="p-5 rounded-2xl bg-indigo-50/50 border border-indigo-200 space-y-3">
+                <h4 className="text-xs font-black uppercase tracking-wider text-indigo-900">
+                  Data Portability & Commercial CRM Extraction
+                </h4>
+                <p className="text-xs text-indigo-800/80">
+                  Export all accumulated visitor telemetry and opt-in contact leads for WhatsApp marketing, CRM import, or audit logs.
+                </p>
+
+                <div className="flex flex-col sm:flex-row items-center gap-3 pt-1">
+                  <button
+                    onClick={() => exportLeadsCsv()}
+                    className="w-full sm:w-auto btn-tactile px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center justify-center space-x-2 shadow-xs transition-all"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Export Captured Leads CSV ({data.totalLeadsCaptured})</span>
+                  </button>
+
+                  <button
+                    onClick={() => exportVisitorLogsCsv()}
+                    className="w-full sm:w-auto btn-tactile px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 font-bold text-xs flex items-center justify-center space-x-2 shadow-2xs transition-all"
+                  >
+                    <Download className="w-3.5 h-3.5 text-slate-500" />
+                    <span>Export Visitor Telemetry CSV</span>
+                  </button>
+                </div>
+              </div>
+            </>
+          ) : (
+            /* --- REVENUE & COMMERCIAL ORDERS VIEW --- */
+            <div className="space-y-6">
+              {/* Financial KPI Tiles */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="p-4 rounded-2xl bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200">
+                  <div className="text-[10px] font-bold text-amber-800 uppercase tracking-wider flex items-center gap-1">
+                    <Crown className="w-3.5 h-3.5 text-amber-600 fill-amber-500" />
+                    <span>Total Gross Revenue</span>
+                  </div>
+                  <div className="text-2xl font-black text-amber-950 mt-1">
+                    ₹{revenueData?.totalRevenueInInr.toLocaleString('en-IN') || 0}
+                  </div>
+                  <div className="text-[10px] text-amber-700 mt-0.5">Direct UPI & Card Collections</div>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                  <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                    Paid Subscribers
+                  </div>
+                  <div className="text-2xl font-black text-slate-900 mt-1">
+                    {revenueData?.paidSubscribersCount || 0}
+                  </div>
+                  <div className="text-[10px] text-slate-400 mt-0.5">Sprint & Topper Members</div>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                  <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                    Average Order Value
+                  </div>
+                  <div className="text-2xl font-black text-slate-900 mt-1">
+                    ₹{revenueData?.averageOrderValueInInr || 0}
+                  </div>
+                  <div className="text-[10px] text-slate-400 mt-0.5">Per subscription sale</div>
+                </div>
+              </div>
+
+              {/* Transactions Ledger */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-black uppercase tracking-wider text-slate-700">
+                    Recent Customer Subscription Orders
+                  </h4>
+                  <button
+                    onClick={() => exportOrdersCsv()}
+                    className="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center space-x-1"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Export Financial CSV</span>
+                  </button>
+                </div>
+
+                <div className="border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-2xs">
+                  <div className="max-h-60 overflow-y-auto">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold sticky top-0">
+                        <tr>
+                          <th className="py-2.5 px-3">Invoice</th>
+                          <th className="py-2.5 px-3">Aspirant</th>
+                          <th className="py-2.5 px-3">Plan</th>
+                          <th className="py-2.5 px-3 text-right">Amount</th>
+                          <th className="py-2.5 px-3 text-center">Invoice</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {revenueData?.recentOrders.map((ord) => (
+                          <tr key={ord.orderId} className="hover:bg-slate-50/80 transition-colors">
+                            <td className="py-2 px-3 font-mono font-semibold text-slate-800">
+                              {ord.invoiceNumber}
+                            </td>
+                            <td className="py-2 px-3">
+                              <div className="font-bold text-slate-900">{ord.userName}</div>
+                              <div className="text-[10px] text-slate-400">{ord.userEmail}</div>
+                            </td>
+                            <td className="py-2 px-3">
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                {ord.planName}
+                              </span>
+                            </td>
+                            <td className="py-2 px-3 text-right font-black text-slate-900">
+                              ₹{ord.amountInInr}
+                            </td>
+                            <td className="py-2 px-3 text-center">
+                              <button
+                                type="button"
+                                onClick={() => printCommercialInvoice(ord)}
+                                className="p-1 rounded-lg border border-slate-200 hover:bg-slate-100 text-slate-600 transition-colors"
+                                title="Print / Download PDF Invoice"
+                              >
+                                <Printer className="w-3.5 h-3.5" />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              {/* Commercial Notice */}
+              <div className="p-4 rounded-2xl bg-amber-50/60 border border-amber-200 text-xs text-amber-900 space-y-1">
+                <div className="font-bold flex items-center gap-1.5">
+                  <ShieldCheck className="w-4 h-4 text-amber-700" />
+                  <span>GST & Commercial Ledger Compliance</span>
+                </div>
+                <p className="text-[11px] text-amber-800 leading-relaxed">
+                  All transactions include standard 18% GST (SAC Code 999293). Real-time invoices are generated in compliance with Indian commercial e-commerce regulations.
+                </p>
+              </div>
             </div>
-
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
-              <div className="flex items-center space-x-1.5 text-slate-500 text-xs font-semibold">
-                <Eye className="w-3.5 h-3.5 text-sky-600" />
-                <span>Page Views</span>
-              </div>
-              <div className="text-2xl font-black text-slate-900 mt-1">
-                {data.totalPageViews}
-              </div>
-              <div className="text-[10px] text-slate-400 mt-0.5">Screen transitions</div>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-emerald-50/50 border border-emerald-200/80">
-              <div className="flex items-center space-x-1.5 text-emerald-700 text-xs font-semibold">
-                <FileText className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Leads Captured</span>
-              </div>
-              <div className="text-2xl font-black text-emerald-900 mt-1">
-                {data.totalLeadsCaptured}
-              </div>
-              <div className="text-[10px] text-emerald-600 font-medium mt-0.5">Blueprint downloads</div>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-indigo-50/50 border border-indigo-200/80">
-              <div className="flex items-center space-x-1.5 text-indigo-700 text-xs font-semibold">
-                <TrendingUp className="w-3.5 h-3.5 text-indigo-600" />
-                <span>Conversion Rate</span>
-              </div>
-              <div className="text-2xl font-black text-indigo-900 mt-1">
-                {data.conversionRatePercent}%
-              </div>
-              <div className="text-[10px] text-indigo-600 font-medium mt-0.5">Visitor-to-lead</div>
-            </div>
-          </div>
-
-          {/* Device & Form Factor Breakdown */}
-          <div className="p-5 rounded-2xl border border-slate-200 bg-white shadow-2xs space-y-3">
-            <h4 className="text-xs font-black uppercase tracking-wider text-slate-500 flex items-center justify-between">
-              <span>Device Form Factor Distribution</span>
-              <span className="text-indigo-600 font-bold lowercase">mobile-first index</span>
-            </h4>
-
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs font-bold text-slate-700">
-                <span className="flex items-center gap-1.5">
-                  <Smartphone className="w-3.5 h-3.5 text-emerald-600" />
-                  Mobile Smartphones
-                </span>
-                <span>{data.deviceDistribution.mobile}%</span>
-              </div>
-              <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                <div 
-                  className="bg-emerald-500 h-full rounded-full transition-all"
-                  style={{ width: `${data.deviceDistribution.mobile}%` }}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs font-bold text-slate-700">
-                <span className="flex items-center gap-1.5">
-                  <Monitor className="w-3.5 h-3.5 text-sky-600" />
-                  Desktop & Laptops
-                </span>
-                <span>{data.deviceDistribution.desktop}%</span>
-              </div>
-              <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                <div 
-                  className="bg-sky-500 h-full rounded-full transition-all"
-                  style={{ width: `${data.deviceDistribution.desktop}%` }}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs font-bold text-slate-700">
-                <span className="flex items-center gap-1.5">
-                  <Tablet className="w-3.5 h-3.5 text-amber-600" />
-                  Tablets & iPads
-                </span>
-                <span>{data.deviceDistribution.tablet}%</span>
-              </div>
-              <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                <div 
-                  className="bg-amber-500 h-full rounded-full transition-all"
-                  style={{ width: `${data.deviceDistribution.tablet}%` }}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Current Visitor Session Metadata */}
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs space-y-2">
-            <div className="flex items-center justify-between font-bold text-slate-800">
-              <span className="flex items-center gap-1.5">
-                <Activity className="w-3.5 h-3.5 text-indigo-600" />
-                Active Session Telemetry
-              </span>
-              <span className="font-mono text-[11px] text-slate-500">{data.activeVisitor.id}</span>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-slate-600 text-[11px]">
-              <div><strong>OS:</strong> {data.activeVisitor.os}</div>
-              <div><strong>Browser:</strong> {data.activeVisitor.browser}</div>
-              <div><strong>Resolution:</strong> {data.activeVisitor.screenResolution}</div>
-              <div><strong>Referrer:</strong> {data.activeVisitor.referrer}</div>
-            </div>
-          </div>
-
-          {/* CRM & Telemetry Download Actions */}
-          <div className="p-5 rounded-2xl bg-indigo-50/50 border border-indigo-200 space-y-3">
-            <h4 className="text-xs font-black uppercase tracking-wider text-indigo-900">
-              Data Portability & Commercial CRM Extraction
-            </h4>
-            <p className="text-xs text-indigo-800/80">
-              Export all accumulated visitor telemetry and opt-in contact leads for WhatsApp marketing, CRM import, or audit logs.
-            </p>
-
-            <div className="flex flex-col sm:flex-row items-center gap-3 pt-1">
-              <button
-                onClick={() => exportLeadsCsv()}
-                className="w-full sm:w-auto btn-tactile px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center justify-center space-x-2 shadow-xs transition-all"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>Export Captured Leads CSV ({data.totalLeadsCaptured})</span>
-              </button>
-
-              <button
-                onClick={() => exportVisitorLogsCsv()}
-                className="w-full sm:w-auto btn-tactile px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 font-bold text-xs flex items-center justify-center space-x-2 shadow-2xs transition-all"
-              >
-                <Download className="w-3.5 h-3.5 text-slate-500" />
-                <span>Export Visitor Telemetry CSV</span>
-              </button>
-            </div>
-          </div>
+          )}
         </div>
 
         {/* Footer */}
         <div className="px-6 py-3 border-t border-slate-100 bg-slate-50 flex items-center justify-between text-xs text-slate-500">
-          <span>AspirantAtlas Telemetry • Client-Side Zero Tracker Cookie Architecture</span>
+          <span>AspirantAtlas Commercial Hub • Version 1.4</span>
           <button
             onClick={onClose}
             className="px-4 py-1.5 rounded-xl bg-slate-200 hover:bg-slate-300 font-bold text-slate-800 transition-colors"

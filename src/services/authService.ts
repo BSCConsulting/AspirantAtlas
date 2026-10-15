@@ -13,6 +13,10 @@ export interface AspirantUser {
   joinedDate: string;
   isCloudSynced: boolean;
   lastSyncedAt: string;
+  isPro?: boolean;
+  plan?: 'free' | 'sprint' | 'topper';
+  subscriptionExpiresAt?: string;
+  invoiceId?: string;
 }
 
 export const DEMO_PROFILES: AspirantUser[] = [
@@ -20,23 +24,31 @@ export const DEMO_PROFILES: AspirantUser[] = [
     id: 'demo-upsc',
     name: 'Ananya Sharma',
     email: 'ananya.air14@aspirantatlas.org',
+    mobile: '+91 98765 43210',
     targetExam: 'upsc',
     prepHorizonDays: 150,
     dailyGoalHours: 8,
     joinedDate: 'Oct 2026',
     isCloudSynced: true,
-    lastSyncedAt: 'Just now'
+    lastSyncedAt: 'Just now',
+    isPro: true,
+    plan: 'topper',
+    subscriptionExpiresAt: '2027-10-15',
+    invoiceId: 'INV-2026-AA001'
   },
   {
     id: 'demo-appsc',
     name: 'Rajesh Varma',
     email: 'rajesh.appsc@aspirantatlas.org',
+    mobile: '+91 98765 12345',
     targetExam: 'appsc',
     prepHorizonDays: 90,
     dailyGoalHours: 6,
     joinedDate: 'Oct 2026',
     isCloudSynced: true,
-    lastSyncedAt: 'Just now'
+    lastSyncedAt: 'Just now',
+    isPro: false,
+    plan: 'free'
   },
   {
     id: 'demo-tspsc',
@@ -104,6 +116,38 @@ export function updateUserProfile(updates: Partial<AspirantUser>): AspirantUser 
   const updated = { ...current, ...updates };
   saveUser(updated);
   return updated;
+}
+
+export function upgradeUserToPro(
+  planId: 'sprint' | 'topper',
+  durationDays: number,
+  invoiceId: string
+): AspirantUser {
+  const current = getCurrentUser();
+  const expiryDate = new Date(Date.now() + durationDays * 86400000).toISOString().split('T')[0];
+
+  const baseUser: AspirantUser = current || {
+    id: `user-${Date.now()}`,
+    name: 'Pro Aspirant',
+    email: 'subscriber@aspirantatlas.org',
+    targetExam: 'upsc',
+    prepHorizonDays: 90,
+    dailyGoalHours: 8,
+    joinedDate: new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+    isCloudSynced: true,
+    lastSyncedAt: 'Just now'
+  };
+
+  const upgraded: AspirantUser = {
+    ...baseUser,
+    isPro: true,
+    plan: planId,
+    subscriptionExpiresAt: expiryDate,
+    invoiceId
+  };
+
+  saveUser(upgraded);
+  return upgraded;
 }
 
 export function logout(): void {

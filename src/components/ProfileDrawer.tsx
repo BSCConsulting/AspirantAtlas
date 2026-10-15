@@ -19,7 +19,8 @@ import {
   Phone,
   TrendingUp,
   Users,
-  ChevronRight
+  ChevronRight,
+  Crown
 } from 'lucide-react';
 import { 
   AspirantUser, 
@@ -46,6 +47,7 @@ interface ProfileDrawerProps {
   onOpenDashboard?: () => void;
   onOpenLeadCapture?: () => void;
   onOpenVisitorInsights?: () => void;
+  onOpenPricing?: () => void;
 }
 
 export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
@@ -57,7 +59,8 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
   onOpenGeminiKey,
   onOpenDashboard,
   onOpenLeadCapture,
-  onOpenVisitorInsights
+  onOpenVisitorInsights,
+  onOpenPricing
 }) => {
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncStatusMsg, setSyncStatusMsg] = useState('');
@@ -225,6 +228,55 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
                   </div>
                 </div>
               </div>
+
+              {/* Pro Subscription Status Banner */}
+              {currentUser.isPro ? (
+                <div className="p-4 rounded-2xl border-2 border-amber-300 bg-gradient-to-r from-amber-50 to-orange-50/40 flex items-center justify-between shadow-2xs">
+                  <div className="space-y-0.5">
+                    <div className="text-xs font-black text-amber-950 flex items-center space-x-1.5">
+                      <Crown className="w-4 h-4 text-amber-600 fill-amber-500" />
+                      <span>PRO ACTIVE ({currentUser.plan?.toUpperCase() || 'TOPPER'})</span>
+                    </div>
+                    <p className="text-[11px] text-amber-800/80">
+                      Valid through {currentUser.subscriptionExpiresAt || 'Oct 2027'} • Invoice #{currentUser.invoiceId || 'INV-2026-AA01'}
+                    </p>
+                  </div>
+                  {onOpenPricing && (
+                    <button
+                      onClick={() => {
+                        onClose();
+                        onOpenPricing();
+                      }}
+                      className="btn-tactile px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold shadow-xs shrink-0"
+                    >
+                      Plans
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <div className="p-4 rounded-2xl border border-amber-200 bg-gradient-to-r from-amber-50 via-white to-amber-50/50 flex items-center justify-between shadow-2xs">
+                  <div className="space-y-0.5">
+                    <div className="text-xs font-black text-amber-950 flex items-center space-x-1.5">
+                      <Crown className="w-4 h-4 text-amber-600 fill-amber-500" />
+                      <span>Upgrade to AspirantAtlas PRO</span>
+                    </div>
+                    <p className="text-[11px] text-slate-500">
+                      Unlimited AI evaluations, 210+ question vault & master notes.
+                    </p>
+                  </div>
+                  {onOpenPricing && (
+                    <button
+                      onClick={() => {
+                        onClose();
+                        onOpenPricing();
+                      }}
+                      className="btn-tactile px-3.5 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-xl text-xs font-black shadow-xs shrink-0"
+                    >
+                      ₹499+
+                    </button>
+                  )}
+                </div>
+              )}
 
               {/* Cloud Sync Status */}
               <div className="p-4 rounded-2xl border border-slate-200/90 bg-slate-50/70 flex items-center justify-between">
@@ -470,6 +522,25 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
                     <div>
                       <div>Free 2026 Kit</div>
                       <div className="text-[10px] text-slate-500 font-normal">Blueprint PDF</div>
+                    </div>
+                  </button>
+                )}
+
+                {onOpenPricing && (
+                  <button
+                    onClick={() => {
+                      onClose();
+                      onOpenPricing();
+                    }}
+                    className="p-3 rounded-xl border border-amber-300 bg-gradient-to-r from-amber-50 to-orange-50 hover:bg-amber-100 text-left flex items-center space-x-2.5 transition-all text-xs font-bold text-amber-950 sm:col-span-2 shadow-2xs"
+                  >
+                    <Crown className="w-4 h-4 text-amber-600 fill-amber-500 shrink-0" />
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <span>AspirantAtlas PRO Plans</span>
+                        <span className="text-[10px] bg-amber-200 text-amber-900 px-1.5 py-0.2 rounded font-black uppercase">From ₹499</span>
+                      </div>
+                      <div className="text-[10px] text-slate-500 font-normal">Unlimited AI Evaluations & Prelims Vault</div>
                     </div>
                   </button>
                 )}

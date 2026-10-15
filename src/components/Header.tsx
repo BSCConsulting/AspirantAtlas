@@ -16,7 +16,8 @@ import {
   SlidersHorizontal,
   ChevronDown,
   TrendingUp,
-  Gift
+  Gift,
+  Crown
 } from 'lucide-react';
 import { AspirantUser } from '../services/authService';
 import { StudySession } from '../services/studySessionService';
@@ -40,6 +41,7 @@ interface HeaderProps {
   onOpenCompass?: () => void;
   onOpenDashboard?: () => void;
   onOpenLeadCapture?: () => void;
+  onOpenPricing?: () => void;
   currentUser?: AspirantUser | null;
   onOpenSessionModal?: () => void;
   activeSession?: StudySession | null;
@@ -61,6 +63,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenCompass,
   onOpenDashboard,
   onOpenLeadCapture,
+  onOpenPricing,
   currentUser,
   onOpenSessionModal,
   activeSession,
@@ -200,6 +203,28 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
             )}
 
+            {/* Commercial PRO Upgrade / Badge Button */}
+            {currentUser?.isPro ? (
+              <div
+                className="h-9 px-2.5 sm:px-3 rounded-xl bg-gradient-to-r from-amber-400/20 to-amber-500/20 border border-amber-300 text-amber-900 text-xs font-black flex items-center space-x-1.5 shadow-2xs cursor-default"
+                title="AspirantAtlas PRO Subscriber Active"
+              >
+                <Crown className="w-3.5 h-3.5 text-amber-600 fill-amber-500" />
+                <span className="hidden xs:inline">PRO</span>
+              </div>
+            ) : (
+              onOpenPricing && (
+                <button
+                  onClick={onOpenPricing}
+                  className="btn-tactile h-9 px-2.5 sm:px-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-xs font-black transition-all shadow-xs flex items-center space-x-1.5 animate-pulse"
+                  title="View Commercial Pro Subscription Plans"
+                >
+                  <Crown className="w-3.5 h-3.5 text-amber-100 fill-amber-100" />
+                  <span className="hidden sm:inline">Upgrade</span>
+                </button>
+              )
+            )}
+
             {/* Consolidated Quick Tools Menu Button */}
             <div className="relative">
               <button
@@ -318,13 +343,15 @@ export const Header: React.FC<HeaderProps> = ({
               >
                 {currentUser ? (
                   <>
-                    <div className="w-5 h-5 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-black text-[10px] shrink-0">
+                    <div className={`w-5 h-5 rounded-lg flex items-center justify-center font-black text-[10px] shrink-0 ${
+                      currentUser.isPro ? 'bg-gradient-to-tr from-amber-500 to-amber-600 text-slate-950 font-black shadow-xs ring-1 ring-amber-400' : 'bg-indigo-600 text-white'
+                    }`}>
                       {currentUser.name.charAt(0)}
                     </div>
                     <span className="hidden sm:inline truncate max-w-[80px]">
                       {currentUser.name.split(' ')[0]}
                     </span>
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-xs animate-pulse shrink-0" />
+                    <span className={`w-2 h-2 rounded-full shrink-0 ${currentUser.isPro ? 'bg-amber-400 ring-2 ring-amber-300 animate-pulse' : 'bg-emerald-500 shadow-xs'}`} />
                   </>
                 ) : (
                   <>

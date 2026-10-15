@@ -21,6 +21,9 @@ import { StudySessionModal } from './components/StudySessionModal';
 import { AspirantDashboardModal } from './components/AspirantDashboardModal';
 import { LeadCaptureModal } from './components/LeadCaptureModal';
 import { AdminVisitorInsightsModal } from './components/AdminVisitorInsightsModal';
+import { PricingModal } from './components/PricingModal';
+import { CheckoutModal } from './components/CheckoutModal';
+import { SubscriptionPlan } from './services/subscriptionService';
 import { AspirantUser, getCurrentUser } from './services/authService';
 import { initVisitorTracker, recordPageView } from './services/visitorTracker';
 import { 
@@ -41,6 +44,8 @@ export function App() {
   const [isDashboardOpen, setIsDashboardOpen] = useState(false);
   const [isLeadCaptureOpen, setIsLeadCaptureOpen] = useState(false);
   const [isVisitorInsightsOpen, setIsVisitorInsightsOpen] = useState(false);
+  const [isPricingOpen, setIsPricingOpen] = useState(false);
+  const [selectedCheckoutPlan, setSelectedCheckoutPlan] = useState<SubscriptionPlan | null>(null);
   const [activeSession, setActiveSession] = useState<StudySession | null>(() => 
     getActiveSession(currentUser?.id || 'default-aspirant')
   );
@@ -277,6 +282,7 @@ export function App() {
         onOpenCompass={() => setIsOnboardingOpen(true)}
         onOpenDashboard={() => setIsDashboardOpen(true)}
         onOpenLeadCapture={() => setIsLeadCaptureOpen(true)}
+        onOpenPricing={() => setIsPricingOpen(true)}
         currentUser={currentUser}
         onOpenSessionModal={() => setIsSessionModalOpen(true)}
         activeSession={activeSession}
@@ -475,6 +481,31 @@ export function App() {
         onOpenVisitorInsights={() => {
           setIsAuthOpen(false);
           setIsVisitorInsightsOpen(true);
+        }}
+        onOpenPricing={() => {
+          setIsAuthOpen(false);
+          setIsPricingOpen(true);
+        }}
+      />
+
+      {/* Commercial Subscription Tiers & Pricing Modal */}
+      <PricingModal
+        isOpen={isPricingOpen}
+        onClose={() => setIsPricingOpen(false)}
+        currentUser={currentUser}
+        onSelectPlan={(plan) => {
+          setSelectedCheckoutPlan(plan);
+        }}
+      />
+
+      {/* Indian UPI & Payment Gateway Checkout Simulator */}
+      <CheckoutModal
+        isOpen={Boolean(selectedCheckoutPlan)}
+        onClose={() => setSelectedCheckoutPlan(null)}
+        plan={selectedCheckoutPlan}
+        currentUser={currentUser}
+        onPaymentSuccess={(updatedUser) => {
+          setCurrentUser(updatedUser);
         }}
       />
 

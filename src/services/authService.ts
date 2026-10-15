@@ -270,3 +270,33 @@ export function exportLeadsCsv(): string {
   ]);
   return [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
 }
+
+/**
+ * Returns a deduplicated comma-separated string of registered WhatsApp numbers
+ * for pasting directly into WhatsApp Web broadcast or community lists.
+ */
+export function getFormattedWhatsAppNumbers(): string {
+  const leads = getCapturedLeads();
+  const validNumbers = leads
+    .map(l => l.mobile.replace(/\s+/g, ''))
+    .filter(Boolean);
+  const unique = Array.from(new Set(validNumbers));
+  return unique.join(', ');
+}
+
+/**
+ * Triggers direct browser download of the captured leads CSV.
+ */
+export function triggerDownloadLeadsCsv(): void {
+  const csv = exportLeadsCsv();
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `AspirantAtlas_WhatsApp_Leads_${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   X, 
   Download, 
@@ -10,10 +10,15 @@ import {
   Mail, 
   User, 
   BookOpen, 
-  ExternalLink 
+  ExternalLink,
+  AlertCircle,
+  Printer
 } from 'lucide-react';
 import { ExamId } from '../types';
 import { saveCapturedLead } from '../services/authService';
+import { validateIndianMobile, sanitizePhoneInput } from '../utils/phoneValidator';
+import { generateAndPrintBlueprint } from '../utils/blueprintGenerator';
+import { playChime, playClick } from '../services/soundService';
 
 interface LeadCaptureModalProps {
   isOpen: boolean;
@@ -34,33 +39,77 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
 }) => {
   const [name, setName] = useState(defaultName);
   const [email, setEmail] = useState(defaultEmail);
-  const [mobile, setMobile] = useState(defaultMobile);
+  const [mobile, setMobile] = useState('');
+  const [mobileError, setMobileError] = useState<string | null>(null);
+  const [isMobileValid, setIsMobileValid] = useState(false);
+  const [registeredPhone, setRegisteredPhone] = useState('');
   const [targetExam, setTargetExam] = useState<ExamId>(selectedExam);
   const [timeline, setTimeline] = useState('90-Day Standard Sprint');
   const [isSubmitted, setIsSubmitted] = useState(false);
 
+  // Initialize and validate default mobile if provided
+  useEffect(() => {
+    if (defaultMobile) {
+      const sanitized = sanitizePhoneInput(defaultMobile);
+      setMobile(sanitized);
+      const res = validateIndianMobile(sanitized);
+      setIsMobileValid(res.isValid);
+      setMobileError(res.isValid ? null : res.errorMessage || null);
+    }
+  }, [defaultMobile]);
+
   if (!isOpen) return null;
+
+  const handleMobileChange = (val: string) => {
+    const sanitized = sanitizePhoneInput(val);
+    setMobile(sanitized);
+
+    if (!sanitized) {
+      setMobileError(null);
+      setIsMobileValid(false);
+      return;
+    }
+
+    const res = validateIndianMobile(sanitized);
+    if (res.isValid) {
+      setMobileError(null);
+      setIsMobileValid(true);
+    } else {
+      setMobileError(res.errorMessage || 'Invalid phone number');
+      setIsMobileValid(false);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !email.trim() || !mobile.trim()) return;
+    playClick();
+
+    const valResult = validateIndianMobile(mobile);
+    if (!valResult.isValid) {
+      setMobileError(valResult.errorMessage || 'Please enter a valid 10-digit Indian mobile number');
+      setIsMobileValid(false);
+      return;
+    }
+
+    if (!name.trim() || !email.trim()) return;
 
     saveCapturedLead({
       name: name.trim(),
       email: email.trim(),
-      mobile: mobile.trim(),
+      mobile: valResult.formatted,
       targetExam,
       timeline,
       source: 'blueprint_modal'
     });
 
+    setRegisteredPhone(valResult.formatted);
     setIsSubmitted(true);
+    playChime();
   };
 
-  const examLabels: Record<ExamId, string> = {
-    upsc: 'UPSC Civil Services (CSE)',
-    appsc: 'APPSC Group 1 & 2',
-    tspsc: 'TSPSC Group 1 & 2'
+  const handleDownloadBlueprint = () => {
+    playChime();
+    generateAndPrintBlueprint(targetExam, name.trim() || 'Aspirant');
   };
 
   return (
@@ -139,12 +188,32 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
                     <input
                       type="tel"
                       required
-                      placeholder="+91 98765 43210"
+                      placeholder="9876543210"
                       value={mobile}
-                      onChange={(e) => setMobile(e.target.value)}
-                      className="w-full pl-9 pr-3 py-2 rounded-xl text-xs bg-slate-50 border border-slate-200 text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                      onChange={(e) => handleMobileChange(e.target.value)}
+                      maxLength={14}
+                      className={`w-full pl-9 pr-3 py-2 rounded-xl text-xs bg-slate-50 border text-slate-900 focus:bg-white focus:outline-none focus:ring-2 ${
+                        mobileError
+                          ? 'border-rose-400 focus:ring-rose-500/20 focus:border-rose-500 bg-rose-50/20'
+                          : isMobileValid
+                          ? 'border-emerald-400 focus:ring-emerald-500/20 focus:border-emerald-500'
+                          : 'border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-500'
+                      }`}
                     />
                   </div>
+                  {/* Validation Feedback */}
+                  {mobileError && (
+                    <div className="flex items-center space-x-1 text-[11px] text-rose-600 font-semibold mt-1">
+                      <AlertCircle className="w-3 h-3 shrink-0" />
+                      <span>{mobileError}</span>
+                    </div>
+                  )}
+                  {isMobileValid && (
+                    <div className="flex items-center space-x-1 text-[11px] text-emerald-600 font-semibold mt-1">
+                      <CheckCircle2 className="w-3 h-3 shrink-0" />
+                      <span>Verified 10-digit Indian WhatsApp Number</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -189,7 +258,12 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
               <div className="pt-2">
                 <button
                   type="submit"
-                  className="btn-tactile w-full py-3 px-4 rounded-xl text-xs font-black bg-gradient-to-r from-indigo-600 to-sky-600 hover:from-indigo-500 hover:to-sky-500 text-white shadow-elevation-1 hover:shadow-glow-indigo transition-all flex items-center justify-center space-x-2"
+                  disabled={!isMobileValid || !name.trim() || !email.trim()}
+                  className={`btn-tactile w-full py-3 px-4 rounded-xl text-xs font-black transition-all flex items-center justify-center space-x-2 ${
+                    isMobileValid && name.trim() && email.trim()
+                      ? 'bg-gradient-to-r from-indigo-600 to-sky-600 hover:from-indigo-500 hover:to-sky-500 text-white shadow-elevation-1 hover:shadow-glow-indigo cursor-pointer'
+                      : 'bg-slate-200 text-slate-400 cursor-not-allowed border border-slate-300'
+                  }`}
                 >
                   <Download className="w-4 h-4" />
                   <span>Instant Download Blueprint & Join Broadcast</span>
@@ -210,23 +284,20 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
               <div className="space-y-1">
                 <h4 className="text-xl font-black text-slate-900">Your Access Kit is Ready!</h4>
                 <p className="text-xs text-slate-600 max-w-sm mx-auto">
-                  Thank you, <strong>{name}</strong>! We have registered your WhatsApp number (<strong>{mobile}</strong>) for our daily current affairs capsule.
+                  Thank you, <strong>{name}</strong>! We have registered your WhatsApp number (<strong>{registeredPhone}</strong>) for our daily current affairs capsule.
                 </p>
               </div>
 
               {/* Action Buttons */}
               <div className="space-y-2.5 pt-2 max-w-sm mx-auto">
-                <a
-                  href={`/documents/${targetExam.toUpperCase()}_Micro_Syllabus_Blueprint.pdf`}
-                  download
-                  onClick={() => {
-                    // Trigger simulated download toast or trigger
-                  }}
-                  className="btn-tactile w-full py-3 px-4 rounded-xl text-xs font-black bg-indigo-600 hover:bg-indigo-500 text-white shadow-elevation-1 flex items-center justify-center space-x-2 transition-all"
+                <button
+                  type="button"
+                  onClick={handleDownloadBlueprint}
+                  className="btn-tactile w-full py-3 px-4 rounded-xl text-xs font-black bg-gradient-to-r from-indigo-600 to-sky-600 hover:from-indigo-500 hover:to-sky-500 text-white shadow-md flex items-center justify-center space-x-2 transition-all cursor-pointer"
                 >
-                  <Download className="w-4 h-4" />
-                  <span>Download {targetExam.toUpperCase()} PDF Blueprint</span>
-                </a>
+                  <Printer className="w-4 h-4 text-white" />
+                  <span>Download / Print {targetExam.toUpperCase()} PDF Blueprint</span>
+                </button>
 
                 <a
                   href="https://t.me/AspirantAtlasOfficial"

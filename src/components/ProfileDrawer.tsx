@@ -20,7 +20,9 @@ import {
   TrendingUp,
   Users,
   ChevronRight,
-  Crown
+  Crown,
+  Copy,
+  Check
 } from 'lucide-react';
 import { 
   AspirantUser, 
@@ -32,8 +34,11 @@ import {
   exportFullCloudBackupJson, 
   importCloudBackupJson,
   exportLeadsCsv,
-  getCapturedLeads
+  getCapturedLeads,
+  getFormattedWhatsAppNumbers,
+  triggerDownloadLeadsCsv
 } from '../services/authService';
+import { validateIndianMobile, sanitizePhoneInput } from '../utils/phoneValidator';
 import { getUserLedger, formatMinutes } from '../services/studySessionService';
 import { ExamId } from '../types';
 
@@ -69,6 +74,8 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
   const [mobileNumber, setMobileNumber] = useState('');
   const [selectedExam, setSelectedExam] = useState<ExamId>('upsc');
   const [isEmailFormOpen, setIsEmailFormOpen] = useState(false);
+  const [copiedDrawerNumbers, setCopiedDrawerNumbers] = useState(false);
+  const [drawerMobileError, setDrawerMobileError] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
@@ -413,13 +420,47 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
                 </div>
 
                 {leadsCount > 0 && (
-                  <button
-                    onClick={handleExportLeads}
-                    className="btn-tactile w-full mt-2.5 py-2 px-3 rounded-xl border border-emerald-300 bg-emerald-50/80 hover:bg-emerald-100 text-xs font-bold text-emerald-800 flex items-center justify-center space-x-1.5 transition-all shadow-2xs"
-                  >
-                    <Users className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>Export {leadsCount} Captured Leads (CSV)</span>
-                  </button>
+                  <div className="p-3.5 rounded-2xl border border-emerald-300 bg-emerald-50/70 space-y-2.5 mt-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-1.5 text-xs font-bold text-emerald-950">
+                        <Phone className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>WhatsApp Community Leads ({leadsCount})</span>
+                      </div>
+                      <span className="text-[10px] bg-emerald-200 text-emerald-900 font-extrabold px-1.5 py-0.2 rounded">
+                        CRM Ready
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-emerald-800 leading-relaxed">
+                      Captured numbers for your informal WhatsApp groups & daily current affairs broadcast.
+                    </p>
+                    <div className="flex items-center gap-2 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const formatted = getFormattedWhatsAppNumbers();
+                          if (formatted) {
+                            navigator.clipboard.writeText(formatted);
+                            setCopiedDrawerNumbers(true);
+                            setTimeout(() => setCopiedDrawerNumbers(false), 2000);
+                          }
+                        }}
+                        className="btn-tactile flex-1 py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center justify-center space-x-1.5 shadow-xs"
+                      >
+                        {copiedDrawerNumbers ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                        <span>{copiedDrawerNumbers ? 'Copied Numbers!' : 'Copy for WhatsApp'}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleExportLeads}
+                        className="btn-tactile py-2 px-3 rounded-xl border border-emerald-300 bg-white hover:bg-emerald-50 text-emerald-900 text-xs font-bold flex items-center space-x-1 shadow-2xs"
+                        title="Download CSV"
+                      >
+                        <Download className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>CSV</span>
+                      </button>
+                    </div>
+                  </div>
                 )}
               </div>
 

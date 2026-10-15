@@ -26,6 +26,13 @@ import {
   DistrictGeoItem, 
   StateGeoItem 
 } from '../data/geoMapData';
+import {
+  REAL_TELANGANA_SVG_DISTRICTS,
+  REAL_ANDHRA_SVG_DISTRICTS,
+  REAL_INDIA_SVG_STATES,
+  SvgDistrictBoundary,
+  SvgStateBoundary
+} from '../data/realDistrictSvgData';
 import { ExamId } from '../types';
 import { playClick, playChime } from '../services/soundService';
 
@@ -89,6 +96,29 @@ export const DynamicGeoAtlas: React.FC<DynamicGeoAtlasProps> = ({
       return !q || s.name.toLowerCase().includes(q) || s.nameTelugu.includes(q) || s.capital.toLowerCase().includes(q) || s.psc.toLowerCase().includes(q);
     });
   }, [searchQuery]);
+
+  // Lookup maps for linking authentic vector SVG paths to rich civil services dossiers
+  const geoTgMap = useMemo(() => {
+    const map = new Map<string, DistrictGeoItem>();
+    TELANGANA_DISTRICTS.forEach(d => map.set(d.id, d));
+    return map;
+  }, []);
+
+  const geoApMap = useMemo(() => {
+    const map = new Map<string, DistrictGeoItem>();
+    ANDHRA_PRADESH_DISTRICTS.forEach(d => map.set(d.id, d));
+    return map;
+  }, []);
+
+  const geoIndiaMap = useMemo(() => {
+    const map = new Map<string, StateGeoItem>();
+    INDIA_STATES.forEach(s => {
+      map.set(s.id.toUpperCase(), s);
+      map.set(s.code.toUpperCase(), s);
+      map.set(s.name.toLowerCase(), s);
+    });
+    return map;
+  }, []);
 
   return (
     <div className="space-y-6 animate-fadeIn pb-12 w-full max-w-7xl mx-auto px-2 sm:px-4">
@@ -323,8 +353,8 @@ export const DynamicGeoAtlas: React.FC<DynamicGeoAtlasProps> = ({
             {/* Authentic Vector SVG Spatial Geographic Canvas */}
             <div className="relative z-10 flex-1 flex items-center justify-center p-1 sm:p-2 overflow-hidden">
               <svg
-                viewBox="120 90 600 600"
-                className="w-full h-auto max-h-[420px] select-none transition-all drop-shadow-2xl"
+                viewBox={activeMap === 'india' ? '0 0 612 696' : activeMap === 'telangana' ? '20 20 750 710' : '20 20 760 710'}
+                className="w-full h-auto max-h-[500px] select-none transition-all drop-shadow-2xl"
                 preserveAspectRatio="xMidYMid meet"
               >
                 <defs>
@@ -339,360 +369,338 @@ export const DynamicGeoAtlas: React.FC<DynamicGeoAtlasProps> = ({
                   </filter>
                   <linearGradient id="godavariGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.8" />
-                    <stop offset="100%" stopColor="#0284c7" stopOpacity="0.3" />
+                    <stop offset="100%" stopColor="#0284c7" stopOpacity="0.4" />
                   </linearGradient>
                   <linearGradient id="krishnaGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop offset="0%" stopColor="#2dd4bf" stopOpacity="0.8" />
-                    <stop offset="100%" stopColor="#0d9488" stopOpacity="0.3" />
+                    <stop offset="100%" stopColor="#0d9488" stopOpacity="0.4" />
                   </linearGradient>
                 </defs>
 
                 {/* Topographic Background Graticule Lines */}
-                <g opacity="0.12" stroke="#94a3b8" strokeDasharray="3 6" strokeWidth="0.8">
-                  <line x1="120" y1="200" x2="720" y2="200" />
-                  <line x1="120" y1="350" x2="720" y2="350" />
-                  <line x1="120" y1="500" x2="720" y2="500" />
-                  <line x1="120" y1="650" x2="720" y2="650" />
-                  <line x1="250" y1="90" x2="250" y2="690" />
-                  <line x1="400" y1="90" x2="400" y2="690" />
-                  <line x1="550" y1="90" x2="550" y2="690" />
+                <g opacity="0.1" stroke="#94a3b8" strokeDasharray="3 6" strokeWidth="0.8">
+                  <line x1="20" y1="180" x2="760" y2="180" />
+                  <line x1="20" y1="360" x2="760" y2="360" />
+                  <line x1="20" y1="540" x2="760" y2="540" />
+                  <line x1="200" y1="20" x2="200" y2="710" />
+                  <line x1="400" y1="20" x2="400" y2="710" />
+                  <line x1="600" y1="20" x2="600" y2="710" />
                 </g>
 
-                {/* Animated Major River System Lines (Physical Geography Overlay) */}
+                {/* 1. TELANGANA 33 DISTRICTS AUTHENTIC VECTOR MAP */}
                 {activeMap === 'telangana' && (
-                  <g className="rivers-overlay pointer-events-none">
-                    {/* Godavari River Flow Path (North-West to South-East) */}
-                    <path
-                      d="M 280 270 Q 380 230 460 250 T 560 310 T 640 450 T 680 500"
-                      fill="none"
-                      stroke="url(#godavariGradient)"
-                      strokeWidth="3.5"
-                      strokeDasharray="6 3"
-                      className="animate-pulse"
-                    />
-                    <text x="590" y="380" fill="#38bdf8" fontSize="10" fontWeight="bold" opacity="0.7">
-                      🌊 Godavari River
-                    </text>
+                  <g className="telangana-cartographic-districts">
+                    {/* Shadow Silhouette for 3D depth */}
+                    <g opacity="0.3" transform="translate(4, 5)">
+                      {REAL_TELANGANA_SVG_DISTRICTS.map((svgD) => (
+                        <path key={`tg-shadow-${svgD.id}`} d={svgD.path} fill="#090d16" />
+                      ))}
+                    </g>
 
-                    {/* Krishna River Flow Path (South-West to South-East) */}
-                    <path
-                      d="M 260 560 Q 330 580 400 590 T 500 580 T 580 540"
-                      fill="none"
-                      stroke="url(#krishnaGradient)"
-                      strokeWidth="3.5"
-                      strokeDasharray="6 3"
-                      className="animate-pulse"
-                    />
-                    <text x="360" y="615" fill="#2dd4bf" fontSize="10" fontWeight="bold" opacity="0.7">
-                      🌊 Krishna River
-                    </text>
+                    {/* Surrounding Neighboring State Annotations */}
+                    <g className="neighbor-states select-none pointer-events-none" opacity="0.65">
+                      <text x="120" y="70" fill="#94a3b8" fontSize="13" fontWeight="900" letterSpacing="2">MAHARASHTRA</text>
+                      <text x="560" y="55" fill="#94a3b8" fontSize="13" fontWeight="900" letterSpacing="2">MAHARASHTRA</text>
+                      <text x="655" y="240" fill="#94a3b8" fontSize="13" fontWeight="900" letterSpacing="2">CHHATTISGARH</text>
+                      <text x="600" y="670" fill="#94a3b8" fontSize="13" fontWeight="900" letterSpacing="2">ANDHRA PRADESH</text>
+                      <text x="45" y="495" fill="#94a3b8" fontSize="13" fontWeight="900" letterSpacing="2">KARNATAKA</text>
 
-                    {/* Musi River Tributary */}
-                    <path
-                      d="M 370 470 Q 430 470 515 520"
-                      fill="none"
-                      stroke="#93c5fd"
-                      strokeWidth="2"
-                      strokeDasharray="4 2"
-                      opacity="0.6"
-                    />
-                    <text x="440" y="475" fill="#93c5fd" fontSize="8" fontWeight="bold" opacity="0.6">
-                      Musi River
-                    </text>
-                  </g>
-                )}
+                      {/* Map Title and Compass Header */}
+                      <text x="45" y="58" fill="#f8fafc" fontSize="18" fontWeight="900" letterSpacing="1">TELANGANA MAP</text>
+                      <text x="45" y="76" fill="#38bdf8" fontSize="11" fontWeight="bold">33 Administrative Districts</text>
+                    </g>
 
-                {activeMap === 'andhra' && (
-                  <g className="rivers-overlay pointer-events-none">
-                    {/* Bay of Bengal Coastline Oceanic Glow Arc */}
-                    <path
-                      d="M 720 100 Q 640 220 560 320 T 450 440 T 360 580 T 350 740"
-                      fill="none"
-                      stroke="#38bdf8"
-                      strokeWidth="12"
-                      strokeOpacity="0.15"
-                    />
-                    <path
-                      d="M 710 105 Q 635 220 555 320 T 445 440 T 355 580 T 345 735"
-                      fill="none"
-                      stroke="#0284c7"
-                      strokeWidth="2.5"
-                      strokeDasharray="5 3"
-                    />
-                    <text x="580" y="480" fill="#38bdf8" fontSize="12" fontWeight="black" opacity="0.6" letterSpacing="2">
-                      BAY OF BENGAL 🌊
-                    </text>
+                    {/* Major River System Flow Overlays */}
+                    <g className="rivers-overlay pointer-events-none" opacity="0.75">
+                      {/* Godavari River Flow (North-West to South-East) */}
+                      <path
+                        d="M 280 210 Q 360 215 450 250 T 570 300 T 660 370 T 730 460"
+                        fill="none"
+                        stroke="url(#godavariGradient)"
+                        strokeWidth="3.5"
+                        strokeDasharray="6 3"
+                        className="animate-pulse"
+                      />
+                      <text x="560" y="285" fill="#38bdf8" fontSize="10" fontWeight="bold" opacity="0.9">
+                        🌊 Godavari River
+                      </text>
 
-                    {/* Godavari & Krishna Deltas */}
-                    <path
-                      d="M 460 320 Q 510 340 540 380"
-                      fill="none"
-                      stroke="#38bdf8"
-                      strokeWidth="3"
-                      strokeDasharray="4 2"
-                    />
-                    <text x="490" y="325" fill="#38bdf8" fontSize="9" fontWeight="bold" opacity="0.8">
-                      Godavari Delta (Konaseema)
-                    </text>
+                      {/* Krishna River Flow (South-West to South-East) */}
+                      <path
+                        d="M 200 580 Q 290 610 390 610 T 520 600 T 630 550"
+                        fill="none"
+                        stroke="url(#krishnaGradient)"
+                        strokeWidth="3.5"
+                        strokeDasharray="6 3"
+                        className="animate-pulse"
+                      />
+                      <text x="350" y="630" fill="#2dd4bf" fontSize="10" fontWeight="bold" opacity="0.9">
+                        🌊 Krishna River
+                      </text>
+                    </g>
 
-                    <path
-                      d="M 360 460 Q 400 440 430 460"
-                      fill="none"
-                      stroke="#2dd4bf"
-                      strokeWidth="3"
-                      strokeDasharray="4 2"
-                    />
-                    <text x="360" y="435" fill="#2dd4bf" fontSize="9" fontWeight="bold" opacity="0.8">
-                      Krishna Delta (Prakasam Barrage)
-                    </text>
-                  </g>
-                )}
-
-                {/* 1. TELANGANA 33 DISTRICTS SPATIAL VECTOR MAP */}
-                {activeMap === 'telangana' && (
-                  <g className="telangana-districts-spatial">
-                    {filteredTgDistricts.map((d) => {
-                      const isSelected = selectedTgDistrict.id === d.id;
-                      // Color based on Zone
-                      const isNorth = d.zone?.includes('Kaleshwaram') || d.zone?.includes('Basara');
-                      const isCentral = d.zone?.includes('Charminar') || d.zone?.includes('Yadadri');
-                      const fillColor = isSelected
-                        ? '#10b981' // Bright Emerald when selected
-                        : isNorth
-                        ? '#064e3b' // Deep Emerald for North
-                        : isCentral
-                        ? '#1e1b4b' // Deep Indigo for Central
-                        : '#3b0764'; // Deep Purple for South
-
-                      const strokeColor = isSelected
-                        ? '#34d399'
-                        : isNorth
-                        ? '#059669'
-                        : isCentral
-                        ? '#6366f1'
-                        : '#a855f7';
+                    {/* Contiguous District Polygons */}
+                    {REAL_TELANGANA_SVG_DISTRICTS.map((svgD) => {
+                      const geoItem = geoTgMap.get(svgD.id) || selectedTgDistrict;
+                      const isSelected = selectedTgDistrict.id === svgD.id;
+                      const matchesSearch = !searchQuery || svgD.name.toLowerCase().includes(searchQuery.toLowerCase()) || svgD.nameTelugu.includes(searchQuery);
 
                       return (
                         <g
-                          key={d.id}
-                          className="cursor-pointer transition-all duration-300 group"
+                          key={svgD.id}
+                          className="cursor-pointer transition-all duration-200 group"
                           onClick={() => {
                             playClick();
-                            setSelectedTgDistrict(d);
+                            if (geoItem) setSelectedTgDistrict(geoItem);
                           }}
-                          onMouseEnter={() => setSelectedTgDistrict(d)}
+                          onMouseEnter={() => {
+                            if (geoItem) setSelectedTgDistrict(geoItem);
+                          }}
                           filter={isSelected ? 'url(#svgGlow)' : undefined}
+                          opacity={matchesSearch ? 1 : 0.35}
                         >
-                          {/* Animated radar beacon wave for selected territory */}
+                          {/* Animated beacon wave for selected territory */}
                           {isSelected && (
                             <circle
-                              cx={d.x + d.w / 2}
-                              cy={d.y + d.h / 2}
-                              r={Math.max(d.w, d.h) / 1.1}
-                              fill="#10b981"
-                              opacity="0.25"
+                              cx={svgD.labelX}
+                              cy={svgD.labelY}
+                              r="26"
+                              fill={svgD.color}
+                              opacity="0.35"
                               className="animate-ping pointer-events-none"
                             />
                           )}
 
-                          {/* Territorial Polygon Cell */}
-                          <rect
-                            x={d.x}
-                            y={d.y}
-                            width={d.w}
-                            height={d.h}
-                            rx="10"
-                            fill={fillColor}
-                            stroke={strokeColor}
-                            strokeWidth={isSelected ? '2.5' : '1.2'}
-                            className="transition-all duration-200 group-hover:stroke-white group-hover:brightness-125"
+                          {/* Authentic Geographic Polygon */}
+                          <path
+                            d={svgD.path}
+                            fill={isSelected ? '#38bdf8' : svgD.color}
+                            stroke="#ffffff"
+                            strokeWidth={isSelected ? '2.8' : '1.2'}
+                            strokeLinejoin="round"
+                            className="transition-all duration-150 group-hover:brightness-125 group-hover:stroke-cyan-300"
                           />
 
-                          {/* District Label Text */}
+                          {/* Centered District Label */}
                           <text
-                            x={d.x + d.w / 2}
-                            y={d.y + d.h / 2 - 2}
+                            x={svgD.labelX}
+                            y={svgD.labelY}
                             textAnchor="middle"
-                            fill={isSelected ? '#ffffff' : '#f1f5f9'}
-                            fontSize={d.w < 55 ? '8.5' : '10'}
-                            fontWeight="900"
-                            className="pointer-events-none select-none tracking-tight"
-                          >
-                            {d.name.length > 12 ? d.name.slice(0, 10) + '..' : d.name}
-                          </text>
-
-                          {/* HQ Subtitle / River Marker */}
-                          <text
-                            x={d.x + d.w / 2}
-                            y={d.y + d.h / 2 + 10}
-                            textAnchor="middle"
-                            fill={isSelected ? '#a7f3d0' : '#94a3b8'}
-                            fontSize="7.5"
-                            fontWeight="bold"
-                            className="pointer-events-none select-none"
-                          >
-                            HQ: {d.hq}
-                          </text>
-                        </g>
-                      );
-                    })}
-                  </g>
-                )}
-
-                {/* 2. ANDHRA PRADESH 26 DISTRICTS SPATIAL VECTOR MAP */}
-                {activeMap === 'andhra' && (
-                  <g className="andhra-districts-spatial">
-                    {filteredApDistricts.map((d) => {
-                      const isSelected = selectedApDistrict.id === d.id;
-                      const isCoastal = d.region === 'Coastal Andhra';
-                      const isUttar = d.region === 'Uttarandhra';
-                      const fillColor = isSelected
-                        ? '#0284c7' // Bright Sky Blue when selected
-                        : isUttar
-                        ? '#064e3b' // Emerald for Uttarandhra
-                        : isCoastal
-                        ? '#0c4a6e' // Deep Ocean Blue for Coastal
-                        : '#78350f'; // Warm Amber for Rayalaseema
-
-                      const strokeColor = isSelected
-                        ? '#38bdf8'
-                        : isUttar
-                        ? '#10b981'
-                        : isCoastal
-                        ? '#0284c7'
-                        : '#f59e0b';
-
-                      return (
-                        <g
-                          key={d.id}
-                          className="cursor-pointer transition-all duration-300 group"
-                          onClick={() => {
-                            playClick();
-                            setSelectedApDistrict(d);
-                          }}
-                          onMouseEnter={() => setSelectedApDistrict(d)}
-                          filter={isSelected ? 'url(#svgGlow)' : undefined}
-                        >
-                          {isSelected && (
-                            <circle
-                              cx={d.x + d.w / 2}
-                              cy={d.y + d.h / 2}
-                              r={Math.max(d.w, d.h) / 1.1}
-                              fill="#0284c7"
-                              opacity="0.25"
-                              className="animate-ping pointer-events-none"
-                            />
-                          )}
-
-                          <rect
-                            x={d.x}
-                            y={d.y}
-                            width={d.w}
-                            height={d.h}
-                            rx="10"
-                            fill={fillColor}
-                            stroke={strokeColor}
-                            strokeWidth={isSelected ? '2.5' : '1.2'}
-                            className="transition-all duration-200 group-hover:stroke-white group-hover:brightness-125"
-                          />
-
-                          <text
-                            x={d.x + d.w / 2}
-                            y={d.y + d.h / 2 - 2}
-                            textAnchor="middle"
-                            fill={isSelected ? '#ffffff' : '#f8fafc'}
-                            fontSize={d.w < 55 ? '8.5' : '10'}
-                            fontWeight="900"
-                            className="pointer-events-none select-none tracking-tight"
-                          >
-                            {d.name.length > 13 ? d.name.slice(0, 11) + '..' : d.name}
-                          </text>
-
-                          <text
-                            x={d.x + d.w / 2}
-                            y={d.y + d.h / 2 + 10}
-                            textAnchor="middle"
-                            fill={isSelected ? '#bae6fd' : '#cbd5e1'}
-                            fontSize="7.5"
-                            fontWeight="bold"
-                            className="pointer-events-none select-none"
-                          >
-                            {d.coastlineKm ? `🌊 ${d.coastlineKm}km` : `⛰️ ${d.hq}`}
-                          </text>
-                        </g>
-                      );
-                    })}
-                  </g>
-                )}
-
-                {/* 3. INDIA NATIONAL CADRE SPATIAL VECTOR MAP */}
-                {activeMap === 'india' && (
-                  <g className="india-states-spatial">
-                    {filteredIndiaStates.map((s) => {
-                      const isSelected = selectedIndiaState.id === s.id;
-                      const fillColor = isSelected
-                        ? '#4f46e5' // Bright Indigo when selected
-                        : '#1e1b4b'; // Midnight Indigo default
-
-                      const strokeColor = isSelected ? '#818cf8' : '#4338ca';
-
-                      return (
-                        <g
-                          key={s.id}
-                          className="cursor-pointer transition-all duration-300 group"
-                          onClick={() => {
-                            playClick();
-                            setSelectedIndiaState(s);
-                          }}
-                          onMouseEnter={() => setSelectedIndiaState(s)}
-                          filter={isSelected ? 'url(#svgGlow)' : undefined}
-                        >
-                          {isSelected && (
-                            <circle
-                              cx={s.x + s.w / 2}
-                              cy={s.y + s.h / 2}
-                              r={Math.max(s.w, s.h) / 1.2}
-                              fill="#4f46e5"
-                              opacity="0.25"
-                              className="animate-ping pointer-events-none"
-                            />
-                          )}
-
-                          <rect
-                            x={s.x}
-                            y={s.y}
-                            width={s.w}
-                            height={s.h}
-                            rx="12"
-                            fill={fillColor}
-                            stroke={strokeColor}
-                            strokeWidth={isSelected ? '2.5' : '1.2'}
-                            className="transition-all duration-200 group-hover:stroke-white group-hover:brightness-125"
-                          />
-
-                          <text
-                            x={s.x + s.w / 2}
-                            y={s.y + s.h / 2 - 4}
-                            textAnchor="middle"
+                            dominantBaseline="central"
                             fill="#ffffff"
-                            fontSize="11"
+                            fontSize={svgD.id === 'hyderabad' ? '8.5' : '8'}
                             fontWeight="900"
-                            className="pointer-events-none select-none"
+                            className="pointer-events-none select-none drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]"
+                            paintOrder="stroke"
+                            stroke="#0f172a"
+                            strokeWidth="2.5"
+                            strokeLinejoin="round"
                           >
-                            {s.code}
+                            {showTelugu ? svgD.nameTelugu : svgD.name}
                           </text>
+                        </g>
+                      );
+                    })}
+                  </g>
+                )}
+
+                {/* 2. ANDHRA PRADESH 26 DISTRICTS AUTHENTIC VECTOR MAP */}
+                {activeMap === 'andhra' && (
+                  <g className="andhra-cartographic-districts">
+                    {/* Shadow Silhouette for 3D depth */}
+                    <g opacity="0.3" transform="translate(4, 5)">
+                      {REAL_ANDHRA_SVG_DISTRICTS.map((svgD) => (
+                        <path key={`ap-shadow-${svgD.id}`} d={svgD.path} fill="#090d16" />
+                      ))}
+                    </g>
+
+                    {/* Surrounding Neighboring State Annotations */}
+                    <g className="neighbor-states select-none pointer-events-none" opacity="0.7">
+                      <text x="610" y="50" fill="#94a3b8" fontSize="13" fontWeight="900" letterSpacing="1">
+                        {showTelugu ? 'ఒడిశా (ODISHA)' : 'ODISHA'}
+                      </text>
+                      <text x="460" y="70" fill="#94a3b8" fontSize="13" fontWeight="900" letterSpacing="1">
+                        {showTelugu ? 'ఛత్తీస్‌గఢ్ (CHHATTISGARH)' : 'CHHATTISGARH'}
+                      </text>
+                      <text x="210" y="170" fill="#94a3b8" fontSize="13" fontWeight="900" letterSpacing="1">
+                        {showTelugu ? 'తెలంగాణ (TELANGANA)' : 'TELANGANA'}
+                      </text>
+                      <text x="40" y="420" fill="#94a3b8" fontSize="13" fontWeight="900" letterSpacing="1">
+                        {showTelugu ? 'కర్ణాటక (KARNATAKA)' : 'KARNATAKA'}
+                      </text>
+                      <text x="230" y="690" fill="#94a3b8" fontSize="13" fontWeight="900" letterSpacing="1">
+                        {showTelugu ? 'తమిళనాడు (TAMIL NADU)' : 'TAMIL NADU'}
+                      </text>
+
+                      {/* Bay of Bengal Ocean Typography */}
+                      <text x="520" y="460" fill="#38bdf8" fontSize="15" fontWeight="black" opacity="0.8" letterSpacing="2">
+                        {showTelugu ? 'బంగాళాఖాతం' : 'BAY OF BENGAL 🌊'}
+                      </text>
+                      <text x="520" y="482" fill="#0284c7" fontSize="10" fontWeight="bold" opacity="0.8" letterSpacing="1">
+                        974 km Eastern Sea Coastline
+                      </text>
+
+                      {/* Map Title Header */}
+                      <text x="40" y="60" fill="#f8fafc" fontSize="18" fontWeight="900" letterSpacing="1">
+                        {showTelugu ? 'ఆంధ్రప్రదేశ్ జిల్లాలు' : 'ANDHRA PRADESH MAP'}
+                      </text>
+                      <text x="40" y="78" fill="#38bdf8" fontSize="11" fontWeight="bold">
+                        {showTelugu ? 'పునర్విభజన 26 జిల్లాలు' : '26 Reorganized Districts'}
+                      </text>
+                    </g>
+
+                    {/* Godavari & Krishna Deltas Accent Lines */}
+                    <g className="deltas-overlay pointer-events-none" opacity="0.75">
+                      <path
+                        d="M 440 220 Q 480 250 515 285"
+                        fill="none"
+                        stroke="#38bdf8"
+                        strokeWidth="3"
+                        strokeDasharray="4 2"
+                      />
+                      <text x="470" y="245" fill="#38bdf8" fontSize="9" fontWeight="bold">
+                        Godavari Delta
+                      </text>
+
+                      <path
+                        d="M 370 320 Q 405 340 435 365"
+                        fill="none"
+                        stroke="#2dd4bf"
+                        strokeWidth="3"
+                        strokeDasharray="4 2"
+                      />
+                      <text x="360" y="315" fill="#2dd4bf" fontSize="9" fontWeight="bold">
+                        Krishna Delta
+                      </text>
+                    </g>
+
+                    {/* Contiguous District Polygons */}
+                    {REAL_ANDHRA_SVG_DISTRICTS.map((svgD) => {
+                      const geoItem = geoApMap.get(svgD.id) || selectedApDistrict;
+                      const isSelected = selectedApDistrict.id === svgD.id;
+                      const matchesSearch = !searchQuery || svgD.name.toLowerCase().includes(searchQuery.toLowerCase()) || svgD.nameTelugu.includes(searchQuery);
+
+                      return (
+                        <g
+                          key={svgD.id}
+                          className="cursor-pointer transition-all duration-200 group"
+                          onClick={() => {
+                            playClick();
+                            if (geoItem) setSelectedApDistrict(geoItem);
+                          }}
+                          onMouseEnter={() => {
+                            if (geoItem) setSelectedApDistrict(geoItem);
+                          }}
+                          filter={isSelected ? 'url(#svgGlow)' : undefined}
+                          opacity={matchesSearch ? 1 : 0.35}
+                        >
+                          {isSelected && (
+                            <circle
+                              cx={svgD.labelX}
+                              cy={svgD.labelY}
+                              r="26"
+                              fill={svgD.color}
+                              opacity="0.35"
+                              className="animate-ping pointer-events-none"
+                            />
+                          )}
+
+                          <path
+                            d={svgD.path}
+                            fill={isSelected ? '#38bdf8' : svgD.color}
+                            stroke="#ffffff"
+                            strokeWidth={isSelected ? '2.8' : '1.2'}
+                            strokeLinejoin="round"
+                            className="transition-all duration-150 group-hover:brightness-125 group-hover:stroke-cyan-300"
+                          />
 
                           <text
-                            x={s.x + s.w / 2}
-                            y={s.y + s.h / 2 + 10}
+                            x={svgD.labelX}
+                            y={svgD.labelY}
                             textAnchor="middle"
-                            fill={isSelected ? '#c7d2fe' : '#94a3b8'}
-                            fontSize="8"
-                            fontWeight="bold"
-                            className="pointer-events-none select-none"
+                            dominantBaseline="central"
+                            fill="#ffffff"
+                            fontSize={svgD.name.length > 14 ? '7.2' : '8.2'}
+                            fontWeight="900"
+                            className="pointer-events-none select-none drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]"
+                            paintOrder="stroke"
+                            stroke="#0f172a"
+                            strokeWidth="2.5"
+                            strokeLinejoin="round"
                           >
-                            {s.name.length > 11 ? s.name.slice(0, 9) + '..' : s.name}
+                            {showTelugu ? svgD.nameTelugu : svgD.name}
                           </text>
+                        </g>
+                      );
+                    })}
+
+                    {/* Inset India Locator Map in corner (Matching user reference) */}
+                    <g className="india-locator pointer-events-none select-none" transform="translate(620, 520) scale(0.18)">
+                      <rect x="-10" y="-10" width="632" height="716" rx="20" fill="#0f172a" stroke="#334155" strokeWidth="6" opacity="0.9" />
+                      {REAL_INDIA_SVG_STATES.map((s) => (
+                        <path
+                          key={`locator-${s.id}`}
+                          d={s.path}
+                          fill={s.id === 'ap' ? '#ef4444' : '#334155'}
+                          stroke="#ffffff"
+                          strokeWidth="2"
+                        />
+                      ))}
+                      <text x="20" y="650" fill="#38bdf8" fontSize="42" fontWeight="bold">Andhra Pradesh Locator</text>
+                    </g>
+                  </g>
+                )}
+
+                {/* 3. INDIA NATIONAL CADRE AUTHENTIC VECTOR MAP */}
+                {activeMap === 'india' && (
+                  <g className="india-cartographic-states">
+                    {/* Shadow Silhouette for 3D depth */}
+                    <g opacity="0.35" transform="translate(3, 4)">
+                      {REAL_INDIA_SVG_STATES.map((state) => (
+                        <path key={`india-shadow-${state.id}`} d={state.path} fill="#090d16" />
+                      ))}
+                    </g>
+
+                    {/* Oceanic Labels and Annotations */}
+                    <g className="neighbor-oceans select-none pointer-events-none" opacity="0.65">
+                      <text x="50" y="480" fill="#38bdf8" fontSize="12" fontWeight="900" letterSpacing="1">ARABIAN SEA 🌊</text>
+                      <text x="440" y="480" fill="#38bdf8" fontSize="12" fontWeight="900" letterSpacing="1">BAY OF BENGAL 🌊</text>
+                      <text x="210" y="680" fill="#38bdf8" fontSize="12" fontWeight="900" letterSpacing="1">INDIAN OCEAN</text>
+                      <text x="320" y="115" fill="#94a3b8" fontSize="11" fontWeight="bold" letterSpacing="1">HIMALAYAS 🏔️</text>
+
+                      <text x="30" y="45" fill="#f8fafc" fontSize="16" fontWeight="900" letterSpacing="1">BHARAT / INDIA CADRE MAP</text>
+                      <text x="30" y="65" fill="#818cf8" fontSize="10" fontWeight="bold">28 States & 8 Union Territories</text>
+                    </g>
+
+                    {/* Contiguous State Polygons */}
+                    {REAL_INDIA_SVG_STATES.map((state) => {
+                      const geoItem = geoIndiaMap.get(state.id.toUpperCase()) || geoIndiaMap.get('IN-' + state.id.toUpperCase()) || selectedIndiaState;
+                      const isSelected = selectedIndiaState.id === geoItem.id || selectedIndiaState.code.toLowerCase() === state.id.toLowerCase();
+                      const matchesSearch = !searchQuery || state.name.toLowerCase().includes(searchQuery.toLowerCase());
+
+                      return (
+                        <g
+                          key={state.id}
+                          className="cursor-pointer transition-all duration-200 group"
+                          onClick={() => {
+                            playClick();
+                            if (geoItem) setSelectedIndiaState(geoItem);
+                          }}
+                          onMouseEnter={() => {
+                            if (geoItem) setSelectedIndiaState(geoItem);
+                          }}
+                          filter={isSelected ? 'url(#svgGlow)' : undefined}
+                          opacity={matchesSearch ? 1 : 0.35}
+                        >
+                          {/* Authentic Geographic State Polygon */}
+                          <path
+                            d={state.path}
+                            fill={isSelected ? '#4f46e5' : state.color || '#334155'}
+                            stroke="#ffffff"
+                            strokeWidth={isSelected ? '2.4' : '0.8'}
+                            strokeLinejoin="round"
+                            className="transition-all duration-150 group-hover:brightness-125 group-hover:stroke-amber-300"
+                          />
                         </g>
                       );
                     })}

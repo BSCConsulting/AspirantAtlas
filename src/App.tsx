@@ -18,6 +18,8 @@ import { MobileBottomNav } from './components/MobileBottomNav';
 import { GeminiKeyModal } from './components/GeminiKeyModal';
 import { OnboardingModal } from './components/OnboardingModal';
 import { StudySessionModal } from './components/StudySessionModal';
+import { AspirantDashboardModal } from './components/AspirantDashboardModal';
+import { LeadCaptureModal } from './components/LeadCaptureModal';
 import { AspirantUser, getCurrentUser } from './services/authService';
 import { 
   StudySession, 
@@ -26,7 +28,7 @@ import {
   endCheckOut, 
   recordSessionActivity 
 } from './services/studySessionService';
-import { Compass, ShieldCheck, ArrowLeft, ChevronRight } from 'lucide-react';
+import { Compass, ShieldCheck, ArrowLeft, ChevronRight, Gift } from 'lucide-react';
 
 export function App() {
   const [currentUser, setCurrentUser] = useState<AspirantUser | null>(() => getCurrentUser());
@@ -34,6 +36,8 @@ export function App() {
   const [isGeminiKeyOpen, setIsGeminiKeyOpen] = useState(false);
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
   const [isSessionModalOpen, setIsSessionModalOpen] = useState(false);
+  const [isDashboardOpen, setIsDashboardOpen] = useState(false);
+  const [isLeadCaptureOpen, setIsLeadCaptureOpen] = useState(false);
   const [activeSession, setActiveSession] = useState<StudySession | null>(() => 
     getActiveSession(currentUser?.id || 'default-aspirant')
   );
@@ -266,6 +270,8 @@ export function App() {
         onOpenAuth={() => setIsAuthOpen(true)}
         onOpenGeminiKey={() => setIsGeminiKeyOpen(true)}
         onOpenCompass={() => setIsOnboardingOpen(true)}
+        onOpenDashboard={() => setIsDashboardOpen(true)}
+        onOpenLeadCapture={() => setIsLeadCaptureOpen(true)}
         currentUser={currentUser}
         onOpenSessionModal={() => setIsSessionModalOpen(true)}
         activeSession={activeSession}
@@ -319,6 +325,29 @@ export function App() {
           </div>
         </div>
       )}
+
+      {/* 2026 Micro-Syllabus Blueprint & Free Kit Announcement Bar */}
+      <div className="bg-gradient-to-r from-amber-500/10 via-sky-500/10 to-indigo-500/10 border-b border-amber-200/60 px-4 sm:px-6 lg:px-8 py-2">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div className="flex items-center space-x-2">
+            <span className="bg-amber-100 text-amber-900 border border-amber-200 text-[10px] font-black uppercase px-2 py-0.5 rounded-full flex items-center gap-1">
+              <Gift className="w-3 h-3 text-amber-600" />
+              Free Access
+            </span>
+            <span className="text-slate-800 font-semibold">
+              2026 Civil Services Micro-Syllabus Blueprint & Formula Cheat Sheets
+            </span>
+            <span className="hidden md:inline text-slate-500">• Join Daily WhatsApp & Telegram Broadcast</span>
+          </div>
+          <button
+            onClick={() => setIsLeadCaptureOpen(true)}
+            className="btn-tactile text-indigo-700 hover:text-indigo-900 font-bold flex items-center space-x-1 underline text-xs"
+          >
+            <span>Download Kit & Join</span>
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      </div>
 
       <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 w-full pb-28 md:pb-8 overflow-x-hidden">
         {activeTab === 'roadmap' && (
@@ -430,6 +459,47 @@ export function App() {
         onUserChanged={setCurrentUser}
         onOpenSessionModal={() => setIsSessionModalOpen(true)}
         onOpenGeminiKey={() => setIsGeminiKeyOpen(true)}
+        onOpenDashboard={() => {
+          setIsAuthOpen(false);
+          setIsDashboardOpen(true);
+        }}
+        onOpenLeadCapture={() => {
+          setIsAuthOpen(false);
+          setIsLeadCaptureOpen(true);
+        }}
+      />
+
+      {/* Aspirant Analytics, Motion Timeline & Rank Predictor Dashboard Modal */}
+      <AspirantDashboardModal
+        isOpen={isDashboardOpen}
+        onClose={() => setIsDashboardOpen(false)}
+        currentUser={currentUser}
+        onUserUpdated={setCurrentUser}
+        selectedExam={selectedExam}
+        completedNodeIds={completedNodeIds}
+        streakDays={streakDays}
+        onOpenSessionModal={() => {
+          setIsDashboardOpen(false);
+          setIsSessionModalOpen(true);
+        }}
+        onNavigateToTopic={(nodeId) => {
+          setIsDashboardOpen(false);
+          handleOpenTopicById(nodeId);
+        }}
+        onNavigateToMocks={() => {
+          setIsDashboardOpen(false);
+          handleNavigateTab('mock-tests');
+        }}
+      />
+
+      {/* Commercial Visitor Lead Capture & Blueprint Modal */}
+      <LeadCaptureModal
+        isOpen={isLeadCaptureOpen}
+        onClose={() => setIsLeadCaptureOpen(false)}
+        selectedExam={selectedExam}
+        defaultEmail={currentUser?.email || ''}
+        defaultName={currentUser?.name || ''}
+        defaultMobile={currentUser?.mobile || ''}
       />
 
       {/* Global Gemini API Key Settings Modal */}

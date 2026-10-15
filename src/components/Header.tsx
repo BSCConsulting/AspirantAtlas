@@ -12,10 +12,11 @@ import {
   Calendar, 
   Search, 
   User, 
-  Key, 
   Clock,
   SlidersHorizontal,
-  ChevronDown
+  ChevronDown,
+  TrendingUp,
+  Gift
 } from 'lucide-react';
 import { AspirantUser } from '../services/authService';
 import { StudySession } from '../services/studySessionService';
@@ -37,6 +38,8 @@ interface HeaderProps {
   onOpenAuth?: () => void;
   onOpenGeminiKey?: () => void;
   onOpenCompass?: () => void;
+  onOpenDashboard?: () => void;
+  onOpenLeadCapture?: () => void;
   currentUser?: AspirantUser | null;
   onOpenSessionModal?: () => void;
   activeSession?: StudySession | null;
@@ -56,6 +59,8 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenAuth,
   onOpenGeminiKey,
   onOpenCompass,
+  onOpenDashboard,
+  onOpenLeadCapture,
   currentUser,
   onOpenSessionModal,
   activeSession,
@@ -183,6 +188,18 @@ export const Header: React.FC<HeaderProps> = ({
               )
             )}
 
+            {/* Dashboard & Rank Predictor Button */}
+            {onOpenDashboard && (
+              <button
+                onClick={onOpenDashboard}
+                className="btn-tactile h-9 px-2.5 sm:px-3 rounded-xl border border-indigo-200/90 bg-indigo-50/80 hover:bg-indigo-100 text-indigo-800 text-xs font-black transition-all shadow-2xs flex items-center space-x-1.5"
+                title="Aspirant Analytics Dashboard & Rank Predictor"
+              >
+                <TrendingUp className="w-3.5 h-3.5 text-indigo-600" />
+                <span className="hidden md:inline">Dashboard</span>
+              </button>
+            )}
+
             {/* Consolidated Quick Tools Menu Button */}
             <div className="relative">
               <button
@@ -203,10 +220,24 @@ export const Header: React.FC<HeaderProps> = ({
               {isToolsOpen && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setIsToolsOpen(false)} />
-                  <div className="absolute right-0 mt-2 w-60 bg-white rounded-2xl border border-slate-200/90 shadow-2xl p-2 z-50 animate-scaleUp space-y-1">
+                  <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl border border-slate-200/90 shadow-2xl p-2 z-50 animate-scaleUp space-y-1">
                     <div className="px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-slate-400 border-b border-slate-100">
                       Aspirant Utilities
                     </div>
+
+                    {/* Performance Dashboard */}
+                    {onOpenDashboard && (
+                      <button
+                        onClick={() => {
+                          setIsToolsOpen(false);
+                          onOpenDashboard();
+                        }}
+                        className="w-full px-3 py-2 rounded-xl text-xs font-bold text-slate-800 hover:bg-indigo-50 hover:text-indigo-900 flex items-center space-x-2 transition-colors"
+                      >
+                        <TrendingUp className="w-4 h-4 text-indigo-600" />
+                        <span>Performance Dashboard</span>
+                      </button>
+                    )}
 
                     {/* Daily Habit Drill */}
                     <button
@@ -252,6 +283,25 @@ export const Header: React.FC<HeaderProps> = ({
                       >
                         <Compass className="w-4 h-4 text-sky-600" />
                         <span>Compass Guide</span>
+                      </button>
+                    )}
+
+                    {/* Free Blueprint Kit */}
+                    {onOpenLeadCapture && (
+                      <button
+                        onClick={() => {
+                          setIsToolsOpen(false);
+                          onOpenLeadCapture();
+                        }}
+                        className="w-full px-3 py-2 rounded-xl text-xs font-bold text-amber-950 bg-amber-50 hover:bg-amber-100/80 rounded-xl flex items-center justify-between transition-colors border border-amber-200/60"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <Gift className="w-4 h-4 text-amber-600" />
+                          <span>Free 2026 Blueprint Kit</span>
+                        </div>
+                        <span className="text-[10px] bg-amber-200/80 text-amber-900 font-extrabold px-1.5 py-0.2 rounded">
+                          Free
+                        </span>
                       </button>
                     )}
                   </div>

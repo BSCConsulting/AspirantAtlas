@@ -16,7 +16,10 @@ import {
   Sparkles,
   BookOpen,
   Key,
-  Phone
+  Phone,
+  TrendingUp,
+  Users,
+  ChevronRight
 } from 'lucide-react';
 import { 
   AspirantUser, 
@@ -26,7 +29,9 @@ import {
   logout, 
   syncCloudData, 
   exportFullCloudBackupJson, 
-  importCloudBackupJson 
+  importCloudBackupJson,
+  exportLeadsCsv,
+  getCapturedLeads
 } from '../services/authService';
 import { getUserLedger, formatMinutes } from '../services/studySessionService';
 import { ExamId } from '../types';
@@ -38,6 +43,8 @@ interface ProfileDrawerProps {
   onUserChanged: (user: AspirantUser | null) => void;
   onOpenSessionModal?: () => void;
   onOpenGeminiKey?: () => void;
+  onOpenDashboard?: () => void;
+  onOpenLeadCapture?: () => void;
 }
 
 export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
@@ -46,7 +53,9 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
   currentUser,
   onUserChanged,
   onOpenSessionModal,
-  onOpenGeminiKey
+  onOpenGeminiKey,
+  onOpenDashboard,
+  onOpenLeadCapture
 }) => {
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncStatusMsg, setSyncStatusMsg] = useState('');
@@ -116,6 +125,19 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
       }
     };
     reader.readAsText(file);
+  };
+
+  const leadsCount = getCapturedLeads().length;
+
+  const handleExportLeads = () => {
+    const csvStr = exportLeadsCsv();
+    const blob = new Blob([csvStr], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `AspirantAtlas_Captured_Leads_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -229,6 +251,25 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
                 <h5 className="text-[11px] font-black uppercase tracking-wider text-slate-400">
                   Quick Navigation
                 </h5>
+                {onOpenDashboard && (
+                  <button
+                    onClick={() => {
+                      onClose();
+                      onOpenDashboard();
+                    }}
+                    className="w-full p-3.5 rounded-xl border border-indigo-300/80 bg-gradient-to-r from-indigo-950 via-slate-900 to-indigo-900 text-white text-xs font-black flex items-center justify-between shadow-xs transition-all group"
+                  >
+                    <div className="flex items-center space-x-2.5">
+                      <TrendingUp className="w-4 h-4 text-sky-400 group-hover:scale-110 transition-transform" />
+                      <div className="text-left">
+                        <div className="leading-tight">Aspirant Performance Dashboard</div>
+                        <div className="text-[10px] text-slate-300 font-normal">AIR Rank Projection & Motion Timeline</div>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-white transition-colors" />
+                  </button>
+                )}
+
                 {onOpenSessionModal && (
                   <button
                     onClick={() => {
@@ -316,6 +357,16 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
                     <input type="file" accept=".json" onChange={handleImportBackup} className="hidden" />
                   </label>
                 </div>
+
+                {leadsCount > 0 && (
+                  <button
+                    onClick={handleExportLeads}
+                    className="btn-tactile w-full mt-2.5 py-2 px-3 rounded-xl border border-emerald-300 bg-emerald-50/80 hover:bg-emerald-100 text-xs font-bold text-emerald-800 flex items-center justify-center space-x-1.5 transition-all shadow-2xs"
+                  >
+                    <Users className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Export {leadsCount} Captured Leads (CSV)</span>
+                  </button>
+                )}
               </div>
 
               {/* AI Evaluation Engine & Key Config */}
@@ -357,6 +408,41 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
                 <p className="text-xs text-slate-300 leading-relaxed">
                   Log in to track your syllabus completion, clock daily study hours, save test percentiles, and sync across devices.
                 </p>
+              </div>
+
+              {/* Guest Quick Tools: Dashboard & Free Kit */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {onOpenDashboard && (
+                  <button
+                    onClick={() => {
+                      onClose();
+                      onOpenDashboard();
+                    }}
+                    className="p-3 rounded-xl border border-indigo-200 bg-indigo-50/70 hover:bg-indigo-100/80 text-left flex items-center space-x-2.5 transition-all text-xs font-bold text-indigo-950"
+                  >
+                    <TrendingUp className="w-4 h-4 text-indigo-600 shrink-0" />
+                    <div>
+                      <div>My Dashboard</div>
+                      <div className="text-[10px] text-slate-500 font-normal">AIR Predictor</div>
+                    </div>
+                  </button>
+                )}
+
+                {onOpenLeadCapture && (
+                  <button
+                    onClick={() => {
+                      onClose();
+                      onOpenLeadCapture();
+                    }}
+                    className="p-3 rounded-xl border border-amber-200 bg-amber-50/70 hover:bg-amber-100/80 text-left flex items-center space-x-2.5 transition-all text-xs font-bold text-amber-950"
+                  >
+                    <ShieldCheck className="w-4 h-4 text-amber-600 shrink-0" />
+                    <div>
+                      <div>Free 2026 Kit</div>
+                      <div className="text-[10px] text-slate-500 font-normal">Blueprint PDF</div>
+                    </div>
+                  </button>
+                )}
               </div>
 
               {/* 1-Click Instant Demo Profiles */}

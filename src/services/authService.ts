@@ -4,6 +4,9 @@ export interface AspirantUser {
   id: string;
   name: string;
   email: string;
+  mobile?: string;
+  prepMode?: 'full-time' | 'working-pro';
+  stateDistrict?: string;
   targetExam: ExamId;
   prepHorizonDays: number;
   dailyGoalHours: number;
@@ -78,11 +81,12 @@ export function loginWithDemo(profileId: string): AspirantUser {
   return user;
 }
 
-export function loginWithEmail(name: string, email: string, targetExam: ExamId): AspirantUser {
+export function loginWithEmail(name: string, email: string, targetExam: ExamId, mobile?: string): AspirantUser {
   const user: AspirantUser = {
     id: `user-${Date.now()}`,
     name: name.trim() || 'Aspirant',
     email: email.trim() || 'user@aspirantatlas.org',
+    mobile: mobile?.trim() || undefined,
     targetExam,
     prepHorizonDays: 90,
     dailyGoalHours: 6,
@@ -92,6 +96,14 @@ export function loginWithEmail(name: string, email: string, targetExam: ExamId):
   };
   saveUser(user);
   return user;
+}
+
+export function updateUserProfile(updates: Partial<AspirantUser>): AspirantUser | null {
+  const current = getCurrentUser();
+  if (!current) return null;
+  const updated = { ...current, ...updates };
+  saveUser(updated);
+  return updated;
 }
 
 export function logout(): void {
@@ -154,4 +166,63 @@ export function importCloudBackupJson(jsonString: string): boolean {
     console.error('Failed to import cloud backup:', err);
     return false;
   }
+}
+
+// ==========================================
+// VISITOR & STUDENT LEAD CAPTURE ENGINE
+// ==========================================
+
+export interface CapturedLead {
+  id: string;
+  name: string;
+  email: string;
+  mobile: string;
+  targetExam: ExamId;
+  timeline: string;
+  source: string;
+  capturedAt: string;
+}
+
+const STORAGE_KEY_LEADS = 'aspirant_captured_leads';
+
+export function getCapturedLeads(): CapturedLead[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_LEADS);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveCapturedLead(lead: Omit<CapturedLead, 'id' | 'capturedAt'>): CapturedLead {
+  const existing = getCapturedLeads();
+  const newLead: CapturedLead = {
+    ...lead,
+    id: `lead-${Date.now()}`,
+    capturedAt: new Date().toISOString()
+  };
+  const updated = [newLead, ...existing];
+  try {
+    localStorage.setItem(STORAGE_KEY_LEADS, JSON.stringify(updated));
+  } catch {
+    // ignore
+  }
+  return newLead;
+}
+
+export function exportLeadsCsv(): string {
+  const leads = getCapturedLeads();
+  if (leads.length === 0) return 'ID,Name,Email,Mobile,Target Exam,Timeline,Source,Captured At';
+  const headers = ['ID', 'Name', 'Email', 'Mobile', 'Target Exam', 'Timeline', 'Source', 'Captured At'];
+  const rows = leads.map(l => [
+    l.id,
+    `"${l.name.replace(/"/g, '""')}"`,
+    l.email,
+    l.mobile,
+    l.targetExam,
+    `"${l.timeline.replace(/"/g, '""')}"`,
+    `"${l.source.replace(/"/g, '""')}"`,
+    l.capturedAt
+  ]);
+  return [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
 }

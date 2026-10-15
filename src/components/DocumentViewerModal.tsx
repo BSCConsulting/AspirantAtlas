@@ -6,6 +6,7 @@ import {
   Check, RotateCcw
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { exportDocumentPdfPrint } from '../utils/documentPdfExporter';
 
 interface DocumentViewerModalProps {
   document: DocumentDetail;
@@ -60,48 +61,9 @@ export const DocumentViewerModal: React.FC<DocumentViewerModalProps> = ({
     }
   };
 
-  // Direct In-Portal Download Trigger
+  // Direct In-Portal Publication-Grade PDF Trigger
   const handleDirectDownload = () => {
-    // Generate clean self-contained text/html printable format
-    const contentText = `
-================================================================================
-${document.title.toUpperCase()}
-Authority: ${document.issuingAuthority}
-Date: ${document.dateOrYear} | Pages: ${document.pages}
-Source: AspirantAtlas Open Civil Services Repository
-================================================================================
-
-SUMMARY:
-${document.summary}
-
---------------------------------------------------------------------------------
-DOCUMENT SECTIONS & STATUTORY CLAUSES:
---------------------------------------------------------------------------------
-${document.sections.map(s => `
-[${s.numberOrCode}] ${s.title}
-${s.keyHighlight ? `Key Highlight: ${s.keyHighlight}\n` : ''}
-${s.content.map(c => `• ${c}`).join('\n')}
-`).join('\n--------------------------------------------------------------------------------\n')}
-
---------------------------------------------------------------------------------
-EXAM QUERIES & MODEL Q&A:
---------------------------------------------------------------------------------
-${document.queriesAndAnswers.map((qa, i) => `
-Q${i + 1}: ${qa.question}
-Answer: ${qa.answer}
-Exam Tip: ${qa.examTip}
-`).join('\n')}
-    `.trim();
-
-    const blob = new Blob([contentText], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = window.document.createElement('a');
-    a.href = url;
-    a.download = document.pdfFilename.replace('.pdf', '-AspirantAtlas.txt');
-    window.document.body.appendChild(a);
-    a.click();
-    window.document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    exportDocumentPdfPrint(document, showTelugu);
   };
 
   return (

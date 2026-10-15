@@ -351,6 +351,38 @@ export const StudyPlannerView: React.FC<StudyPlannerViewProps> = ({
                 {day.description}
               </p>
 
+              {/* Day Study Dossier Banner */}
+              {(() => {
+                const dayNodeId = day.tasks.find(t => t.linkedNodeId)?.linkedNodeId;
+                if (!dayNodeId) return null;
+                return (
+                  <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-gradient-to-r from-indigo-50/90 via-sky-50/70 to-slate-50 border border-indigo-100 rounded-xl shadow-xs">
+                    <div className="flex items-center space-x-2.5 min-w-0">
+                      <div className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                        <BookOpen className="w-4 h-4" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-[11px] font-bold uppercase tracking-wider text-indigo-700">
+                          {showTelugu ? 'అధికారిక అధ్యయన పత్రం & పాఠ్యాంశం' : 'Comprehensive Study Dossier & Material'}
+                        </div>
+                        <div className="text-xs font-semibold text-slate-800 truncate">
+                          {showTelugu ? 'స్టాండర్డ్ పుస్తకాలు, ఇన్ఫోగ్రాఫిక్స్, చీట్‌షీట్ & అధికారిక గెజిట్ పత్రాలు' : 'Standard Textbooks, Infographic Matrix, CheatSheet & Official Docs'}
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => onOpenTopic(dayNodeId)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg shadow-sm hover:shadow transition-all shrink-0 cursor-pointer active:scale-95"
+                    >
+                      <BookOpen className="w-3.5 h-3.5" />
+                      <span>{showTelugu ? 'స్టడీ మెటీరియల్ చదవండి' : 'Read Study Material'}</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                );
+              })()}
+
               {/* Tasks Checklist Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                 {day.tasks.map((task) => {
@@ -366,50 +398,71 @@ export const StudyPlannerView: React.FC<StudyPlannerViewProps> = ({
                     <div
                       key={task.id}
                       onClick={() => toggleTask(task.id)}
-                      className={`p-3.5 rounded-xl border text-xs cursor-pointer transition-all flex items-start space-x-3 ${
+                      className={`p-3.5 rounded-xl border text-xs cursor-pointer transition-all flex flex-col justify-between ${
                         isDone
                           ? 'bg-emerald-50/60 border-emerald-200 text-slate-500 line-through'
                           : 'bg-white border-slate-200 hover:border-slate-300 text-slate-800 hover:bg-slate-50/80'
                       }`}
                     >
-                      <button
-                        type="button"
-                        className="shrink-0 mt-0.5 text-slate-400 hover:text-emerald-600 transition-colors"
-                      >
-                        {isDone ? (
-                          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                        ) : (
-                          <Circle className="w-4 h-4 text-slate-300" />
-                        )}
-                      </button>
-
-                      <div className="space-y-1.5 flex-1 min-w-0">
-                        <div className="font-semibold leading-snug break-words">
-                          {task.title}
-                        </div>
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded border ${typeBadge}`}>
-                            {task.type.replace('_', ' ')}
-                          </span>
-                          <span className="text-[10px] text-slate-400 flex items-center gap-0.5">
-                            <Clock className="w-3 h-3" /> {task.durationMinutes}m
-                          </span>
-
-                          {task.linkedNodeId && (
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onOpenTopic(task.linkedNodeId!);
-                              }}
-                              className="text-[10px] font-bold text-sky-600 hover:text-sky-800 flex items-center gap-0.5 bg-sky-50 px-2 py-0.5 rounded border border-sky-200"
-                            >
-                              <span>Hub</span>
-                              <ArrowRight className="w-2.5 h-2.5" />
-                            </button>
+                      <div className="flex items-start space-x-3">
+                        <button
+                          type="button"
+                          className="shrink-0 mt-0.5 text-slate-400 hover:text-emerald-600 transition-colors"
+                        >
+                          {isDone ? (
+                            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                          ) : (
+                            <Circle className="w-4 h-4 text-slate-300" />
                           )}
+                        </button>
+
+                        <div className="space-y-1.5 flex-1 min-w-0">
+                          <div className="font-semibold leading-snug break-words">
+                            {task.title}
+                          </div>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded border ${typeBadge}`}>
+                              {task.type.replace('_', ' ')}
+                            </span>
+                            <span className="text-[10px] text-slate-400 flex items-center gap-0.5">
+                              <Clock className="w-3 h-3" /> {task.durationMinutes}m
+                            </span>
+                          </div>
                         </div>
                       </div>
+
+                      {task.linkedNodeId && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onOpenTopic(task.linkedNodeId!);
+                          }}
+                          className={`w-full mt-3 py-1.5 px-2.5 rounded-lg text-[11px] font-bold flex items-center justify-between border transition-all cursor-pointer shadow-2xs hover:shadow-xs active:scale-[0.99] ${
+                            task.type === 'reading'
+                              ? 'bg-sky-50 hover:bg-sky-100 text-sky-800 border-sky-200'
+                              : task.type === 'revision'
+                              ? 'bg-purple-50 hover:bg-purple-100 text-purple-800 border-purple-200'
+                              : task.type === 'quiz'
+                              ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-200'
+                              : 'bg-amber-50 hover:bg-amber-100 text-amber-800 border-amber-200'
+                          }`}
+                        >
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <BookOpen className="w-3.5 h-3.5 shrink-0" />
+                            <span className="truncate">
+                              {task.type === 'reading'
+                                ? (showTelugu ? 'పాఠ్యాంశం & నోట్స్ చదవండి' : 'Read Chapter & Notes')
+                                : task.type === 'revision'
+                                ? (showTelugu ? 'ఇన్ఫోగ్రాఫిక్స్ & రివిజన్' : 'Review Visuals & CheatSheet')
+                                : task.type === 'quiz'
+                                ? (showTelugu ? 'టాపిక్ టెస్ట్ రాయండి' : 'Attempt Topic MCQs')
+                                : (showTelugu ? 'మెయిన్స్ మాడల్ ఆన్సర్' : 'Open Mains 15M Scaffold')}
+                            </span>
+                          </div>
+                          <ArrowRight className="w-3 h-3 shrink-0 ml-1 text-slate-500" />
+                        </button>
+                      )}
                     </div>
                   );
                 })}

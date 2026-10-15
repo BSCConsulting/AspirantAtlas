@@ -239,8 +239,17 @@ export function App() {
     recordSessionActivity(userId, 'mcq', { attempted: 5, correct: 5 });
   };
 
+  const CANONICAL_NODE_ID_MAP: Record<string, string> = {
+    'econ-macro-fiscal': 'economy-macro-monetary-fiscal',
+    'hist-modern-national-movement': 'history-modern-freedom-struggle',
+    'appsc-bifurcation-act': 'appsc-reorganisation-act-2014',
+    'tspsc-telangana-movement': 'tspsc-movement-state-formation',
+    'polity-judiciary-reforms': 'polity-executive-legislature',
+  };
+
   const handleOpenTopicById = (nodeId: string) => {
-    const node = SYLLABUS_NODES.find(n => n.id === nodeId);
+    const canonicalId = CANONICAL_NODE_ID_MAP[nodeId] || nodeId;
+    const node = SYLLABUS_NODES.find(n => n.id === canonicalId || n.id === nodeId);
     if (node) {
       setSelectedNode(node);
     }
@@ -252,12 +261,14 @@ export function App() {
   ) => {
     setActiveTab(tab);
     if (payload?.nodeId) {
-      const node = SYLLABUS_NODES.find(n => n.id === payload.nodeId);
+      const canonicalId = CANONICAL_NODE_ID_MAP[payload.nodeId] || payload.nodeId;
+      const node = SYLLABUS_NODES.find(n => n.id === canonicalId || n.id === payload.nodeId);
       if (node) {
         setSelectedNode(node);
       }
     }
   };
+
 
   const currentExamNodes = SYLLABUS_NODES.filter(n => n.examScope.includes(selectedExam));
   const completedExamNodesCount = currentExamNodes.filter(n => completedNodeIds.includes(n.id)).length;

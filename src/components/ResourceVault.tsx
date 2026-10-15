@@ -4,6 +4,7 @@ import { DOCUMENT_DETAILS_MAP } from '../data/documentDetails';
 import { DocumentDetail } from '../types';
 import { DocumentViewerModal } from './DocumentViewerModal';
 import { ExternalLink, BookOpen, Download, Sparkles, CheckCircle2 } from 'lucide-react';
+import { exportDocumentPdfPrint } from '../utils/documentPdfExporter';
 
 interface ResourceVaultProps {
   showTelugu: boolean;
@@ -62,58 +63,40 @@ export const ResourceVault: React.FC<ResourceVaultProps> = ({ showTelugu }) => {
 
   const handleDownloadResource = (docId: string, fallbackTitle: string) => {
     const docDetail = DOCUMENT_DETAILS_MAP[docId];
-    let contentText = '';
-
     if (docDetail) {
-      contentText = `
-================================================================================
-${docDetail.title.toUpperCase()}
-Authority: ${docDetail.issuingAuthority}
-Date: ${docDetail.dateOrYear} | Pages: ${docDetail.pages}
-Source: AspirantAtlas Open Civil Services Repository (Zero External Redirects)
-================================================================================
-
-SUMMARY:
-${docDetail.summary}
-
---------------------------------------------------------------------------------
-DOCUMENT SECTIONS & STATUTORY CLAUSES:
---------------------------------------------------------------------------------
-${docDetail.sections.map(s => `
-[${s.numberOrCode}] ${s.title}
-${s.keyHighlight ? `Key Highlight: ${s.keyHighlight}\n` : ''}
-${s.content.map(c => `• ${c}`).join('\n')}
-`).join('\n--------------------------------------------------------------------------------\n')}
-
---------------------------------------------------------------------------------
-EXAM QUERIES & MODEL Q&A:
---------------------------------------------------------------------------------
-${docDetail.queriesAndAnswers.map((qa, i) => `
-Q${i + 1}: ${qa.question}
-Answer: ${qa.answer}
-Exam Tip: ${qa.examTip}
-`).join('\n')}
-      `.trim();
+      exportDocumentPdfPrint(docDetail, showTelugu);
     } else {
-      contentText = `
-================================================================================
-ASPIRANTATLAS RESOURCE ARCHIVE
-Document: ${fallbackTitle}
-================================================================================
-Verified Prescribed Material for UPSC, APPSC, and TSPSC Civil Services.
-Digitized and preserved in the AspirantAtlas zero-redirect public archive.
-      `.trim();
+      const fallbackDoc: DocumentDetail = {
+        id: docId,
+        title: fallbackTitle,
+        titleTelugu: fallbackTitle,
+        issuingAuthority: 'Government of India / State Official Publications',
+        dateOrYear: 'Official Edition',
+        pages: 'Complete In-Portal Archive Document',
+        summary: `Preserved and verified open civil services material for ${fallbackTitle}. Maintained in the AspirantAtlas public repository.`,
+        pdfFilename: `${docId}.pdf`,
+        sections: [
+          {
+            numberOrCode: 'Part I',
+            title: 'Statutory Core & Policy Mandates',
+            content: [
+              `Official provisions and policy tenets under ${fallbackTitle}.`,
+              'Preserved for analytical study across UPSC, APPSC, and TSPSC civil services examinations.'
+            ],
+            keyHighlight: 'Primary statutory reference source.'
+          }
+        ],
+        queriesAndAnswers: [
+          {
+            question: `What is the examination relevance of ${fallbackTitle}?`,
+            answer: `Essential reference material covering core syllabus themes in GS-2 and GS-3.`,
+            examTip: 'Quote statutory clauses and official authority in Mains answers.'
+          }
+        ],
+        testQuestions: []
+      };
+      exportDocumentPdfPrint(fallbackDoc, showTelugu);
     }
-
-    const blob = new Blob([contentText], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = window.document.createElement('a');
-    a.href = url;
-    a.download = `${docId || fallbackTitle.toLowerCase().replace(/[^a-z0-9]/g, '-')}-AspirantAtlas.txt`;
-    window.document.body.appendChild(a);
-    a.click();
-    window.document.body.removeChild(a);
-    URL.revokeObjectURL(url);
   };
 
   return (

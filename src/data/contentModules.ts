@@ -1307,3 +1307,11 @@ export const TOPIC_CONTENT_MAP: Record<string, TopicContent> = {
   // =========================================================================
   'tspsc-economy-socio-economic-outlook': tspscEconomyContent
 };
+
+// Aliases for planner, current affairs bridge, and alternative node keys
+TOPIC_CONTENT_MAP['econ-macro-fiscal'] = economyMacroContent;
+TOPIC_CONTENT_MAP['hist-modern-national-movement'] = historyModernContent;
+TOPIC_CONTENT_MAP['polity-judiciary-reforms'] = TOPIC_CONTENT_MAP['polity-executive-legislature'];
+TOPIC_CONTENT_MAP['appsc-bifurcation-act'] = TOPIC_CONTENT_MAP['appsc-reorganisation-act-2014'];
+TOPIC_CONTENT_MAP['tspsc-telangana-movement'] = TOPIC_CONTENT_MAP['tspsc-movement-state-formation'];
+

@@ -550,39 +550,170 @@ export const DOCUMENT_DETAILS_MAP: Record<string, DocumentDetail> = {
   // =========================================================================
   'union-economic-survey-budget-report': {
     id: 'union-economic-survey-budget-report',
-    title: 'Union Economic Survey & Budget Strategic Highlights',
-    titleTelugu: 'కేంద్ర ఆర్థిక సర్వే & బడ్జెట్ ముఖ్యాంశాలు',
+    title: 'Union Economic Survey & Budget Strategic Highlights (Annual Compendium)',
+    titleTelugu: 'కేంద్ర ఆర్థిక సర్వే & బడ్జెట్ సమగ్ర వ్యూహాత్మక సంకలనం',
     issuingAuthority: 'Economic Division, Department of Economic Affairs, Ministry of Finance',
-    dateOrYear: 'Annual Central Government Survey (2024)',
-    pages: '450 Pages Macro-Overview',
-    summary: 'The flagship economic report card of the Government of India presenting macro-economic trends, capital expenditure priorities, fiscal consolidation trajectories, and inflation dynamics.',
+    dateOrYear: 'Annual Central Government Survey & Union Budget',
+    pages: '450 Pages Macro-Economic Analysis & Strategic Highlights',
+    summary: 'The flagship economic report card of the Government of India presenting macro-economic trends, capital expenditure priorities, fiscal consolidation trajectories, monetary management, and structural supply-side transformations across all key sectors of the Indian economy.',
     pdfFilename: 'union-economic-survey-2024.pdf',
     sections: [
       {
-        numberOrCode: 'Macro Trends',
-        title: 'Real GDP Growth & Capex Multiplier',
+        numberOrCode: 'Chapter 1: Macro Trends',
+        title: 'State of the Economy: Growth Resilience & Capex Multiplier',
         content: [
-          'Real GDP growth maintained above 7%, cementing India as the fastest-growing major economy.',
-          'Public Capital Expenditure increased threefold over 5 years, delivering a private investment crowding-in multiplier of ~2.5x.'
+          'Real GDP growth maintained above 7% for three consecutive fiscal years, cementing India as the fastest-growing major global economy.',
+          'Public Capital Expenditure (Capex) surged over threefold from ₹3.36 lakh crore in FY20 to over ₹11.11 lakh crore (3.4% of GDP) in FY25, delivering an estimated economic multiplier of ~2.5x to 3.0x on private corporate investment.',
+          'Post-pandemic recovery transitioning from government-funded infrastructure catalysts to private corporate investment and robust domestic consumption demand.',
+          'Macroeconomic stability bolstered by healthy tax buoyancy with Gross Tax Revenue growing at a steady double-digit pace.'
         ],
-        keyHighlight: 'Focus on supply-side capacity enhancement and multi-modal logistics under PM GatiShakti.'
+        keyHighlight: 'Supply-side capacity enhancement under PM GatiShakti and National Infrastructure Pipeline (NIP) crowding in private sector investments.'
+      },
+      {
+        numberOrCode: 'Chapter 2: Fiscal Policy',
+        title: 'Fiscal Consolidation & Debt Trajectory (FRBM Matrix)',
+        content: [
+          'Fiscal deficit glide path: Successfully narrowed from 6.4% of GDP in FY23 to 5.6% in FY24, with a targeted consolidation below 4.5% by FY26.',
+          'Quality of expenditure significantly upgraded: Revenue-to-Capital expenditure ratio improved from 5.4:1 in FY18 to nearly 2.9:1 in FY25, emphasizing asset-creating capital over pure revenue subsidies.',
+          'Revised FRBM framework adherence: Rebalancing general government debt towards the recommended 60% of GDP benchmark (40% Central government, 20% States).'
+        ],
+        keyHighlight: 'Structural expenditure rationalization via Direct Benefit Transfer (DBT) has eliminated over ₹2.7 lakh crore in cumulative ghost leakages.'
+      },
+      {
+        numberOrCode: 'Chapter 3: Monetary Policy',
+        title: 'Monetary Management, Banking Health & Credit Growth',
+        content: [
+          'Reserve Bank of India (RBI) Monetary Policy Committee (MPC) maintained a calibrated headline policy repo rate to anchor inflation expectations while safeguarding growth momentum.',
+          'Banking sector balance-sheet clean-up: Commercial banks Gross Non-Performing Assets (GNPA) ratio plummeted to a 12-year historical low of 2.8%, down from 11.2% in FY18.',
+          'Capital to Risk-Weighted Assets Ratio (CRAR) of Scheduled Commercial Banks comfortably exceeded 16.8%, well above regulatory Basel-III requirements.',
+          'Broad-based double-digit credit growth (>15%) sustained across retail, MSME, services, and industrial capital expenditure cycles.'
+        ],
+        keyHighlight: 'Twin Balance Sheet Advantage: Indian corporates and banking institutions now boast resilient, de-leveraged balance sheets primed for accelerated credit expansion.'
+      },
+      {
+        numberOrCode: 'Chapter 4: Prices & Inflation',
+        title: 'Inflation Dynamics: Core Moderation vs Food Price Volatility',
+        content: [
+          'Core inflation (Headline CPI excluding volatile food and fuel) moderated steadily to sub-3.5%, reflecting well-anchored aggregate demand and prudent monetary stance.',
+          'Headline inflation remained predominantly influenced by weather-induced supply shocks affecting vegetables (tomatoes, onions, potatoes) and pulses.',
+          'Supply-side government interventions: Targeted open-market sale schemes (OMSS), dynamic buffer stock releases (Bharat Dal, Bharat Atta, Bharat Rice), and rationalized export tariffs on critical cereals.'
+        ],
+        keyHighlight: 'Monetary-fiscal coordination successfully prevented domestic inflation contagion despite geopolitical supply-chain disruptions in the Red Sea corridor.'
+      },
+      {
+        numberOrCode: 'Chapter 5: External Sector',
+        title: 'External Sector: Robust Forex, Manageable CAD & Remittance Flows',
+        content: [
+          'Current Account Deficit (CAD) contained at a healthy, manageable level below 1.2% of GDP, buffered by booming software, business, and financial services exports.',
+          'Foreign Exchange Reserves scaled past historic highs of $650+ Billion, covering over 11 months of projected merchandise imports.',
+          'India retained its position as the top global remittance recipient with annual inflows crossing $125 Billion, reinforcing domestic income support in rural and semi-urban belts.',
+          'External debt-to-GDP ratio dropped to ~18.7%, with short-term external debt remaining well within prudent safety limits.'
+        ],
+        keyHighlight: 'High import cover and low external debt ratio shield India against external currency depreciations and global interest-rate volatility.'
+      },
+      {
+        numberOrCode: 'Chapter 6: Agriculture',
+        title: 'Agriculture & Food Management: Allied Sectors & Tech Adoption',
+        content: [
+          'Agriculture and allied sectors clocked an average annual growth of over 4% over the last 6 years, with livestock, dairying, and fisheries expanding at 7%+, driving agricultural diversification.',
+          'PM-KISAN has disbursed over ₹3 lakh crore directly to 11+ crore farmers without middleman friction.',
+          'Promotion of millets (Shree Anna) and National Mission on Edible Oils to reduce import dependence and enhance climate resilience in semi-arid agrarian pockets.',
+          'Expansion of Digital Public Infrastructure in agriculture via AgriStack, PM-KMY, and Kisan Credit Card digitization.'
+        ],
+        keyHighlight: 'Allied sectors now contribute over 30% of total agricultural output, decoupling farm household incomes from pure monsoon variability.'
+      },
+      {
+        numberOrCode: 'Chapter 7: Industry & Infra',
+        title: 'Industry & Infrastructure: PLI Schemes, Logistics & PM GatiShakti',
+        content: [
+          'Production Linked Incentive (PLI) schemes across 14 key sectors (electronics, pharmaceuticals, telecom, auto) have attracted over ₹1.28 lakh crore in actual investments and created 8.5+ lakh direct jobs.',
+          'Smartphone manufacturing transformed India into the second-largest global producer, with smartphone exports exceeding ₹1.2 lakh crore annually.',
+          'National Logistics Policy and PM GatiShakti National Master Plan integrating 16 central ministries to reduce logistics costs from 14% of GDP towards global benchmarks of ~8-9%.',
+          'Dedicated Freight Corridors (Western & Eastern DFCs) operationalized, doubling freight train operational speeds and decongesting passenger trunk routes.'
+        ],
+        keyHighlight: 'Electronics manufacturing in India grew over 500% in the last decade, transitioning India from a net consumer to a global export hub.'
+      },
+      {
+        numberOrCode: 'Chapter 8: Services & Energy',
+        title: 'Services, Digital Public Infrastructure & Green Transition',
+        content: [
+          'Services sector continues to be the primary economic engine, contributing ~55% of Gross Value Added (GVA) and attracting over 65% of total Foreign Direct Investment (FDI) equity inflows.',
+          'Digital Public Infrastructure (India Stack): Unified Payments Interface (UPI) handling over 13 billion monthly transactions worth ₹20+ lakh crore; Account Aggregator framework democratizing collateral-free credit.',
+          'National Green Hydrogen Mission allocated ₹19,744 crore to establish 5 MMT annual production capacity by 2030, targeting net-zero carbon neutrality by 2070.',
+          'Non-fossil fuel installed electricity capacity reached over 44% of total power mix, surpassing COP26 Nationally Determined Contribution (NDC) targets 7 years ahead of schedule.'
+        ],
+        keyHighlight: 'Global Capability Centres (GCCs) in India now employ over 1.9 million high-skilled professionals, evolving from cost-arbitrage back-offices to strategic innovation and AI hubs.'
       }
     ],
     queriesAndAnswers: [
       {
-        question: 'What is the fiscal deficit target recommended under the FRBM framework?',
-        answer: 'The revised FRBM framework targets a central fiscal deficit of 3% of GDP and a general government debt-to-GDP ratio of 60% (40% Centre, 20% States).',
-        examTip: 'Essential for UPSC GS-3 economy questions.'
+        question: 'What is the "Twin Balance Sheet Advantage" highlighted in recent Economic Surveys?',
+        answer: 'The Twin Balance Sheet Advantage refers to the simultaneous clean-up and financial strengthening of both Indian Commercial Banks (historically low NPAs < 2.8%, high CRAR > 16.8%) and Indian Corporates (significantly reduced debt-to-equity ratios and high interest coverage). This contrasts with the 2014-2018 "Twin Balance Sheet Problem" and positions the economy for sustained private capital expenditure.',
+        examTip: 'High-yield analytical concept for UPSC GS-3 and State PSC economy papers.'
+      },
+      {
+        question: 'How does Public Capital Expenditure (Capex) crowd-in private corporate investment?',
+        answer: 'Public Capex in critical arterial infrastructure (highways, dedicated freight corridors, port connectivity, power grids) reduces systemic logistics costs and improves supply-chain turnaround times. This improves operational profit margins for private businesses, making their new capital investments financially viable and thereby "crowding-in" rather than displacing private credit.',
+        examTip: 'Cite the 2.5x to 3.0x capex multiplier when answering questions on infrastructure-led growth.'
+      },
+      {
+        question: 'What is the distinction between Headline CPI Inflation and Core CPI Inflation?',
+        answer: 'Headline CPI measures total consumer inflation across all basket items including volatile food and fuel categories. Core CPI inflation strips out volatile food and fuel prices, reflecting underlying demand pressures and structural monetary trends. While Indian core inflation has remained comfortably below 3.5%, headline inflation is frequently skewed by weather-induced vegetable shocks.',
+        examTip: 'Essential distinction for questions on the RBI Monetary Policy framework under the 4% (+/- 2%) mandate.'
+      },
+      {
+        question: 'What institutional mechanisms ensure the credibility of India’s fiscal consolidation trajectory?',
+        answer: 'Credibility is driven by: (1) Adherence to the statutory FRBM glide path targeting a central deficit under 4.5% of GDP by FY26, (2) Elimination of extra-budgetary borrowings by bringing food and fertilizer subsidies transparently onto the Union balance sheet, and (3) Systematic rationalization of revenue expenditure via Direct Benefit Transfers.',
+        examTip: 'Mention expenditure quality metrics (Revenue to Capital outlay ratio) in Mains answers.'
+      },
+      {
+        question: 'What are the strategic objectives of the National Logistics Policy (NLP) and PM GatiShakti?',
+        answer: 'The NLP and PM GatiShakti aim to reduce India\'s logistics cost from ~13-14% of GDP to single digits (8-9%) by synchronizing multi-modal infrastructure across rail, road, shipping, and aviation, while digitalizing freight documentation through Unified Logistics Interface Platform (ULIP).',
+        examTip: 'Connect PM GatiShakti with export competitiveness and manufacturing competitiveness under Make in India.'
+      },
+      {
+        question: 'How has India’s Digital Public Infrastructure (DPI) contributed to formalization and financial inclusion?',
+        answer: 'DPI (Aadhaar identity + UPI instant payments + Account Aggregator consent layer + ONDC e-commerce) has lowered customer onboarding costs by 90%+, facilitated direct benefit transfers to 11+ crore farmers, and enabled formal cash-flow-based micro-lending to millions of unbanked street vendors and MSMEs under schemes like PM SVANidhi.',
+        examTip: 'Anchor GS-3 questions on inclusive growth with the India Stack framework.'
       }
     ],
     testQuestions: [
       {
         id: 'ues-q1',
-        question: 'Who authors and presents the Economic Survey of India in Parliament?',
-        options: ['Governor of RBI', 'Chief Economic Adviser (CEA)', 'Finance Commission Chairman', 'NITI Aayog CEO'],
+        question: 'The Economic Survey of India is authored and presented by which official department?',
+        options: ['Department of Revenue', 'Economics Division, Department of Economic Affairs', 'Reserve Bank of India', 'NITI Aayog Policy Division'],
         correctIndex: 1,
-        explanation: 'The Economic Survey is prepared by the Economics Division of the Department of Economic Affairs under the guidance of the Chief Economic Adviser (CEA).',
-        tag: 'Indian Economy'
+        explanation: 'The Economic Survey is authored annually by the Economics Division of the Department of Economic Affairs under the Ministry of Finance, guided by the Chief Economic Adviser (CEA).',
+        tag: 'Institutional Structure'
+      },
+      {
+        id: 'ues-q2',
+        question: 'Under the revised FRBM framework, what is the targeted Central Government debt-to-GDP ratio benchmark?',
+        options: ['30% of GDP', '40% of GDP', '50% of GDP', '60% of GDP'],
+        correctIndex: 1,
+        explanation: 'The N.K. Singh FRBM Committee recommended a general government debt limit of 60% of GDP, divided into 40% for the Central Government and 20% for State Governments.',
+        tag: 'Fiscal Policy'
+      },
+      {
+        id: 'ues-q3',
+        question: 'The "Crowding-In Effect" of public capital expenditure primarily refers to:',
+        options: [
+          'High public borrowing forcing interest rates up and reducing private borrowing',
+          'Strategic public infrastructure investment creating viable business conditions that induce private sector investment',
+          'Replacing private banks with public sector financial institutions',
+          'Direct nationalization of strategic industrial enterprises'
+        ],
+        correctIndex: 1,
+        explanation: 'Crowding-in occurs when government capital expenditure on foundational infrastructure creates favorable market conditions and lower logistics costs, encouraging private enterprises to invest capital.',
+        tag: 'Macroeconomic Concepts'
+      },
+      {
+        id: 'ues-q4',
+        question: 'Which of the following is excluded to calculate "Core Inflation"?',
+        options: ['Housing and Education', 'Food and Energy/Fuel', 'Manufacturing and Transport', 'Personal Care and Health'],
+        correctIndex: 1,
+        explanation: 'Core inflation strips out the prices of Food and Energy/Fuel because their price fluctuations are predominantly driven by short-term supply shocks rather than persistent monetary demand.',
+        tag: 'Inflation Dynamics'
       }
     ]
   },

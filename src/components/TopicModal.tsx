@@ -559,6 +559,71 @@ Exam Tip: ${qa.examTip}
                   ))}
                 </ul>
               </div>
+
+              {/* Mains Analytical Depth & Answer Writing Anchor */}
+              <div className="bg-gradient-to-br from-indigo-50/90 via-sky-50/50 to-white border border-indigo-200/90 rounded-2xl p-5 shadow-xs space-y-3.5">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center space-x-2">
+                    <span className="bg-indigo-600 text-white text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full shadow-2xs flex items-center gap-1">
+                      <Award className="w-3 h-3 text-amber-300" />
+                      Mains Analytical Bridge
+                    </span>
+                    <span className="text-xs font-bold text-slate-500">UPSC GS-2 / State PSC</span>
+                  </div>
+                  <span className="text-xs font-black text-indigo-700 bg-indigo-100/80 px-2.5 py-0.5 rounded-lg border border-indigo-200">
+                    {content.mainsScaffold.marks} Marks • ~{content.mainsScaffold.timeMinutes} Mins
+                  </span>
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-extrabold text-slate-900 leading-relaxed">
+                    {content.mainsScaffold.question}
+                  </h4>
+                  <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                    Mains requires synthesising constitutional articles with landmark case doctrines, comparative legal precedents, and multi-dimensional arguments.
+                  </p>
+                </div>
+
+                {/* Quick Fodder Badges */}
+                <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                  <span className="text-[11px] font-bold text-slate-500 mr-1">Key Anchors:</span>
+                  {content.cheatSheet.statutoryOrConstitutionalProvisions.slice(0, 3).map((p, pIdx) => (
+                    <span key={pIdx} className="text-[10px] font-mono font-bold bg-white text-indigo-800 border border-indigo-200 px-2 py-0.5 rounded-md shadow-2xs">
+                      {p.code}
+                    </span>
+                  ))}
+                  {content.cheatSheet.landmarkPrecedents.slice(0, 2).map((lp, lpIdx) => (
+                    <span key={lpIdx} className="text-[10px] font-bold bg-white text-sky-800 border border-sky-200 px-2 py-0.5 rounded-md shadow-2xs truncate max-w-[170px]" title={lp.title}>
+                      ⚖️ {lp.title.split(' vs ')[0].split(' v. ')[0]}
+                    </span>
+                  ))}
+                </div>
+
+                {/* Direct Action Buttons */}
+                <div className="pt-2 flex flex-wrap items-center justify-between gap-2 border-t border-indigo-100">
+                  <button
+                    onClick={() => setActiveTab('mains')}
+                    className="btn-tactile px-3.5 py-2 rounded-xl text-xs font-black bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs flex items-center space-x-1.5 transition-all"
+                  >
+                    <BookMarked className="w-3.5 h-3.5" />
+                    <span>Study Full Mains Model Answer & Fodder</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+
+                  {onNavigateToMains && (
+                    <button
+                      onClick={() => {
+                        onClose();
+                        onNavigateToMains(content.mainsScaffold.question, node.title);
+                      }}
+                      className="btn-tactile px-3.5 py-2 rounded-xl text-xs font-bold bg-white hover:bg-slate-50 text-indigo-900 border border-indigo-200/90 shadow-2xs flex items-center space-x-1.5 transition-all"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+                      <span>Attempt in AI Mains Studio</span>
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
           )}
 
@@ -891,44 +956,97 @@ Exam Tip: ${qa.examTip}
           )}
 
           {/* ============================================================== */}
-          {/* TAB 6: MAINS MODEL ANSWER                                      */}
+          {/* TAB 6: MAINS MODEL ANSWER & ANALYTICAL FODDER                   */}
           {/* ============================================================== */}
           {activeTab === 'mains' && (
             <div className="space-y-6">
-              <div className="bg-amber-50/80 border border-amber-200/80 p-4 rounded-xl">
-                <div className="flex items-center justify-between text-amber-900 text-xs font-bold mb-1.5">
-                  <span className="uppercase tracking-wider">Mains Model Question</span>
-                  <span>{content.mainsScaffold.marks} Marks • ~{content.mainsScaffold.timeMinutes} Mins</span>
+              
+              {/* Question Header Card */}
+              <div className="bg-gradient-to-r from-amber-500/15 via-indigo-500/10 to-transparent border border-amber-300/80 p-5 rounded-2xl shadow-xs space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-2 text-amber-950 text-xs font-bold">
+                  <div className="flex items-center space-x-2">
+                    <span className="bg-amber-500 text-white font-black text-[10px] uppercase tracking-wider px-2.5 py-0.5 rounded-full shadow-2xs">
+                      Mains Master Question
+                    </span>
+                    <span className="text-slate-500 font-medium">UPSC GS-2 / State PSC</span>
+                  </div>
+                  <span className="bg-white border border-amber-300 font-black text-amber-900 px-3 py-1 rounded-xl shadow-2xs">
+                    {content.mainsScaffold.marks} Marks • ~{content.mainsScaffold.timeMinutes} Mins
+                  </span>
                 </div>
-                <p className="text-sm font-bold text-slate-900 leading-relaxed">
+                <p className="text-sm sm:text-base font-extrabold text-slate-900 leading-relaxed">
                   {content.mainsScaffold.question}
                 </p>
               </div>
 
-              <div className="border border-slate-200 rounded-xl p-5 bg-white space-y-4">
-                <div>
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-sky-800 bg-sky-50 px-2 py-0.5 rounded border border-sky-200">
-                    1. Introduction (25–30 Words)
+              {/* Directives & Key Precedents Anchor */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                
+                {/* Directive Guidance */}
+                <div className="bg-sky-50/80 border border-sky-200/90 rounded-2xl p-4 space-y-2">
+                  <span className="text-[11px] font-black uppercase tracking-wider text-sky-900 flex items-center gap-1.5">
+                    <Compass className="w-3.5 h-3.5 text-sky-600" />
+                    Examiner Directive Deconstruction
                   </span>
-                  <p className="text-xs text-slate-700 mt-1.5 leading-relaxed bg-slate-50/60 p-3 rounded-lg border border-slate-100">
+                  <p className="text-xs text-sky-950 leading-relaxed">
+                    This question tests your capacity to trace structural constitutional evolution. You must cite explicit Articles, distinguish procedural formal equality from substantive judicial justice, and provide real case jurisprudence.
+                  </p>
+                </div>
+
+                {/* Precedents & Articles to Quote */}
+                <div className="bg-indigo-50/80 border border-indigo-200/90 rounded-2xl p-4 space-y-2">
+                  <span className="text-[11px] font-black uppercase tracking-wider text-indigo-900 flex items-center gap-1.5">
+                    <Award className="w-3.5 h-3.5 text-indigo-600" />
+                    Mandatory Value-Add Precedents
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {content.cheatSheet.statutoryOrConstitutionalProvisions.map((prov, pIdx) => (
+                      <span key={pIdx} className="text-[10px] font-mono font-bold bg-white text-indigo-900 border border-indigo-200 px-2 py-0.5 rounded shadow-2xs">
+                        {prov.code}
+                      </span>
+                    ))}
+                    {content.cheatSheet.landmarkPrecedents.map((prec, prIdx) => (
+                      <span key={prIdx} className="text-[10px] font-bold bg-white text-sky-900 border border-sky-200 px-2 py-0.5 rounded shadow-2xs" title={prec.significance}>
+                        ⚖️ {prec.title.split(' vs ')[0].split(' v. ')[0]}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Step-by-Step 250-Word Model Structure */}
+              <div className="border border-slate-200/90 rounded-2xl p-5 sm:p-6 bg-white space-y-5 shadow-xs">
+                
+                {/* Part 1: Intro Hook */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[11px] font-black uppercase tracking-wider text-sky-900 bg-sky-100/80 px-2.5 py-0.5 rounded-lg border border-sky-200">
+                      1. Introduction (25–30 Words) • Constitutional Anchor
+                    </span>
+                    <span className="text-[11px] text-slate-400 font-medium">Topper Hook</span>
+                  </div>
+                  <p className="text-xs text-slate-700 leading-relaxed bg-slate-50 p-3.5 rounded-xl border border-slate-100 font-medium">
                     {content.mainsScaffold.approach.intro}
                   </p>
                 </div>
 
-                <div className="space-y-3">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-800">
-                    2. Core Body Arguments & Value Points
+                {/* Part 2: Body Paragraphs with Subheadings */}
+                <div className="space-y-3.5">
+                  <span className="text-[11px] font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+                    <FileText className="w-3.5 h-3.5 text-indigo-600" />
+                    2. Core Analytical Body & Multi-Dimensional Arguments
                   </span>
                   {content.mainsScaffold.approach.body.map((b, bIdx) => (
-                    <div key={bIdx} className="border border-slate-100 p-3.5 rounded-lg bg-slate-50/40">
-                      <span className="font-bold text-xs text-slate-900 block mb-1.5">
+                    <div key={bIdx} className="border border-slate-200/80 p-4 rounded-xl bg-slate-50/50 space-y-2">
+                      <span className="font-extrabold text-xs text-slate-900 block text-indigo-950">
                         {b.subheading}
                       </span>
-                      <ul className="space-y-1 text-xs text-slate-600">
+                      <ul className="space-y-1.5 text-xs text-slate-700">
                         {b.points.map((pt, pIdx) => (
                           <li key={pIdx} className="flex items-start space-x-2">
-                            <span className="text-sky-600 font-bold">•</span>
-                            <span>{pt}</span>
+                            <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0 mt-1.5" />
+                            <span className="leading-relaxed">{pt}</span>
                           </li>
                         ))}
                       </ul>
@@ -936,25 +1054,52 @@ Exam Tip: ${qa.examTip}
                   ))}
                 </div>
 
+                {/* Part 3: Visual Diagram Idea */}
                 {content.mainsScaffold.approach.diagramSuggestion && (
-                  <div className="bg-indigo-50/60 border border-indigo-100 p-3.5 rounded-lg text-xs">
-                    <span className="font-bold text-indigo-900 block mb-1">
-                      Value-Add Visual Diagram Idea for Exam Copy:
+                  <div className="bg-gradient-to-r from-indigo-50/80 to-purple-50/60 border border-indigo-200 p-4 rounded-xl text-xs space-y-1">
+                    <span className="font-black text-indigo-950 block text-[11px] uppercase tracking-wider flex items-center gap-1">
+                      <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+                      Visual Diagram / Flowchart Idea to Sketch on Answer Copy:
                     </span>
-                    <p className="text-indigo-800/80 leading-relaxed">
+                    <p className="text-indigo-900/90 leading-relaxed font-medium">
                       {content.mainsScaffold.approach.diagramSuggestion}
                     </p>
                   </div>
                 )}
 
+                {/* Part 4: Conclusion */}
                 <div>
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                    3. Forward-Looking Conclusion (25–30 Words)
-                  </span>
-                  <p className="text-xs text-slate-700 mt-1.5 leading-relaxed bg-slate-50/60 p-3 rounded-lg border border-slate-100">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[11px] font-black uppercase tracking-wider text-emerald-900 bg-emerald-100/80 px-2.5 py-0.5 rounded-lg border border-emerald-200">
+                      3. Forward-Looking Conclusion (25–30 Words) • Constitutional Morality
+                    </span>
+                    <span className="text-[11px] text-slate-400 font-medium">Balanced Closure</span>
+                  </div>
+                  <p className="text-xs text-slate-700 leading-relaxed bg-slate-50 p-3.5 rounded-xl border border-slate-100 font-medium">
                     {content.mainsScaffold.approach.conclusion}
                   </p>
                 </div>
+
+                {/* Action Toolbar */}
+                <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
+                  <div className="text-xs text-slate-500 font-medium">
+                    Mastered the structure? Test your speed and synthesis under exam conditions.
+                  </div>
+                  {onNavigateToMains && (
+                    <button
+                      onClick={() => {
+                        onClose();
+                        onNavigateToMains(content.mainsScaffold.question, node.title);
+                      }}
+                      className="btn-tactile px-4 py-2 rounded-xl text-xs font-black bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs flex items-center space-x-1.5 transition-all"
+                    >
+                      <Award className="w-3.5 h-3.5" />
+                      <span>Draft in AI Mains Studio Now</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+
               </div>
             </div>
           )}
@@ -971,10 +1116,10 @@ Exam Tip: ${qa.examTip}
                   Closed-Loop Study Flywheel
                 </span>
                 <h4 className="text-sm sm:text-base font-black text-white mt-1.5">
-                  Finished Reading? Complete Topic Mastery
+                  Complete Topic Mastery Flywheel
                 </h4>
                 <p className="text-xs text-slate-300 max-w-xl leading-relaxed">
-                  Top rankers never stop at passive reading. Transition directly into MCQ elimination drills and structured Mains answer writing for this exact topic.
+                  Top rankers never stop at passive reading. Transition directly into MCQ elimination drills, study the 250-word Mains framework, and submit for instant Gemini AI semantic evaluation.
                 </p>
               </div>
 
@@ -993,10 +1138,10 @@ Exam Tip: ${qa.examTip}
               </div>
             </div>
 
-            {/* Flywheel Trigger Buttons */}
-            <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+            {/* Flywheel 3-Step Action Buttons */}
+            <div className="relative z-10 grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
               
-              {/* Prelims Drill Handoff */}
+              {/* Step 2: Prelims Speed Drill */}
               <button
                 onClick={() => {
                   onClose();
@@ -1004,21 +1149,46 @@ Exam Tip: ${qa.examTip}
                     onNavigateToMocks(node.subject);
                   }
                 }}
-                className="btn-tactile p-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-left transition-all flex items-center justify-between group"
+                className="btn-tactile p-3.5 rounded-2xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-left transition-all flex flex-col justify-between group"
               >
                 <div className="space-y-1">
                   <div className="flex items-center space-x-1.5 text-xs font-bold text-amber-300">
                     <Zap className="w-4 h-4 text-amber-400" />
-                    <span>Step 2: Prelims Speed Drill</span>
+                    <span>Step 2: Prelims Drill</span>
                   </div>
                   <div className="text-xs text-slate-200">
-                    Practice 5–10 MCQ elimination questions on <strong className="text-white">{node.subject}</strong>
+                    5–10 MCQ elimination questions on <strong className="text-white">{node.subject}</strong>
                   </div>
                 </div>
-                <ArrowRight className="w-4 h-4 text-amber-400 group-hover:translate-x-1 transition-transform shrink-0 ml-2" />
+                <div className="pt-2 flex items-center text-amber-400 text-xs font-bold">
+                  <span>Start Quiz</span>
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform ml-1" />
+                </div>
               </button>
 
-              {/* Mains Studio Handoff */}
+              {/* Step 3: Study Mains Model Answer & Fodder */}
+              <button
+                onClick={() => {
+                  setActiveTab('mains');
+                }}
+                className="btn-tactile p-3.5 rounded-2xl border border-sky-500/30 bg-sky-500/10 hover:bg-sky-500/20 text-left transition-all flex flex-col justify-between group"
+              >
+                <div className="space-y-1">
+                  <div className="flex items-center space-x-1.5 text-xs font-bold text-sky-300">
+                    <BookMarked className="w-4 h-4 text-sky-400" />
+                    <span>Step 3: Study Model Answer</span>
+                  </div>
+                  <div className="text-xs text-slate-200">
+                    Review 250-word Topper structure, precedent case laws, & diagram ideas
+                  </div>
+                </div>
+                <div className="pt-2 flex items-center text-sky-400 text-xs font-bold">
+                  <span>Open Scaffold</span>
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform ml-1" />
+                </div>
+              </button>
+
+              {/* Step 4: AI Mains Studio Submission */}
               <button
                 onClick={() => {
                   onClose();
@@ -1029,18 +1199,21 @@ Exam Tip: ${qa.examTip}
                     );
                   }
                 }}
-                className="btn-tactile p-4 rounded-2xl border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 text-left transition-all flex items-center justify-between group"
+                className="btn-tactile p-3.5 rounded-2xl border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 text-left transition-all flex flex-col justify-between group"
               >
                 <div className="space-y-1">
                   <div className="flex items-center space-x-1.5 text-xs font-bold text-indigo-300">
                     <Award className="w-4 h-4 text-indigo-400" />
-                    <span>Step 3: Grade Mains Answer</span>
+                    <span>Step 4: AI Evaluation</span>
                   </div>
                   <div className="text-xs text-slate-200">
-                    Draft a 150/250-word answer for instant <strong className="text-white">Gemini AI semantic grading</strong>
+                    Draft & submit answer for instant <strong className="text-white">Gemini 15M rubric grading</strong>
                   </div>
                 </div>
-                <ArrowRight className="w-4 h-4 text-indigo-400 group-hover:translate-x-1 transition-transform shrink-0 ml-2" />
+                <div className="pt-2 flex items-center text-indigo-400 text-xs font-bold">
+                  <span>Write Answer</span>
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform ml-1" />
+                </div>
               </button>
 
             </div>

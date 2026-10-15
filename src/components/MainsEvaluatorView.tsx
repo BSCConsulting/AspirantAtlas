@@ -16,6 +16,8 @@ import {
   HelpCircle,
   Copy,
   ChevronDown,
+  ChevronUp,
+  BookMarked,
   Camera,
   Image as ImageIcon,
   Key,
@@ -283,6 +285,7 @@ export const MainsEvaluatorView: React.FC<MainsEvaluatorProps> = ({
   const [timerSeconds, setTimerSeconds] = useState<number>(0);
   const [isTimerRunning, setIsTimerRunning] = useState<boolean>(false);
   const [showModelAnswer, setShowModelAnswer] = useState<boolean>(false);
+  const [showFodderVault, setShowFodderVault] = useState<boolean>(true);
   const [isGeminiModalOpen, setIsGeminiModalOpen] = useState<boolean>(false);
   const [hasGeminiKey, setHasGeminiKey] = useState<boolean>(() => !!getGeminiApiKey());
   const [pastReports, setPastReports] = useState<MainsEvaluationReport[]>(() => {
@@ -481,6 +484,102 @@ export const MainsEvaluatorView: React.FC<MainsEvaluatorProps> = ({
                 <p className="text-xs text-slate-500 italic border-t border-slate-200/60 pt-2">
                   English: {selectedQuestion.question}
                 </p>
+              )}
+            </div>
+
+            {/* Topper Answer Blueprint & Value-Addition Fodder Vault */}
+            <div className="bg-gradient-to-br from-indigo-50/70 via-sky-50/40 to-white rounded-2xl border border-indigo-200/90 shadow-xs p-4.5 space-y-3.5">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center space-x-2">
+                  <span className="w-6 h-6 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-black text-xs shadow-2xs">
+                    <BookMarked className="w-3.5 h-3.5" />
+                  </span>
+                  <span className="font-extrabold text-xs text-indigo-950 uppercase tracking-wider">
+                    Topper Fodder & Answer Writing Vault
+                  </span>
+                </div>
+                <button
+                  onClick={() => setShowFodderVault(!showFodderVault)}
+                  className="btn-tactile text-xs font-bold text-indigo-700 hover:text-indigo-900 flex items-center gap-1 bg-white px-2.5 py-1 rounded-lg border border-indigo-200 shadow-2xs"
+                >
+                  <span>{showFodderVault ? 'Hide Blueprint' : 'Peek at Key Articles & Dimensions'}</span>
+                  {showFodderVault ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                </button>
+              </div>
+
+              {showFodderVault && (
+                <div className="space-y-3 pt-1 border-t border-indigo-100 animate-fadeIn">
+                  
+                  {/* Badges: Articles, Acts & PESTLE Dimensions */}
+                  <div className="space-y-2">
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span className="text-[11px] font-bold text-slate-500">Key Provisions & Precedents:</span>
+                      {selectedQuestion.keyArticlesOrActs.map((art, aIdx) => (
+                        <span key={aIdx} className="text-[10px] font-mono font-bold bg-white text-indigo-900 border border-indigo-200 px-2 py-0.5 rounded-md shadow-2xs">
+                          {art}
+                        </span>
+                      ))}
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span className="text-[11px] font-bold text-slate-500">PESTLE Angles:</span>
+                      {selectedQuestion.pestleThemes.map((theme, tIdx) => (
+                        <span key={tIdx} className="text-[10px] font-bold bg-indigo-100/80 text-indigo-800 border border-indigo-200 px-2 py-0.5 rounded-md">
+                          {theme}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Model Outline Summary */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 pt-1 text-xs text-slate-700">
+                    <div className="bg-white/90 p-3 rounded-xl border border-slate-200/90 shadow-2xs space-y-1">
+                      <span className="font-extrabold text-[11px] text-sky-800 uppercase tracking-wider block">
+                        1. Introduction Hook
+                      </span>
+                      <p className="line-clamp-3 text-slate-600 leading-relaxed font-medium">
+                        {selectedQuestion.modelIntro}
+                      </p>
+                    </div>
+
+                    <div className="bg-white/90 p-3 rounded-xl border border-slate-200/90 shadow-2xs space-y-1">
+                      <span className="font-extrabold text-[11px] text-indigo-800 uppercase tracking-wider block">
+                        2. Core Dimensions
+                      </span>
+                      <ul className="space-y-0.5 text-slate-600 line-clamp-3 leading-relaxed">
+                        {selectedQuestion.modelBody[0]?.points.slice(0, 2).map((pt, pidx) => (
+                          <li key={pidx} className="truncate">• {pt}</li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="bg-white/90 p-3 rounded-xl border border-slate-200/90 shadow-2xs space-y-1">
+                      <span className="font-extrabold text-[11px] text-emerald-800 uppercase tracking-wider block">
+                        3. Way Forward
+                      </span>
+                      <p className="line-clamp-3 text-slate-600 leading-relaxed font-medium">
+                        {selectedQuestion.modelWayForward}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Insert Outline Button */}
+                  <div className="pt-1 flex items-center justify-between">
+                    <span className="text-[11px] text-slate-500">
+                      Struggling to structure? Insert the standard framework into your canvas.
+                    </span>
+                    <button
+                      onClick={() => {
+                        const scaffold = `## 1. Introduction Hook\n${selectedQuestion.modelIntro}\n\n## 2. Core Dimensions & Constitutional Arguments\n${selectedQuestion.modelBody.map(b => `### ${b.title}\n${b.points.map(p => `- ${p}`).join('\n')}`).join('\n\n')}\n\n## 3. Way Forward & Constitutional Morality\n${selectedQuestion.modelWayForward}`;
+                        setUserAnswer(scaffold);
+                      }}
+                      className="btn-tactile text-xs font-bold text-indigo-700 hover:text-indigo-900 bg-white hover:bg-slate-50 px-3 py-1 rounded-lg border border-indigo-200 shadow-2xs flex items-center gap-1 transition-all"
+                    >
+                      <Copy className="w-3 h-3 text-indigo-600" />
+                      <span>Insert Scaffold Framework into Canvas</span>
+                    </button>
+                  </div>
+                </div>
               )}
             </div>
 

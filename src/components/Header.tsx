@@ -109,26 +109,27 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center justify-between h-16 gap-2 sm:gap-4 lg:gap-6">
           
           {/* 1. Left: Brand Emblem & Title + Mobile Exam Selector */}
-          <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-sky-600 to-indigo-500 flex items-center justify-center text-white shadow-sm shadow-indigo-500/20">
-              <Compass className="w-5 h-5 text-white" />
+          <div className="flex items-center space-x-1.5 sm:space-x-3 shrink-0 min-w-0">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-sky-600 to-indigo-500 flex items-center justify-center text-white shadow-sm shadow-indigo-500/20 shrink-0">
+              <Compass className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
 
-            <div className="flex items-center space-x-1.5 sm:space-x-2">
-              <span className="font-black text-sm sm:text-base md:text-lg tracking-tight text-slate-900 leading-none truncate max-w-[105px] xs:max-w-none">
+            <div className="flex items-center space-x-1.5 sm:space-x-2 min-w-0">
+              <span className="font-black text-sm sm:text-base md:text-lg tracking-tight text-slate-900 leading-none whitespace-nowrap">
                 AspirantAtlas
               </span>
-              <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200">
+              <span className="hidden sm:inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
                 Rank Engine
               </span>
             </div>
 
             {/* Mobile Compact Exam Selector Dropdown */}
-            <div className="md:hidden ml-0.5">
+            <div className="md:hidden ml-1 shrink-0">
               <select
                 value={selectedExam}
                 onChange={(e) => onSelectExam(e.target.value as ExamId)}
-                className="bg-slate-100 hover:bg-slate-200/80 border border-slate-200/90 text-[10px] sm:text-[11px] font-black text-slate-800 rounded-lg py-1 px-1 focus:outline-none transition-all cursor-pointer"
+                aria-label="Target Exam Scope"
+                className="bg-slate-100 hover:bg-slate-200/80 border border-slate-200/90 text-[10px] font-black text-slate-800 rounded-lg py-1 px-1.5 focus:outline-none transition-all cursor-pointer"
               >
                 <option value="upsc">UPSC</option>
                 <option value="appsc">APPSC</option>
@@ -145,14 +146,14 @@ export const Header: React.FC<HeaderProps> = ({
                 <button
                   key={exam}
                   onClick={() => onSelectExam(exam)}
-                  className={`btn-tactile px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap flex items-center space-x-1.5 ${
+                  className={`btn-tactile px-2.5 lg:px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap flex items-center space-x-1.5 ${
                     active
                       ? 'bg-white text-slate-900 shadow-sm font-black border border-slate-200/80'
                       : 'text-slate-500 hover:text-slate-900 hover:bg-white/50'
                   }`}
                 >
                   <span>{examTitles[exam].short}</span>
-                  <span className="text-[10px] text-slate-400 font-medium">
+                  <span className="hidden xl:inline text-[10px] text-slate-400 font-medium">
                     {showTelugu ? examTitles[exam].telugu : examTitles[exam].full}
                   </span>
                 </button>
@@ -161,18 +162,18 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* 3. Right: Consolidated Action Controls (All consistent 36px height) */}
-          <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
+          <div className="flex items-center space-x-1 sm:space-x-1.5 shrink-0">
             
-            {/* Search Input Button (Hidden on small mobile, accessible via bottom nav) */}
+            {/* Search Input Button */}
             {onOpenSearch && (
               <button
                 onClick={onOpenSearch}
-                className="hidden sm:flex btn-tactile h-9 px-3 bg-slate-100/80 hover:bg-slate-100 border border-slate-200/80 rounded-xl text-xs text-slate-500 hover:text-slate-900 items-center space-x-2 transition-all group"
+                className="hidden sm:flex btn-tactile h-9 px-2.5 lg:px-3 bg-slate-100/80 hover:bg-slate-100 border border-slate-200/80 rounded-xl text-xs text-slate-500 hover:text-slate-900 items-center space-x-2 transition-all group shrink-0"
                 title="Search Hub (Cmd+K or /)"
               >
                 <Search className="w-3.5 h-3.5 text-slate-400 group-hover:text-indigo-600 transition-colors" />
                 <span className="hidden lg:inline text-xs font-medium">Search...</span>
-                <kbd className="font-mono text-[10px] bg-white border border-slate-200 text-slate-500 px-1.5 py-0.2 rounded font-bold shadow-2xs">
+                <kbd className="hidden xl:inline-block font-mono text-[10px] bg-white border border-slate-200 text-slate-500 px-1.5 py-0.2 rounded font-bold shadow-2xs">
                   ⌘K
                 </kbd>
               </button>
@@ -183,21 +184,21 @@ export const Header: React.FC<HeaderProps> = ({
               activeSession ? (
                 <button
                   onClick={onOpenSessionModal}
-                  className="btn-tactile h-9 px-2 sm:px-3 bg-emerald-50 hover:bg-emerald-100/90 border border-emerald-300 rounded-xl text-xs font-black text-emerald-800 flex items-center space-x-1.5 transition-all shadow-2xs group"
+                  className="btn-tactile h-9 px-2 sm:px-2.5 bg-emerald-50 hover:bg-emerald-100/90 border border-emerald-300 rounded-xl text-xs font-black text-emerald-800 flex items-center space-x-1 sm:space-x-1.5 transition-all shadow-2xs group shrink-0"
                   title="Active Study Session (Click to view or check out)"
                 >
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
                   <span className="font-mono text-xs">
                     {Math.floor(elapsedSeconds / 3600).toString().padStart(2, '0')}:{Math.floor((elapsedSeconds % 3600) / 60).toString().padStart(2, '0')}:{Math.floor(elapsedSeconds % 60).toString().padStart(2, '0')}
                   </span>
-                  <span className="hidden sm:inline text-[10px] font-bold text-emerald-700 bg-emerald-200/60 px-1 py-0.2 rounded">
+                  <span className="hidden md:inline text-[10px] font-bold text-emerald-700 bg-emerald-200/60 px-1 py-0.2 rounded">
                     Check Out
                   </span>
                 </button>
               ) : (
                 <button
                   onClick={onOpenSessionModal}
-                  className="btn-tactile h-9 px-2 sm:px-3 bg-indigo-50/90 hover:bg-indigo-100/80 border border-indigo-200/80 rounded-xl text-xs font-bold text-indigo-700 flex items-center space-x-1.5 transition-all shadow-2xs"
+                  className="btn-tactile h-9 px-2 sm:px-2.5 bg-indigo-50/90 hover:bg-indigo-100/80 border border-indigo-200/80 rounded-xl text-xs font-bold text-indigo-700 flex items-center space-x-1 sm:space-x-1.5 transition-all shadow-2xs shrink-0"
                   title="Daily Study Check-In & Attendance"
                 >
                   <Clock className="w-3.5 h-3.5 text-indigo-600" />
@@ -206,32 +207,32 @@ export const Header: React.FC<HeaderProps> = ({
               )
             )}
 
-            {/* Dashboard & Rank Predictor Button */}
+            {/* Dashboard & Rank Predictor Button (Direct on xl+, available in Tools dropdown on all screens) */}
             {onOpenDashboard && (
               <button
                 onClick={onOpenDashboard}
-                className="btn-tactile h-9 px-2.5 sm:px-3 rounded-xl border border-indigo-200/90 bg-indigo-50/80 hover:bg-indigo-100 text-indigo-800 text-xs font-black transition-all shadow-2xs flex items-center space-x-1.5"
+                className="hidden xl:flex btn-tactile h-9 px-2.5 rounded-xl border border-indigo-200/90 bg-indigo-50/80 hover:bg-indigo-100 text-indigo-800 text-xs font-black transition-all shadow-2xs items-center space-x-1.5 shrink-0"
                 title="Aspirant Analytics Dashboard & Rank Predictor"
               >
                 <TrendingUp className="w-3.5 h-3.5 text-indigo-600" />
-                <span className="hidden md:inline">Dashboard</span>
+                <span>Dashboard</span>
               </button>
             )}
 
             {/* Commercial PRO Upgrade / Badge Button */}
             {currentUser?.isPro ? (
               <div
-                className="h-9 px-2.5 sm:px-3 rounded-xl bg-gradient-to-r from-amber-400/20 to-amber-500/20 border border-amber-300 text-amber-900 text-xs font-black flex items-center space-x-1.5 shadow-2xs cursor-default"
+                className="h-9 px-2 sm:px-2.5 rounded-xl bg-gradient-to-r from-amber-400/20 to-amber-500/20 border border-amber-300 text-amber-900 text-xs font-black flex items-center space-x-1.5 shadow-2xs cursor-default shrink-0"
                 title="AspirantAtlas PRO Subscriber Active"
               >
                 <Crown className="w-3.5 h-3.5 text-amber-600 fill-amber-500" />
-                <span className="hidden xs:inline">PRO</span>
+                <span className="hidden sm:inline">PRO</span>
               </div>
             ) : (
               onOpenPricing && (
                 <button
                   onClick={onOpenPricing}
-                  className="btn-tactile h-9 px-2.5 sm:px-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-xs font-black transition-all shadow-xs flex items-center space-x-1.5 animate-pulse"
+                  className="btn-tactile h-9 px-2 sm:px-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-xs font-black transition-all shadow-xs flex items-center space-x-1.5 animate-pulse shrink-0"
                   title="View Commercial Pro Subscription Plans"
                 >
                   <Crown className="w-3.5 h-3.5 text-amber-100 fill-amber-100" />
@@ -240,10 +241,10 @@ export const Header: React.FC<HeaderProps> = ({
               )
             )}
 
-            {/* Audio Feedback Toggle Button */}
+            {/* Audio Feedback Toggle Button (Available directly on xl+, and inside Tools menu on all screens) */}
             <button
               onClick={toggleSound}
-              className={`btn-tactile h-9 w-9 rounded-xl border text-xs font-bold transition-all flex items-center justify-center shadow-2xs ${
+              className={`hidden xl:flex btn-tactile h-9 w-9 rounded-xl border text-xs font-bold transition-all items-center justify-center shadow-2xs shrink-0 ${
                 soundOn 
                   ? 'bg-white border-slate-200/90 text-indigo-600 hover:bg-slate-50' 
                   : 'bg-slate-100 border-slate-200 text-slate-400 hover:bg-slate-200'
@@ -254,10 +255,10 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
 
             {/* Consolidated Quick Tools Menu Button */}
-            <div className="relative">
+            <div className="relative shrink-0">
               <button
                 onClick={() => setIsToolsOpen(!isToolsOpen)}
-                className={`btn-tactile h-9 px-2.5 sm:px-3 rounded-xl border text-xs font-bold transition-all flex items-center space-x-1.5 shadow-2xs ${
+                className={`btn-tactile h-9 px-2 sm:px-2.5 rounded-xl border text-xs font-bold transition-all flex items-center space-x-1 sm:space-x-1.5 shadow-2xs ${
                   isToolsOpen 
                     ? 'bg-slate-900 text-white border-slate-900 shadow-sm' 
                     : 'bg-white border-slate-200/90 text-slate-700 hover:bg-slate-50'
@@ -265,7 +266,7 @@ export const Header: React.FC<HeaderProps> = ({
                 title="Quick Tools (Language, AI Key, Habit Drill, Guide)"
               >
                 <SlidersHorizontal className="w-3.5 h-3.5" />
-                <span className="hidden lg:inline">Tools</span>
+                <span className="hidden sm:inline">Tools</span>
                 <ChevronDown className={`w-3 h-3 transition-transform ${isToolsOpen ? 'rotate-180' : ''}`} />
               </button>
 
@@ -382,7 +383,7 @@ export const Header: React.FC<HeaderProps> = ({
             {onOpenAuth && (
               <button
                 onClick={onOpenAuth}
-                className="btn-tactile h-9 pl-2 pr-2.5 sm:pr-3 rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold transition-all shadow-2xs flex items-center space-x-2"
+                className="btn-tactile h-9 pl-2 pr-2 sm:pr-2.5 rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold transition-all shadow-2xs flex items-center space-x-1.5 sm:space-x-2 shrink-0"
                 title="Aspirant Profile & Cloud Sync"
               >
                 {currentUser ? (

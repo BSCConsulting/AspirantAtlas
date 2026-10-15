@@ -16,7 +16,11 @@ import {
   Tag,
   Zap,
   Flame,
-  Check
+  Check,
+  ChevronDown,
+  ChevronUp,
+  BookMarked,
+  GraduationCap
 } from 'lucide-react';
 
 interface CurrentAffairsBridgeProps {
@@ -39,6 +43,11 @@ export const CurrentAffairsBridge: React.FC<CurrentAffairsBridgeProps> = ({
   const [filterExam, setFilterExam] = useState<ExamId | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeDigestIdx, setActiveDigestIdx] = useState<number>(0);
+  const [expandedMainsIds, setExpandedMainsIds] = useState<Record<string, boolean>>({});
+
+  const toggleExpandMains = (id: string) => {
+    setExpandedMainsIds(prev => ({ ...prev, [id]: !prev[id] }));
+  };
 
   const filteredItems = CURRENT_AFFAIRS_ITEMS.filter((item) => {
     const matchesExam = filterExam === 'all' || item.examScope.includes(filterExam);
@@ -124,34 +133,135 @@ export const CurrentAffairsBridge: React.FC<CurrentAffairsBridgeProps> = ({
         </div>
 
         {/* Active Digest Card */}
-        {topDigestItems[activeDigestIdx] && (
-          <div className="bg-white rounded-xl p-4 border border-amber-200/60 shadow-xs space-y-3">
-            <div className="flex items-center justify-between">
-              <h4 className="font-extrabold text-sm text-slate-900 line-clamp-1">
-                {showTelugu && topDigestItems[activeDigestIdx].titleTelugu 
-                  ? topDigestItems[activeDigestIdx].titleTelugu 
-                  : topDigestItems[activeDigestIdx].title}
-              </h4>
-              <button
-                onClick={() => onOpenTopic(topDigestItems[activeDigestIdx].linkedNodeId)}
-                className="text-[11px] font-bold text-teal-700 hover:text-teal-900 flex items-center gap-1 shrink-0 bg-teal-50 px-2.5 py-0.5 rounded-lg border border-teal-200"
-              >
-                <span>Syllabus Hub</span>
-                <ArrowRight className="w-3 h-3" />
-              </button>
-            </div>
+        {topDigestItems[activeDigestIdx] && (() => {
+          const currentDigest = topDigestItems[activeDigestIdx];
+          const isMainsExpanded = !!expandedMainsIds[`digest-${currentDigest.id}`];
 
-            <p className="text-xs text-slate-700 leading-relaxed">
-              {topDigestItems[activeDigestIdx].summary}
-            </p>
+          return (
+            <div className="bg-white rounded-2xl p-5 border border-amber-200/80 shadow-xs space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center space-x-2">
+                  <span className="text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-900 px-2 py-0.5 rounded-full border border-amber-300">
+                    Lead Editorial Pointer
+                  </span>
+                  <span className="text-xs text-slate-400 font-medium">{currentDigest.date}</span>
+                </div>
+                <button
+                  onClick={() => onOpenTopic(currentDigest.linkedNodeId)}
+                  className="text-xs font-bold text-teal-700 hover:text-teal-900 flex items-center gap-1.5 shrink-0 bg-teal-50 hover:bg-teal-100 px-3 py-1 rounded-xl border border-teal-200 transition-colors"
+                >
+                  <BookOpen className="w-3.5 h-3.5 text-teal-600" />
+                  <span>Syllabus: {currentDigest.linkedTopicTitle}</span>
+                  <ArrowRight className="w-3 h-3" />
+                </button>
+              </div>
 
-            <div className="flex flex-wrap items-center gap-2 text-xs pt-1 border-t border-slate-100">
-              <span className="text-[11px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
-                ⚡ Prelims: {topDigestItems[activeDigestIdx].prelimsPointer.slice(0, 100)}...
-              </span>
+              <div>
+                <h4 className="font-extrabold text-base text-slate-900 leading-snug">
+                  {showTelugu && currentDigest.titleTelugu 
+                    ? currentDigest.titleTelugu 
+                    : currentDigest.title}
+                </h4>
+                {showTelugu && currentDigest.titleTelugu && (
+                  <p className="text-xs text-slate-400 italic mt-0.5">{currentDigest.title}</p>
+                )}
+              </div>
+
+              <p className="text-xs sm:text-sm text-slate-700 leading-relaxed bg-slate-50/70 p-3.5 rounded-xl border border-slate-100">
+                {currentDigest.summary}
+              </p>
+
+              {/* Dual Focus: Prelims Fact & Mains Question Hook */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+                
+                {/* Full Untruncated Prelims Fact */}
+                <div className="bg-amber-50/90 border border-amber-200/90 rounded-xl p-3.5 space-y-1.5">
+                  <div className="flex items-center space-x-1.5 text-xs font-black text-amber-900">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                    <span>Prelims High-Yield Fact</span>
+                  </div>
+                  <p className="text-xs text-amber-950 leading-relaxed font-medium">
+                    {currentDigest.prelimsPointer}
+                  </p>
+                </div>
+
+                {/* Mains Question Hook */}
+                <div className="bg-indigo-50/90 border border-indigo-200/90 rounded-xl p-3.5 space-y-1.5">
+                  <div className="flex items-center space-x-1.5 text-xs font-black text-indigo-900">
+                    <GraduationCap className="w-3.5 h-3.5 text-indigo-600" />
+                    <span>Mains Question Hook (15M / 250W)</span>
+                  </div>
+                  <p className="text-xs text-indigo-950 leading-relaxed italic font-medium">
+                    {currentDigest.mainsQuestionHook}
+                  </p>
+                </div>
+              </div>
+
+              {/* Interactive Mains Analytical Blueprint & Dimensions Drawer */}
+              <div className="pt-2 border-t border-slate-100">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <button
+                    onClick={() => toggleExpandMains(`digest-${currentDigest.id}`)}
+                    className="btn-tactile text-xs font-bold text-slate-700 hover:text-indigo-900 bg-slate-100/90 hover:bg-slate-200/70 px-3 py-1.5 rounded-xl border border-slate-200 flex items-center space-x-1.5 transition-all"
+                  >
+                    <BookMarked className="w-3.5 h-3.5 text-indigo-600" />
+                    <span>{isMainsExpanded ? 'Hide Mains 250-Word Structure' : 'Study Mains Answer Blueprint & Dimensions'}</span>
+                    {isMainsExpanded ? <ChevronUp className="w-3.5 h-3.5 ml-1" /> : <ChevronDown className="w-3.5 h-3.5 ml-1" />}
+                  </button>
+
+                  {onNavigateToMains && (
+                    <button
+                      onClick={() => onNavigateToMains(currentDigest.mainsQuestionHook, currentDigest.linkedTopicTitle)}
+                      className="btn-tactile flex items-center space-x-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs transition-all"
+                    >
+                      <Award className="w-3.5 h-3.5" />
+                      <span>Attempt in Mains Studio</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+
+                {/* Expanded Mains Answer Fodder */}
+                {isMainsExpanded && (
+                  <div className="mt-3.5 p-4 bg-gradient-to-br from-indigo-50/50 via-white to-slate-50 rounded-2xl border border-indigo-200/80 shadow-inner space-y-3 animate-fadeIn">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-black uppercase tracking-wider text-indigo-900 flex items-center gap-1.5">
+                        <Award className="w-3.5 h-3.5 text-indigo-600" />
+                        Examiner's Expected Value Points & Case Precedents:
+                      </span>
+                      <span className="text-[10px] bg-indigo-100 text-indigo-800 font-bold px-2 py-0.5 rounded-full">
+                        GS-2 / GS-3 Focus
+                      </span>
+                    </div>
+
+                    <ul className="space-y-2 text-xs text-slate-700">
+                      {currentDigest.highYieldPoints.map((pt, pidx) => (
+                        <li key={pidx} className="flex items-start space-x-2 bg-white/80 p-2.5 rounded-lg border border-slate-100">
+                          <span className="w-5 h-5 rounded-md bg-indigo-100 text-indigo-800 text-[10px] font-black flex items-center justify-center shrink-0 mt-0.5">
+                            {pidx + 1}
+                          </span>
+                          <span className="leading-relaxed font-medium">{pt}</span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <div className="bg-amber-50/80 p-3 rounded-xl border border-amber-200/80 text-xs text-amber-950 flex items-start space-x-2">
+                      <Sparkles className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                      <div>
+                        <strong className="text-amber-900 block font-bold">Recommended 250-Word Structure:</strong>
+                        <span className="leading-relaxed">
+                          <strong>Intro:</strong> Define substantive equality & state the Davinder Singh (2024) overruling of Chinnaiah. • 
+                          <strong>Body:</strong> Pro-sub-classification (combating intra-group inequality) vs Concerns (creamy layer debate, empirical data tests). • 
+                          <strong>Conclusion:</strong> Affirm statutory commissions and objective criteria to preserve social cohesion.
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
       </div>
 
       {/* Filter and Search Bar */}
@@ -279,26 +389,53 @@ export const CurrentAffairsBridge: React.FC<CurrentAffairsBridgeProps> = ({
                 </div>
 
                 {/* Mains Hook */}
-                <div className="bg-indigo-50/80 border border-indigo-200/80 rounded-xl p-4 flex flex-col justify-between space-y-2">
+                <div className="bg-indigo-50/80 border border-indigo-200/80 rounded-xl p-4 flex flex-col justify-between space-y-3">
                   <div className="space-y-1.5">
                     <div className="flex items-center space-x-1.5 text-xs font-bold text-indigo-900">
-                      <Award className="w-4 h-4 text-indigo-600" />
-                      <span>Mains Question Hook</span>
+                      <GraduationCap className="w-4 h-4 text-indigo-600" />
+                      <span>Mains Question Hook (15 Marks)</span>
                     </div>
-                    <p className="text-xs text-indigo-950 leading-relaxed italic">
+                    <p className="text-xs text-indigo-950 leading-relaxed italic font-medium">
                       {item.mainsQuestionHook}
                     </p>
                   </div>
-                  {onNavigateToMains && (
-                    <div className="pt-2 flex justify-end">
+
+                  <div className="pt-2 flex flex-wrap items-center justify-between gap-2 border-t border-indigo-100">
+                    <button
+                      onClick={() => toggleExpandMains(item.id)}
+                      className="btn-tactile text-xs font-bold text-indigo-700 hover:text-indigo-900 bg-white/80 hover:bg-white px-2.5 py-1 rounded-lg border border-indigo-200 flex items-center space-x-1 transition-all"
+                    >
+                      <BookMarked className="w-3 h-3 text-indigo-600" />
+                      <span>{expandedMainsIds[item.id] ? 'Hide Blueprint' : 'Mains Blueprint'}</span>
+                      {expandedMainsIds[item.id] ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                    </button>
+
+                    {onNavigateToMains && (
                       <button
                         onClick={() => onNavigateToMains(item.mainsQuestionHook, item.linkedTopicTitle)}
-                        className="btn-tactile flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-black bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs transition-all"
+                        className="btn-tactile flex items-center space-x-1 px-3 py-1.5 rounded-lg text-xs font-black bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs transition-all"
                       >
                         <Award className="w-3.5 h-3.5" />
-                        <span>Grade Answer with Gemini</span>
+                        <span>Grade Answer</span>
                         <ArrowRight className="w-3.5 h-3.5" />
                       </button>
+                    )}
+                  </div>
+
+                  {/* Expanded Blueprint in Feed Card */}
+                  {expandedMainsIds[item.id] && (
+                    <div className="p-3 bg-white/90 rounded-xl border border-indigo-200 text-xs text-slate-700 space-y-2 animate-fadeIn">
+                      <div className="font-bold text-indigo-900 text-[11px] uppercase tracking-wider">
+                        Core Dimensions to Address in 250 Words:
+                      </div>
+                      <ul className="space-y-1 text-slate-600">
+                        {item.highYieldPoints.map((pt, pidx) => (
+                          <li key={pidx} className="flex items-start space-x-1.5">
+                            <span className="text-indigo-600 font-bold">•</span>
+                            <span>{pt}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   )}
                 </div>

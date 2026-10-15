@@ -1,4 +1,5 @@
 import { DocumentDetail } from '../types';
+import { ADDITIONAL_DOCUMENT_DETAILS } from './documentDetailsAdditional';
 
 export const DOCUMENT_DETAILS_MAP: Record<string, DocumentDetail> = {
   // =========================================================================
@@ -846,3 +847,7 @@ export const DOCUMENT_DETAILS_MAP: Record<string, DocumentDetail> = {
     ]
   }
 };
+
+// Merge all additional official documents and statutory reference works
+Object.assign(DOCUMENT_DETAILS_MAP, ADDITIONAL_DOCUMENT_DETAILS);
+

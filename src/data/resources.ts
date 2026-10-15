@@ -786,6 +786,36 @@ export const RESOURCE_VAULT: ResourceCategory[] = [
         fileSize: 'Visual Guide (24 Ch)',
         issuingAuthority: 'PMFIAS (Manjunath Thamminidi)',
         year: 'Illustrated Edition'
+      },
+      {
+        id: 'rv-shankar-ias-environment',
+        docId: 'shankar-ias-environment',
+        title: 'Environment & Ecology: Comprehensive Standard Reference (Shankar IAS)',
+        titleTelugu: 'పర్యావరణం & జీవావరణ శాస్త్రం (శంకర్ ఐఏఎస్ ప్రామాణిక గ్రంథం)',
+        description: 'The universally acknowledged bible for Environment and Ecology in UPSC Civil Services and State PSCs. Delivers exhaustive, systematic coverage across Ecology & Ecosystem dynamics, Biodiversity conservation (in-situ vs ex-situ), Protected Area Network of India, Environmental Pollution, Climate Change, International Conventions (UNFCCC, CBD, UNCCD, Ramsar, CITES, CMS, Stockholm, Basel, Minamata), and statutory environmental acts.',
+        type: 'Standard Reference',
+        subjectKey: 'geography-env',
+        targetExams: ['upsc', 'appsc', 'tspsc'],
+        url: 'https://archive.org',
+        badge: 'Environment Core',
+        fileSize: 'Standard Work (30 Ch)',
+        issuingAuthority: 'Shankar IAS Academy',
+        year: '10th Edition (Standard)'
+      },
+      {
+        id: 'rv-pmfias-environment',
+        docId: 'pmfias-environment',
+        title: 'Environment & Ecology: Illustrated Visual Guide (PMFIAS)',
+        titleTelugu: 'పర్యావరణం & జీవావరణ శాస్త్రం: చిత్రాలతో కూడిన సమగ్ర నోట్స్ (పీఎంఎఫ్ ఐఏఎస్)',
+        description: 'High-yield, visually structured civil services guide to Environment and Ecology. Topper-acclaimed for its crystal-clear color infographics, species distribution maps, IUCN status tables, biogeochemical cycles, mangrove ecology, wetland classification, coral bleaching mechanisms, global carbon cycle, and detailed treaty timelines.',
+        type: 'Standard Reference',
+        subjectKey: 'geography-env',
+        targetExams: ['upsc', 'appsc', 'tspsc'],
+        url: 'https://archive.org',
+        badge: 'Illustrated Ecology',
+        fileSize: 'Visual Guide (32 Ch)',
+        issuingAuthority: 'PMFIAS (Manjunath Thamminidi)',
+        year: 'Illustrated Edition'
       }
     ]
   },
@@ -872,7 +902,22 @@ export const RESOURCE_VAULT: ResourceCategory[] = [
         badge: 'Quantum Mission',
         fileSize: 'Official Report',
         issuingAuthority: "Department of Science and Technology (DST), Govt of India",
-        year: "Approved April 2023 / \u20b96,003 Crore Outlay"
+        year: "Approved April 2023 / ₹6,003 Crore Outlay"
+      },
+      {
+        id: 'rv-ravi-agrahari-science-technology',
+        docId: 'ravi-agrahari-science-technology',
+        title: 'Science and Technology for Civil Services Examinations (Dr. Ravi P. Agrahari)',
+        titleTelugu: 'సైన్స్ & టెక్నాలజీ (డా. రవి పి. అగ్రహారి ప్రామాణిక గ్రంథం)',
+        description: 'The foremost, gold-standard reference work for Science & Technology in UPSC Civil Services Mains GS Paper III and Prelims. Systematically covers Space Technology (ISRO orbits, launch vehicles: PSLV, GSLV Mk III / LVM3, SSLV; Gaganyaan, Chandrayaan-3, Aditya-L1), Defence Technology (Missile classification, BMD shield, Stealth, Submarines), Nuclear Technology (3-stage program, FBRs, Thorium cycle), Biotechnology & Genetics (CRISPR-Cas9, CAR-T, GM crops), and ICT/Emerging Technologies (5G, Quantum Computing, AI, Semiconductors).',
+        type: 'Standard Reference',
+        subjectKey: 'scitech',
+        targetExams: ['upsc', 'appsc', 'tspsc'],
+        url: 'https://archive.org',
+        badge: 'Sci-Tech Core',
+        fileSize: 'Standard Work (22 Modules)',
+        issuingAuthority: 'Dr. Ravi P. Agrahari / McGraw-Hill Education',
+        year: '7th Edition (Standard)'
       }
     ]
   },
@@ -915,6 +960,51 @@ export const RESOURCE_VAULT: ResourceCategory[] = [
         fileSize: '1.7 MB',
         issuingAuthority: 'Committee on Standards in Public Life / DoPT',
         year: 'Benchmark Standard'
+      },
+      {
+        id: 'rv-lexicon-ethics-integrity-aptitude',
+        docId: 'lexicon-ethics-integrity-aptitude',
+        title: 'Lexicon for Ethics, Integrity & Aptitude (Chronicle Books)',
+        titleTelugu: 'నీతిశాస్త్రం, నిజాయితీ & సమర్థత (లెక్సికాన్ - క్రానికల్ బుక్స్)',
+        description: 'The canonical terminological and conceptual lexicon for General Studies Paper IV (Ethics, Integrity & Aptitude). Delivers rigorous definitions, historical origins, administrative context, and philosophical applications of fundamental ethical doctrines: Ethics in public/private life, Human values, Attitude structure (CAB model), Emotional Intelligence, Foundational values for civil service (Integrity, Impartiality, Objectivity, Empathy), Ethical governance, Probity, Citizen\'s Charter, and Case Study resolution frameworks.',
+        type: 'Standard Reference',
+        subjectKey: 'ethics',
+        targetExams: ['upsc', 'appsc', 'tspsc'],
+        url: 'https://archive.org',
+        badge: 'Ethics Lexicon',
+        fileSize: 'Standard Work (16 Ch)',
+        issuingAuthority: 'Chronicle Publications / Niraj Kumar',
+        year: 'GS-4 Benchmark'
+      },
+      {
+        id: 'rv-dk-balaji-ethics-handbook',
+        docId: 'dk-balaji-ethics-handbook',
+        title: 'Ethics, Integrity & Aptitude: Practical Civil Service Perspectives (D.K. Balaji IAS)',
+        titleTelugu: 'సివిల్ సర్వీసెస్ నీతిశాస్త్రం & కేస్ స్టడీస్ (డి.కె. బాలాజీ ఐఏఎస్)',
+        description: 'Authored by a serving civil servant (AIR 36), this authoritative text bridges abstract moral philosophy with the brutal ground realities of Indian district administration. Highly acclaimed for its pragmatic approach to resolving complex case studies involving political pressure, mob violence, communal riots, illegal encroachments, public tender cartels, and humanitarian emergencies while strictly upholding constitutional values and administrative law.',
+        type: 'Standard Reference',
+        subjectKey: 'ethics',
+        targetExams: ['upsc', 'appsc', 'tspsc'],
+        url: 'https://archive.org',
+        badge: 'Administrative Ethics',
+        fileSize: 'Practical Guide (15 Ch)',
+        issuingAuthority: 'D.K. Balaji IAS / McGraw-Hill Education',
+        year: 'Civil Service Standard'
+      },
+      {
+        id: 'rv-subba-rao-ethics-integrity-aptitude',
+        docId: 'subba-rao-ethics-integrity-aptitude',
+        title: 'Ethics, Integrity and Aptitude: Theoretical Foundations (G. Subba Rao IAS & P.N. Roy Chowdhury)',
+        titleTelugu: 'నీతిశాస్త్రం & నైతిక పరిపాలన (జి. సుబ్బారావు ఐఏఎస్ & పి.ఎన్. రాయ్ చౌదరి)',
+        description: 'A deeply philosophical yet administratively grounded treatise on Ethics, Integrity, and Aptitude by former senior IAS officers. Explores the philosophical foundations of Western and Indian moral thought (Socrates, Plato, Aristotle, Bentham, Kant, Rawls, Kautilya, Vivekananda, Gandhi), ethical dilemmas in governance, corporate governance, civil service neutrality vs commitment, citizen-centric administrative reforms, and probity in public life.',
+        type: 'Standard Reference',
+        subjectKey: 'ethics',
+        targetExams: ['upsc', 'appsc', 'tspsc'],
+        url: 'https://archive.org',
+        badge: 'Theoretical Foundations',
+        fileSize: 'Academic Guide (18 Ch)',
+        issuingAuthority: 'G. Subba Rao IAS & P.N. Roy Chowdhury / Access Publishing',
+        year: 'Administrative Classic'
       }
     ]
   },

@@ -1,5 +1,7 @@
 import { DocumentDetail } from '../types';
 import { ADDITIONAL_DOCUMENT_DETAILS } from './documentDetailsAdditional';
+import { REPORTS_BATCH2_DETAILS } from './documentDetailsReportsBatch2';
+import { NCERT_DOCUMENT_DETAILS } from './documentDetailsNcert';
 
 export const DOCUMENT_DETAILS_MAP: Record<string, DocumentDetail> = {
   // =========================================================================
@@ -848,6 +850,9 @@ export const DOCUMENT_DETAILS_MAP: Record<string, DocumentDetail> = {
   }
 };
 
-// Merge all additional official documents and statutory reference works
+// Merge all additional official documents, batch-2 reports, and NCERT foundational textbooks
 Object.assign(DOCUMENT_DETAILS_MAP, ADDITIONAL_DOCUMENT_DETAILS);
+Object.assign(DOCUMENT_DETAILS_MAP, REPORTS_BATCH2_DETAILS);
+Object.assign(DOCUMENT_DETAILS_MAP, NCERT_DOCUMENT_DETAILS);
+
 

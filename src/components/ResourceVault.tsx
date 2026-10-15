@@ -26,10 +26,12 @@ interface ResourceVaultProps {
 export const ResourceVault: React.FC<ResourceVaultProps> = ({ showTelugu }) => {
   const [viewingDocument, setViewingDocument] = useState<DocumentDetail | null>(null);
   const [selectedSubject, setSelectedSubject] = useState<ResourceSubjectKey>('all');
+  const [selectedClass, setSelectedClass] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
   const subjectPills: { id: ResourceSubjectKey; label: string; labelTelugu: string }[] = [
     { id: 'all', label: 'All Subjects', labelTelugu: 'అన్ని విభాగాలు' },
+    { id: 'ncert', label: 'NCERT Books (Class 7-12)', labelTelugu: 'ఎన్‌సీఈఆర్‌టీ పుస్తకాలు (7-12 తరగతులు)' },
     { id: 'polity', label: 'Polity & Law', labelTelugu: 'రాజ్యాంగం & చట్టం' },
     { id: 'economy', label: 'Economy & Budget', labelTelugu: 'ఆర్థికం & బడ్జెట్' },
     { id: 'history', label: 'Modern History', labelTelugu: 'ఆధునిక చరిత్ర' },
@@ -38,6 +40,16 @@ export const ResourceVault: React.FC<ResourceVaultProps> = ({ showTelugu }) => {
     { id: 'ethics', label: 'Ethics & Governance', labelTelugu: 'నీతిశాస్త్రం & పాలన' },
     { id: 'appsc', label: 'Andhra Pradesh (APPSC)', labelTelugu: 'ఆంధ్రప్రదేశ్ (ఏపీపీఎస్సీ)' },
     { id: 'tspsc', label: 'Telangana (TSPSC)', labelTelugu: 'తెలంగాణ (టీఎస్‌పీఎస్సీ)' }
+  ];
+
+  const classPills = [
+    { id: 'all', label: 'All Classes (7–12)', labelTelugu: 'అన్ని తరగతులు (7–12)' },
+    { id: 'Class 7', label: 'Class 7', labelTelugu: '7వ తరగతి' },
+    { id: 'Class 8', label: 'Class 8', labelTelugu: '8వ తరగతి' },
+    { id: 'Class 9', label: 'Class 9', labelTelugu: '9వ తరగతి' },
+    { id: 'Class 10', label: 'Class 10', labelTelugu: '10వ తరగతి' },
+    { id: 'Class 11', label: 'Class 11', labelTelugu: '11వ తరగతి' },
+    { id: 'Class 12', label: 'Class 12', labelTelugu: '12వ తరగతి' }
   ];
 
   const handleOpenDoc = (docId: string, fallbackTitle: string, type: string) => {
@@ -125,7 +137,7 @@ export const ResourceVault: React.FC<ResourceVaultProps> = ({ showTelugu }) => {
     }
   };
 
-  // Filter categories and items based on search and selected subject
+  // Filter categories and items based on search, selected subject, and class grade
   const filteredCategories = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
 
@@ -133,13 +145,24 @@ export const ResourceVault: React.FC<ResourceVaultProps> = ({ showTelugu }) => {
       .filter((cat) => selectedSubject === 'all' || cat.id === selectedSubject)
       .map((cat) => {
         const filteredItems = cat.items.filter((item) => {
+          // If a specific class is selected, filter NCERT items by class
+          if (selectedClass !== 'all' && item.classGrade && item.classGrade !== selectedClass) {
+            return false;
+          }
+          // If a specific class is selected and the category is ncert, only matching class items pass
+          if (selectedClass !== 'all' && cat.id === 'ncert' && item.classGrade !== selectedClass) {
+            return false;
+          }
+
           if (!q) return true;
           return (
             item.title.toLowerCase().includes(q) ||
             item.description.toLowerCase().includes(q) ||
             item.badge.toLowerCase().includes(q) ||
             (item.issuingAuthority && item.issuingAuthority.toLowerCase().includes(q)) ||
-            (item.titleTelugu && item.titleTelugu.toLowerCase().includes(q))
+            (item.titleTelugu && item.titleTelugu.toLowerCase().includes(q)) ||
+            (item.classGrade && item.classGrade.toLowerCase().includes(q)) ||
+            (item.ncertSubject && item.ncertSubject.toLowerCase().includes(q))
           );
         });
 
@@ -149,7 +172,7 @@ export const ResourceVault: React.FC<ResourceVaultProps> = ({ showTelugu }) => {
         };
       })
       .filter((cat) => cat.items.length > 0);
-  }, [selectedSubject, searchQuery]);
+  }, [selectedSubject, selectedClass, searchQuery]);
 
   const totalDocumentsCount = useMemo(() => {
     return RESOURCE_VAULT.reduce((acc, cat) => acc + cat.items.length, 0);
@@ -224,6 +247,34 @@ export const ResourceVault: React.FC<ResourceVaultProps> = ({ showTelugu }) => {
             );
           })}
         </div>
+
+        {/* Secondary Class Grade Filter Bar (active when 'ncert' or 'all' selected) */}
+        {(selectedSubject === 'ncert' || selectedSubject === 'all') && (
+          <div className="pt-2.5 border-t border-slate-100 flex flex-wrap items-center gap-2">
+            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider shrink-0 flex items-center space-x-1">
+              <Filter className="w-3 h-3 text-emerald-600" />
+              <span>{showTelugu ? 'తరగతి ప్రకారం:' : 'Grade Filter:'}</span>
+            </span>
+            <div className="flex items-center space-x-1.5 overflow-x-auto pb-0.5 scrollbar-none">
+              {classPills.map((cp) => {
+                const active = selectedClass === cp.id;
+                return (
+                  <button
+                    key={cp.id}
+                    onClick={() => setSelectedClass(cp.id)}
+                    className={`whitespace-nowrap px-2.5 py-1 rounded-lg text-xs font-bold transition-all shrink-0 cursor-pointer ${
+                      active
+                        ? 'bg-emerald-700 text-white shadow-xs ring-2 ring-emerald-500/20'
+                        : 'bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200'
+                    }`}
+                  >
+                    {showTelugu ? cp.labelTelugu : cp.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Filtered Document Categories */}
@@ -242,6 +293,7 @@ export const ResourceVault: React.FC<ResourceVaultProps> = ({ showTelugu }) => {
             onClick={() => {
               setSearchQuery('');
               setSelectedSubject('all');
+              setSelectedClass('all');
             }}
             className="mt-4 px-4 py-2 bg-emerald-600 text-white rounded-lg text-xs font-bold hover:bg-emerald-700 transition-colors cursor-pointer"
           >

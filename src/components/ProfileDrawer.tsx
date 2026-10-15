@@ -45,6 +45,7 @@ interface ProfileDrawerProps {
   onOpenGeminiKey?: () => void;
   onOpenDashboard?: () => void;
   onOpenLeadCapture?: () => void;
+  onOpenVisitorInsights?: () => void;
 }
 
 export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
@@ -55,7 +56,8 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
   onOpenSessionModal,
   onOpenGeminiKey,
   onOpenDashboard,
-  onOpenLeadCapture
+  onOpenLeadCapture,
+  onOpenVisitorInsights
 }) => {
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncStatusMsg, setSyncStatusMsg] = useState('');
@@ -396,6 +398,34 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
                   </button>
                 )}
               </div>
+
+              {/* Traffic & Commercial Insights Hub */}
+              {onOpenVisitorInsights && (
+                <div className="p-4 rounded-2xl border border-indigo-200/80 bg-gradient-to-br from-indigo-50/60 to-slate-50 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="text-xs font-bold text-slate-800 flex items-center space-x-1.5">
+                      <Users className="w-3.5 h-3.5 text-indigo-600" />
+                      <span>Traffic & Commercial Telemetry</span>
+                    </div>
+                    <span className="text-[10px] font-bold text-indigo-700 bg-indigo-100/80 px-2 py-0.5 rounded-full">
+                      Admin
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 leading-relaxed">
+                    View real-time visitor sessions, device distribution, and export captured leads.
+                  </p>
+                  <button
+                    onClick={() => {
+                      onClose();
+                      onOpenVisitorInsights();
+                    }}
+                    className="btn-tactile w-full py-2 px-3 rounded-xl bg-white border border-indigo-200 hover:bg-indigo-50 text-xs font-bold text-indigo-900 flex items-center justify-center space-x-1.5 transition-all shadow-2xs"
+                  >
+                    <TrendingUp className="w-3.5 h-3.5 text-indigo-600" />
+                    <span>View Visitor Traffic & Conversion Hub</span>
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
             /* --- GUEST / SIGN-IN VIEW --- */
@@ -598,6 +628,34 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
                   </button>
                 )}
               </div>
+
+              {/* Traffic & Commercial Insights Hub for Guests / Admins */}
+              {onOpenVisitorInsights && (
+                <div className="p-4 rounded-2xl border border-indigo-200/80 bg-gradient-to-br from-indigo-50/60 to-slate-50 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="text-xs font-bold text-slate-800 flex items-center space-x-1.5">
+                      <Users className="w-3.5 h-3.5 text-indigo-600" />
+                      <span>Traffic & Commercial Telemetry</span>
+                    </div>
+                    <span className="text-[10px] font-bold text-indigo-700 bg-indigo-100/80 px-2 py-0.5 rounded-full">
+                      Admin
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 leading-relaxed">
+                    View real-time visitor sessions, device distribution, and export captured leads.
+                  </p>
+                  <button
+                    onClick={() => {
+                      onClose();
+                      onOpenVisitorInsights();
+                    }}
+                    className="btn-tactile w-full py-2 px-3 rounded-xl bg-white border border-indigo-200 hover:bg-indigo-50 text-xs font-bold text-indigo-900 flex items-center justify-center space-x-1.5 transition-all shadow-2xs"
+                  >
+                    <TrendingUp className="w-3.5 h-3.5 text-indigo-600" />
+                    <span>View Visitor Traffic & Conversion Hub</span>
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>

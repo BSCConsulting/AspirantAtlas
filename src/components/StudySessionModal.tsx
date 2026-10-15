@@ -21,8 +21,14 @@ import {
   BookOpen, 
   History, 
   Sparkles,
-  Zap
+  Zap,
+  Printer,
+  ChevronRight,
+  ExternalLink
 } from 'lucide-react';
+import { SYLLABUS_NODES } from '../data/curriculum';
+import { TOPIC_CONTENT_MAP } from '../data/contentModules';
+import { exportStudyMaterialPrint } from '../utils/studyMaterialExporter';
 
 interface StudySessionModalProps {
   isOpen: boolean;
@@ -33,6 +39,8 @@ interface StudySessionModalProps {
   onStartSession: (goal: string) => void;
   onEndSession: (rating: number, notes?: string) => void;
   elapsedSeconds: number;
+  onOpenTopic?: (nodeId: string) => void;
+  showTelugu?: boolean;
 }
 
 export const StudySessionModal: React.FC<StudySessionModalProps> = ({
@@ -43,12 +51,15 @@ export const StudySessionModal: React.FC<StudySessionModalProps> = ({
   activeSession,
   onStartSession,
   onEndSession,
-  elapsedSeconds
+  elapsedSeconds,
+  onOpenTopic,
+  showTelugu = false
 }) => {
   const [activeTab, setActiveTab] = useState<'session' | 'history'>('session');
   const [sessionGoalInput, setSessionGoalInput] = useState('');
   const [productivityRating, setProductivityRating] = useState<number>(5);
   const [checkoutNotes, setCheckoutNotes] = useState('');
+  const [selectedMaterialNodeId, setSelectedMaterialNodeId] = useState<string>('polity-constitution-framework');
   const [ledger, setLedger] = useState<UserStudyLedger>(() => getUserLedger(userId));
 
   // Reload ledger when opened or userId changes
@@ -74,6 +85,27 @@ export const StudySessionModal: React.FC<StudySessionModalProps> = ({
     const secs = totalSec % 60;
     return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
+
+  const getMatchingNodeId = (goal: string) => {
+    const g = goal.toLowerCase();
+    if (g.includes('history') || g.includes('freedom') || g.includes('1919') || g.includes('1947')) return 'history-modern-freedom';
+    if (g.includes('economy') || g.includes('fiscal') || g.includes('monetary') || g.includes('survey')) return 'economy-macro-fiscal';
+    if (g.includes('environment') || g.includes('biodiversity') || g.includes('climate') || g.includes('tiger')) return 'environment-biodiversity-treaties';
+    if (g.includes('sci') || g.includes('tech') || g.includes('ai') || g.includes('space')) return 'scitech-emerging-ai';
+    if (g.includes('ethics') || g.includes('governance') || g.includes('case')) return 'ethics-governance-case-studies';
+    if (g.includes('reorganisation') || g.includes('bifurcation') || g.includes('appsc')) return 'appsc-reorganisation-act-2014';
+    if (g.includes('tspsc') || g.includes('telangana')) return 'tspsc-movement-statehood';
+    if (g.includes('federal') || g.includes('judiciary') || g.includes('mains')) return 'polity-federal-judiciary';
+    return 'polity-constitution-framework';
+  };
+
+  useEffect(() => {
+    if (activeSession) {
+      setSelectedMaterialNodeId(getMatchingNodeId(activeSession.sessionGoal));
+    } else if (sessionGoalInput) {
+      setSelectedMaterialNodeId(getMatchingNodeId(sessionGoalInput));
+    }
+  }, [activeSession, sessionGoalInput]);
 
   const heatmap = getDailyHeatmapData(userId, 28); // 4 weeks
 
@@ -240,6 +272,94 @@ export const StudySessionModal: React.FC<StudySessionModalProps> = ({
                   </div>
                 </div>
 
+                {/* IN-SESSION STUDY MATERIAL & NOTES LAUNCHER */}
+                {(() => {
+                  const currentMaterialNode = SYLLABUS_NODES.find(n => n.id === selectedMaterialNodeId) || SYLLABUS_NODES[0];
+                  const currentMaterialContent = TOPIC_CONTENT_MAP[currentMaterialNode.id];
+                  return (
+                    <div className="p-5 rounded-2xl border-2 border-indigo-200/80 bg-gradient-to-br from-indigo-50/70 via-white to-sky-50/50 shadow-sm space-y-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div className="flex items-center space-x-2">
+                          <span className="p-2 rounded-xl bg-indigo-600 text-white shadow-xs">
+                            <BookOpen className="w-4 h-4" />
+                          </span>
+                          <div>
+                            <span className="text-[10px] font-black uppercase tracking-wider text-indigo-700 bg-indigo-100/80 px-2 py-0.5 rounded-md">
+                              Prescribed Study Material
+                            </span>
+                            <h4 className="text-sm font-extrabold text-slate-900 mt-0.5">
+                              {showTelugu && currentMaterialNode.titleTelugu ? currentMaterialNode.titleTelugu : currentMaterialNode.title}
+                            </h4>
+                          </div>
+                        </div>
+
+                        {/* Switcher Dropdown */}
+                        <div className="flex items-center space-x-1.5 text-xs">
+                          <label className="text-[11px] font-semibold text-slate-500 hidden sm:inline">Module:</label>
+                          <select
+                            value={selectedMaterialNodeId}
+                            onChange={(e) => setSelectedMaterialNodeId(e.target.value)}
+                            className="bg-white border border-slate-300 rounded-xl px-2.5 py-1.5 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                          >
+                            {SYLLABUS_NODES.map(node => (
+                              <option key={node.id} value={node.id}>
+                                {node.subject}: {node.title}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="bg-white/80 backdrop-blur-xs p-3.5 rounded-xl border border-slate-200 text-xs space-y-2">
+                        <p className="text-slate-600 line-clamp-2 leading-relaxed">
+                          {currentMaterialContent?.overview || currentMaterialNode.description}
+                        </p>
+
+                        <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-100 text-[11px]">
+                          <div className="flex items-center space-x-2 text-slate-500">
+                            <span className="font-semibold text-slate-700">References:</span>
+                            <span className="truncate max-w-[220px] sm:max-w-xs text-sky-800">
+                              {currentMaterialContent?.standardReferences?.map(r => r.source).join(' • ') || 'Standard Reference Textbooks'}
+                            </span>
+                          </div>
+                          <span className="text-slate-400 font-medium">Est. {currentMaterialNode.estMinutes} mins</span>
+                        </div>
+                      </div>
+
+                      {/* Action buttons */}
+                      <div className="flex flex-col sm:flex-row items-center gap-2.5">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (onOpenTopic) {
+                              onOpenTopic(currentMaterialNode.id);
+                            }
+                          }}
+                          className="w-full sm:w-auto flex-1 btn-tactile px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center justify-center space-x-2 shadow-xs transition-all"
+                        >
+                          <BookOpen className="w-3.5 h-3.5" />
+                          <span>Open Study Notes, Mindmaps & Infographics</span>
+                          <ExternalLink className="w-3.5 h-3.5 opacity-80" />
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (currentMaterialContent) {
+                              exportStudyMaterialPrint(currentMaterialContent, showTelugu);
+                            }
+                          }}
+                          className="w-full sm:w-auto btn-tactile px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 font-bold text-xs flex items-center justify-center space-x-2 shadow-2xs transition-all"
+                          title="Print or Save Study Notes PDF"
+                        >
+                          <Printer className="w-3.5 h-3.5 text-indigo-600" />
+                          <span>Print / PDF Notes</span>
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })()}
+
                 {/* Check-Out Review & Debrief Section */}
                 <div className="p-5 rounded-2xl border border-indigo-100 bg-indigo-50/40 space-y-4">
                   <div className="flex items-center justify-between">
@@ -342,6 +462,51 @@ export const StudySessionModal: React.FC<StudySessionModalProps> = ({
                     </div>
                   </div>
                 </div>
+
+                {/* Matched Study Material Preview */}
+                {(() => {
+                  const currentMaterialNode = SYLLABUS_NODES.find(n => n.id === selectedMaterialNodeId) || SYLLABUS_NODES[0];
+                  const currentMaterialContent = TOPIC_CONTENT_MAP[currentMaterialNode.id];
+                  return (
+                    <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/80 space-y-2.5">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-bold text-slate-700 flex items-center gap-1.5">
+                          <BookOpen className="w-3.5 h-3.5 text-indigo-600" />
+                          <span>Matched Syllabus Module & Study Notes:</span>
+                        </span>
+                        <span className="text-[10px] font-black uppercase text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200">
+                          {currentMaterialNode.subject}
+                        </span>
+                      </div>
+                      
+                      <div className="flex items-center justify-between gap-3 bg-white p-3 rounded-lg border border-slate-200/80 text-xs">
+                        <div>
+                          <div className="font-bold text-slate-900">
+                            {showTelugu && currentMaterialNode.titleTelugu ? currentMaterialNode.titleTelugu : currentMaterialNode.title}
+                          </div>
+                          <div className="text-[11px] text-slate-500 mt-0.5">
+                            Standard Textbooks: {currentMaterialContent?.standardReferences?.map(r => r.source).join(' • ') || 'NCERT Core'}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (currentMaterialContent) {
+                                exportStudyMaterialPrint(currentMaterialContent, showTelugu);
+                              }
+                            }}
+                            className="p-1.5 rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-700 transition-colors"
+                            title="Preview Printable Notes PDF"
+                          >
+                            <Printer className="w-3.5 h-3.5 text-indigo-600" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
 
                 {/* Action CTA */}
                 <div className="pt-2 flex items-center justify-end space-x-3">

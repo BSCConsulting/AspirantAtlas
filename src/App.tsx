@@ -20,7 +20,9 @@ import { OnboardingModal } from './components/OnboardingModal';
 import { StudySessionModal } from './components/StudySessionModal';
 import { AspirantDashboardModal } from './components/AspirantDashboardModal';
 import { LeadCaptureModal } from './components/LeadCaptureModal';
+import { AdminVisitorInsightsModal } from './components/AdminVisitorInsightsModal';
 import { AspirantUser, getCurrentUser } from './services/authService';
+import { initVisitorTracker, recordPageView } from './services/visitorTracker';
 import { 
   StudySession, 
   getActiveSession, 
@@ -38,6 +40,7 @@ export function App() {
   const [isSessionModalOpen, setIsSessionModalOpen] = useState(false);
   const [isDashboardOpen, setIsDashboardOpen] = useState(false);
   const [isLeadCaptureOpen, setIsLeadCaptureOpen] = useState(false);
+  const [isVisitorInsightsOpen, setIsVisitorInsightsOpen] = useState(false);
   const [activeSession, setActiveSession] = useState<StudySession | null>(() => 
     getActiveSession(currentUser?.id || 'default-aspirant')
   );
@@ -87,6 +90,7 @@ export function App() {
       setNavHistory((prev) => [...prev, activeTab]);
       setActiveTab(newTab);
       localStorage.setItem('aspirant_active_tab', newTab);
+      recordPageView(newTab);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
@@ -147,6 +151,7 @@ export function App() {
   }, [showTelugu]);
 
   useEffect(() => {
+    initVisitorTracker();
     const hasOnboarded = localStorage.getItem('aspirant_onboarded');
     if (!hasOnboarded) {
       setIsOnboardingOpen(true);
@@ -467,6 +472,10 @@ export function App() {
           setIsAuthOpen(false);
           setIsLeadCaptureOpen(true);
         }}
+        onOpenVisitorInsights={() => {
+          setIsAuthOpen(false);
+          setIsVisitorInsightsOpen(true);
+        }}
       />
 
       {/* Aspirant Analytics, Motion Timeline & Rank Predictor Dashboard Modal */}
@@ -502,6 +511,12 @@ export function App() {
         defaultMobile={currentUser?.mobile || ''}
       />
 
+      {/* Admin Visitor Traffic & Lead Analytics Modal */}
+      <AdminVisitorInsightsModal
+        isOpen={isVisitorInsightsOpen}
+        onClose={() => setIsVisitorInsightsOpen(false)}
+      />
+
       {/* Global Gemini API Key Settings Modal */}
       <GeminiKeyModal
         isOpen={isGeminiKeyOpen}
@@ -526,6 +541,11 @@ export function App() {
         onStartSession={handleStartSession}
         onEndSession={handleEndSession}
         elapsedSeconds={elapsedSeconds}
+        onOpenTopic={(nodeId) => {
+          setIsSessionModalOpen(false);
+          handleOpenTopicById(nodeId);
+        }}
+        showTelugu={showTelugu}
       />
 
       <footer className="bg-white border-t border-slate-200 mt-16 py-8 mb-16 md:mb-0">

@@ -9,6 +9,7 @@ import {
   BookOpen, Eye, CloudLightning, Zap
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { exportStudyMaterialPrint } from '../utils/studyMaterialExporter';
 
 interface TopicModalProps {
   node: SyllabusNode;
@@ -361,9 +362,9 @@ Exam Tip: ${qa.examTip}
           <div className="flex items-center space-x-2.5 print:hidden">
             {/* 1-Click Print / Download PDF */}
             <button
-              onClick={() => window.print()}
+              onClick={() => exportStudyMaterialPrint(content, showTelugu)}
               className="btn-tactile flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-all shadow-xs"
-              title="Print or Save as 1-Page PDF"
+              title="Print or Save High-Yield Notes as PDF"
             >
               <Printer className="w-3.5 h-3.5 text-sky-300" />
               <span>Save PDF</span>

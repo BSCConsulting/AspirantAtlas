@@ -116,6 +116,8 @@ export const DynamicGeoAtlas: React.FC<DynamicGeoAtlasProps> = ({
       map.set(s.id.toUpperCase(), s);
       map.set(s.code.toUpperCase(), s);
       map.set(s.name.toLowerCase(), s);
+      map.set(s.code.toLowerCase(), s);
+      map.set(s.id.replace('IN-', '').toLowerCase(), s);
     });
     return map;
   }, []);
@@ -661,22 +663,25 @@ export const DynamicGeoAtlas: React.FC<DynamicGeoAtlasProps> = ({
                       ))}
                     </g>
 
-                    {/* Oceanic Labels and Annotations */}
-                    <g className="neighbor-oceans select-none pointer-events-none" opacity="0.65">
-                      <text x="50" y="480" fill="#38bdf8" fontSize="12" fontWeight="900" letterSpacing="1">ARABIAN SEA 🌊</text>
-                      <text x="440" y="480" fill="#38bdf8" fontSize="12" fontWeight="900" letterSpacing="1">BAY OF BENGAL 🌊</text>
+                    {/* Oceanic Labels and Annotations (Tucked away from northern borders) */}
+                    <g className="neighbor-oceans select-none pointer-events-none" opacity="0.75">
+                      <text x="35" y="490" fill="#38bdf8" fontSize="12" fontWeight="900" letterSpacing="1">ARABIAN SEA 🌊</text>
+                      <text x="440" y="490" fill="#38bdf8" fontSize="12" fontWeight="900" letterSpacing="1">BAY OF BENGAL 🌊</text>
                       <text x="210" y="680" fill="#38bdf8" fontSize="12" fontWeight="900" letterSpacing="1">INDIAN OCEAN</text>
-                      <text x="320" y="115" fill="#94a3b8" fontSize="11" fontWeight="bold" letterSpacing="1">HIMALAYAS 🏔️</text>
+                      <text x="330" y="125" fill="#94a3b8" fontSize="11" fontWeight="bold" letterSpacing="1">HIMALAYAS 🏔️</text>
 
-                      <text x="30" y="45" fill="#f8fafc" fontSize="16" fontWeight="900" letterSpacing="1">BHARAT / INDIA CADRE MAP</text>
-                      <text x="30" y="65" fill="#818cf8" fontSize="10" fontWeight="bold">28 States & 8 Union Territories</text>
+                      {/* Map Title positioned in clean top corner without overlapping J&K */}
+                      <text x="20" y="32" fill="#f8fafc" fontSize="16" fontWeight="900" letterSpacing="1">BHARAT / INDIA CADRE MAP</text>
+                      <text x="20" y="48" fill="#818cf8" fontSize="10" fontWeight="bold">28 States & 8 Union Territories</text>
                     </g>
 
-                    {/* Contiguous State Polygons */}
+                    {/* Contiguous State Polygons with Mentioned Names on each State Diagram */}
                     {REAL_INDIA_SVG_STATES.map((state) => {
-                      const geoItem = geoIndiaMap.get(state.id.toUpperCase()) || geoIndiaMap.get('IN-' + state.id.toUpperCase()) || selectedIndiaState;
-                      const isSelected = selectedIndiaState.id === geoItem.id || selectedIndiaState.code.toLowerCase() === state.id.toLowerCase();
-                      const matchesSearch = !searchQuery || state.name.toLowerCase().includes(searchQuery.toLowerCase());
+                      const geoItem = geoIndiaMap.get(state.id) || geoIndiaMap.get(state.code) || selectedIndiaState;
+                      const isSelected = selectedIndiaState.id === geoItem.id || selectedIndiaState.code.toLowerCase() === state.code.toLowerCase();
+                      const matchesSearch = !searchQuery || state.name.toLowerCase().includes(searchQuery.toLowerCase()) || state.nameTelugu.includes(searchQuery);
+
+                      const isSmallState = ['dl', 'ch', 'ga', 'sk', 'tr', 'mn', 'mz', 'nl', 'dn', 'dd', 'py'].includes(state.id);
 
                       return (
                         <g
@@ -692,15 +697,47 @@ export const DynamicGeoAtlas: React.FC<DynamicGeoAtlasProps> = ({
                           filter={isSelected ? 'url(#svgGlow)' : undefined}
                           opacity={matchesSearch ? 1 : 0.35}
                         >
+                          {/* Animated beacon wave on selected state */}
+                          {isSelected && (
+                            <circle
+                              cx={state.labelX}
+                              cy={state.labelY}
+                              r="26"
+                              fill={state.color}
+                              opacity="0.35"
+                              className="animate-ping pointer-events-none"
+                            />
+                          )}
+
                           {/* Authentic Geographic State Polygon */}
                           <path
                             d={state.path}
-                            fill={isSelected ? '#4f46e5' : state.color || '#334155'}
+                            fill={isSelected ? '#38bdf8' : state.color}
                             stroke="#ffffff"
-                            strokeWidth={isSelected ? '2.4' : '0.8'}
+                            strokeWidth={isSelected ? '2.8' : '1.2'}
                             strokeLinejoin="round"
-                            className="transition-all duration-150 group-hover:brightness-125 group-hover:stroke-amber-300"
+                            className="transition-all duration-150 group-hover:brightness-125 group-hover:stroke-cyan-300"
                           />
+
+                          {/* Mention State Name on each State Diagram */}
+                          <text
+                            x={state.labelX}
+                            y={state.labelY}
+                            textAnchor="middle"
+                            dominantBaseline="central"
+                            fill="#ffffff"
+                            fontSize={isSmallState ? '6.8' : state.name.length > 12 ? '7.5' : '8.5'}
+                            fontWeight="900"
+                            className="pointer-events-none select-none drop-shadow-[0_1px_2px_rgba(0,0,0,0.95)]"
+                            paintOrder="stroke"
+                            stroke="#0f172a"
+                            strokeWidth="2.5"
+                            strokeLinejoin="round"
+                          >
+                            {showTelugu
+                              ? (isSmallState ? state.code : (state.nameTelugu.length > 8 ? state.code : state.nameTelugu))
+                              : (isSmallState ? state.code : state.name)}
+                          </text>
                         </g>
                       );
                     })}

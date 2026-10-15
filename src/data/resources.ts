@@ -1077,6 +1077,51 @@ export const RESOURCE_VAULT: ResourceCategory[] = [
         fileSize: 'Official Report',
         issuingAuthority: "Telugu Akademi, Government of Andhra Pradesh",
         year: "Official Prescribed Paper-II & Paper-V Standard"
+      },
+      {
+        id: 'rv-telugu-akademi-andhra-history',
+        docId: 'telugu-akademi-andhra-history',
+        title: "History & Culture of Andhra Pradesh (Telugu Akademi / Dr. P. Raghunadha Rao)",
+        titleTelugu: "ఆంధ్రప్రదేశ్ సమగ్ర చరిత్ర & సంస్కృతి (తెలుగు అకాడమీ ప్రామాణిక గ్రంథం)",
+        description: "The definitive, authoritative reference text prescribed for APPSC Group 1, Group 2, and UPSC regional history. Comprehensive coverage from ancient Andhra kingdoms (Satavahanas, Ikshvakus, Vishnukundins, Eastern Chalukyas of Vengi), medieval flowering under Kakatiyas, Reddi kingdoms, and Vijayanagara Empire (Sri Krishnadevaraya), to European colonial arrival, 1857 resistance, Andhra Movement, 1953 Kurnool capital formation, 1956 Visalandhra, and post-bifurcation cultural heritage.",
+        type: 'Standard Reference',
+        subjectKey: 'appsc',
+        targetExams: ['appsc', 'upsc'],
+        url: 'https://teluguacademy.net',
+        badge: 'APPSC History Benchmark',
+        fileSize: 'Complete Academic Volume',
+        issuingAuthority: 'Telugu Akademi, Government of Andhra Pradesh',
+        year: 'Prescribed Syllabus Standard'
+      },
+      {
+        id: 'rv-ap-economy-sociology-telugu-akademi',
+        docId: 'ap-economy-sociology-telugu-akademi',
+        title: "Andhra Pradesh Economy: Performance, Structure & Policies (Telugu Akademi)",
+        titleTelugu: "ఆంధ్రప్రదేశ్ ఆర్థిక వ్యవస్థ: స్వరూపం, అభివృద్ధి & విధానాలు (తెలుగు అకాడమీ)",
+        description: "Prescribed standard reference for APPSC Group 1 Paper-IV and Group 2 Paper-II. In-depth analysis of AP GSDP, agricultural diversification into horticulture & aquaculture, Rayalaseema drought mitigation, 974 km coastline port-led development, VCIC and CBIC industrial corridors, and post-bifurcation Andhra Pradesh Reorganisation Act 2014 fiscal allocations.",
+        type: 'Standard Reference',
+        subjectKey: 'appsc',
+        targetExams: ['appsc'],
+        url: 'https://teluguacademy.net',
+        badge: 'APPSC Economy Standard',
+        fileSize: 'Complete Academic Volume',
+        issuingAuthority: 'Telugu Akademi, Government of Andhra Pradesh',
+        year: 'Prescribed Syllabus Standard'
+      },
+      {
+        id: 'rv-ap-telangana-geography-telugu-akademi',
+        docId: 'ap-telangana-geography-telugu-akademi',
+        title: "Geography of Andhra Pradesh & Telangana: Regional Dynamics (Telugu Akademi)",
+        titleTelugu: "ఆంధ్రప్రదేశ్ మరియు తెలంగాణ ప్రాంతీయ భూగోళశాస్త్రం (తెలుగు అకాడమీ)",
+        description: "The comprehensive geographic reference text for APPSC & TSPSC civil services exams. Covers physiographic divisions (Coastal Plains, Eastern Ghats, Deccan Plateau), river drainage basins (Godavari, Krishna, Penna, Musi), soils, agro-climatic zones, minerals, forest types, climate patterns, irrigation projects, and regional urban-demographic profiles.",
+        type: 'Standard Reference',
+        subjectKey: 'appsc',
+        targetExams: ['appsc', 'tspsc'],
+        url: 'https://teluguacademy.net',
+        badge: 'Regional Geography',
+        fileSize: 'Complete Academic Volume',
+        issuingAuthority: 'Telugu Akademi',
+        year: 'Prescribed Syllabus Standard'
       }
     ]
   },
@@ -1164,6 +1209,51 @@ export const RESOURCE_VAULT: ResourceCategory[] = [
         fileSize: 'Official Report',
         issuingAuthority: "Telugu Akademi, Government of Telangana",
         year: "Official Prescribed State History Text"
+      },
+      {
+        id: 'rv-telugu-akademi-telangana-history',
+        docId: 'telugu-akademi-telangana-history',
+        title: "History & Culture of Telangana: From Pre-History to State Formation (Telugu Akademi)",
+        titleTelugu: "తెలంగాణ సమగ్ర చరిత్ర & సంస్కృతి: ప్రాచీన కాలం నుండి రాష్ట్ర ఆవిర్భావం వరకు (తెలుగు అకాడమీ)",
+        description: "The gold-standard reference prescribed by TGPSC/TSPSC for Group 1 Paper-II & Group 2. Comprehensive coverage of Kotilingala, Satavahanas, Ikshvakus, Vishnukundins, Badami & Kalyani Chalukyas, Kakatiyas of Warangal, Musunuri Nayakas, Qutb Shahis of Golconda, Asaf Jahis of Hyderabad, anti-feudal jagirdari struggles, Hyderabad State accession (Operation Polo), and socio-cultural movements.",
+        type: 'Standard Reference',
+        subjectKey: 'tspsc',
+        targetExams: ['tspsc'],
+        url: 'https://teluguacademy.net',
+        badge: 'TSPSC History Benchmark',
+        fileSize: 'Complete Academic Volume',
+        issuingAuthority: 'Telugu Akademi, Government of Telangana',
+        year: 'Prescribed Syllabus Standard'
+      },
+      {
+        id: 'rv-telangana-movement-state-formation-v-prakash',
+        docId: 'telangana-movement-state-formation-v-prakash',
+        title: "Telangana Movement & State Formation: Comprehensive Reference (V. Prakash / Telugu Akademi)",
+        titleTelugu: "తెలంగాణ ఉద్యమం మరియు రాష్ట్ర ఆవిర్భావ సమగ్ర చరిత్ర (వి. ప్రకాశ్ / తెలుగు అకాడమీ)",
+        description: "The definitive sourcebook for TSPSC Group 1 Paper-VI (150 Marks) and Group 2. In-depth chronicle of the Telangana statehood struggle from 1948 accession, 1952 Mulki Agitation, 1956 Gentlemen's Agreement violations, 1969 Jai Telangana Agitation, 1973 Six-Point Formula & Presidential Order (Article 371-D), G.O. Ms 610 & Girglani Commission, political revival post-2001, Sakala Janula Samme, Million March, Sri Krishna Committee Report, and AP Reorganisation Act 2014.",
+        type: 'Standard Reference',
+        subjectKey: 'tspsc',
+        targetExams: ['tspsc'],
+        url: 'https://teluguacademy.net',
+        badge: 'TSPSC Paper-VI Core',
+        fileSize: 'Complete Academic Volume',
+        issuingAuthority: 'Telugu Akademi / V. Prakash',
+        year: 'Prescribed Syllabus Standard'
+      },
+      {
+        id: 'rv-telangana-economy-development-telugu-akademi',
+        docId: 'telangana-economy-development-telugu-akademi',
+        title: "Telangana Economy: Structure, Growth & Policy Reforms (Telugu Akademi)",
+        titleTelugu: "తెలంగాణ ఆర్థిక వ్యవస్థ: వృద్ధి, నిర్మాణం & సంస్కరణలు (తెలుగు అకాడమీ)",
+        description: "Prescribed standard reference for TSPSC Group 1 Paper-V and Group 2 Economy papers. Systematic coverage of Telangana GSDP trajectory, structural transition from rainfed agriculture to mega-lift irrigation (Kaleshwaram, Palamuru-Ranga Reddy), Rythu Bandhu & Rythu Bharosa, Mission Kakatiya, industrial growth via TS-iPASS, Hyderabad Pharma City & Genome Valley, and state fiscal federalism dynamics.",
+        type: 'Standard Reference',
+        subjectKey: 'tspsc',
+        targetExams: ['tspsc'],
+        url: 'https://teluguacademy.net',
+        badge: 'TSPSC Economy Standard',
+        fileSize: 'Complete Academic Volume',
+        issuingAuthority: 'Telugu Akademi, Government of Telangana',
+        year: 'Prescribed Syllabus Standard'
       }
     ]
   },

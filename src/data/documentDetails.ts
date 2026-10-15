@@ -5,6 +5,7 @@ import { NCERT_DOCUMENT_DETAILS } from './documentDetailsNcert';
 import { BATCH_A_DOCUMENT_DETAILS } from './documentDetailsBatchA';
 import { BATCH_B_DOCUMENT_DETAILS } from './documentDetailsBatchB';
 import { BATCH_C_DOCUMENT_DETAILS } from './documentDetailsBatchC';
+import { BATCH_D_DOCUMENT_DETAILS } from './documentDetailsBatchD';
 
 export const DOCUMENT_DETAILS_MAP: Record<string, DocumentDetail> = {
   // =========================================================================
@@ -860,5 +861,6 @@ Object.assign(DOCUMENT_DETAILS_MAP, NCERT_DOCUMENT_DETAILS);
 Object.assign(DOCUMENT_DETAILS_MAP, BATCH_A_DOCUMENT_DETAILS);
 Object.assign(DOCUMENT_DETAILS_MAP, BATCH_B_DOCUMENT_DETAILS);
 Object.assign(DOCUMENT_DETAILS_MAP, BATCH_C_DOCUMENT_DETAILS);
+Object.assign(DOCUMENT_DETAILS_MAP, BATCH_D_DOCUMENT_DETAILS);
 
 

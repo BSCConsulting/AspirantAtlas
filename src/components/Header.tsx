@@ -17,10 +17,13 @@ import {
   ChevronDown,
   TrendingUp,
   Gift,
-  Crown
+  Crown,
+  Volume2,
+  VolumeX
 } from 'lucide-react';
 import { AspirantUser } from '../services/authService';
 import { StudySession } from '../services/studySessionService';
+import { isSoundEnabled, setSoundEnabled, playChime, playClick } from '../services/soundService';
 
 export type ActiveNavTab = 'roadmap' | 'mock-tests' | 'mains-evaluator' | 'current-affairs' | 'study-planner' | 'vault';
 
@@ -70,6 +73,18 @@ export const Header: React.FC<HeaderProps> = ({
   elapsedSeconds = 0
 }) => {
   const [isToolsOpen, setIsToolsOpen] = useState(false);
+  const [soundOn, setSoundOn] = useState(() => isSoundEnabled());
+
+  const toggleSound = () => {
+    const next = !soundOn;
+    setSoundOn(next);
+    setSoundEnabled(next);
+    if (next) {
+      playChime();
+    } else {
+      playClick();
+    }
+  };
 
   const examTitles: Record<ExamId, { short: string; full: string; telugu: string }> = {
     upsc: { short: 'UPSC CSE', full: 'Civil Services', telugu: 'సివిల్స్' },
@@ -225,6 +240,19 @@ export const Header: React.FC<HeaderProps> = ({
               )
             )}
 
+            {/* Audio Feedback Toggle Button */}
+            <button
+              onClick={toggleSound}
+              className={`btn-tactile h-9 w-9 rounded-xl border text-xs font-bold transition-all flex items-center justify-center shadow-2xs ${
+                soundOn 
+                  ? 'bg-white border-slate-200/90 text-indigo-600 hover:bg-slate-50' 
+                  : 'bg-slate-100 border-slate-200 text-slate-400 hover:bg-slate-200'
+              }`}
+              title={soundOn ? 'Tactile Audio Cues Active (Click to Mute)' : 'Tactile Audio Muted (Click to Unmute)'}
+            >
+              {soundOn ? <Volume2 className="w-4 h-4 text-indigo-600" /> : <VolumeX className="w-4 h-4 text-slate-400" />}
+            </button>
+
             {/* Consolidated Quick Tools Menu Button */}
             <div className="relative">
               <button
@@ -294,6 +322,22 @@ export const Header: React.FC<HeaderProps> = ({
                       </div>
                       <span className="text-[10px] bg-indigo-100 text-indigo-800 font-extrabold px-2 py-0.5 rounded-full">
                         {showTelugu ? 'తెలుగు' : 'English'}
+                      </span>
+                    </button>
+
+                    {/* Audio Feedback Toggle */}
+                    <button
+                      onClick={toggleSound}
+                      className="w-full px-3 py-2 rounded-xl text-xs font-bold text-slate-800 hover:bg-indigo-50 hover:text-indigo-900 flex items-center justify-between transition-colors"
+                    >
+                      <div className="flex items-center space-x-2">
+                        {soundOn ? <Volume2 className="w-4 h-4 text-indigo-600" /> : <VolumeX className="w-4 h-4 text-slate-400" />}
+                        <span>Audio Feedback</span>
+                      </div>
+                      <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${
+                        soundOn ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-500'
+                      }`}>
+                        {soundOn ? 'Active' : 'Muted'}
                       </span>
                     </button>
 

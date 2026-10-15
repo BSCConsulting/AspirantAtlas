@@ -11,11 +11,14 @@ import {
   Zap, 
   Lock, 
   Sparkles,
-  Printer
+  Printer,
+  Copy,
+  Check
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { SubscriptionPlan, OrderRecord, recordSuccessfulOrder, printCommercialInvoice } from '../services/subscriptionService';
 import { AspirantUser, upgradeUserToPro } from '../services/authService';
+import { playChime, playClick } from '../services/soundService';
 
 interface CheckoutModalProps {
   isOpen: boolean;
@@ -39,11 +42,24 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [payerMobile, setPayerMobile] = useState(currentUser?.mobile || '');
   const [isProcessing, setIsProcessing] = useState(false);
   const [completedOrder, setCompletedOrder] = useState<OrderRecord | null>(null);
+  const [isCopied, setIsCopied] = useState(false);
+
+  const handleCopyUpi = () => {
+    try {
+      navigator.clipboard.writeText('aspirantatlas@oksbi');
+      setIsCopied(true);
+      playClick();
+      setTimeout(() => setIsCopied(false), 2000);
+    } catch {
+      // fallback
+    }
+  };
 
   if (!isOpen || !plan) return null;
 
   const handleSimulatePayment = () => {
     setIsProcessing(true);
+    playClick();
 
     setTimeout(() => {
       // 1. Record order
@@ -66,7 +82,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       setIsProcessing(false);
       setCompletedOrder(order);
 
-      // 3. Trigger confetti celebration
+      // 3. Audio & confetti celebration
+      playChime();
       try {
         confetti({
           particleCount: 100,
@@ -287,11 +304,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 {paymentMethod === 'UPI' && (
                   <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
                     <div className="flex items-center space-x-3">
-                      <div className="w-16 h-16 bg-white border border-slate-300 rounded-xl flex items-center justify-center p-1.5 shadow-2xs">
+                      <div className="w-16 h-16 bg-white border border-slate-300 rounded-xl flex items-center justify-center p-1.5 shadow-2xs shrink-0">
                         {/* Dynamic SVG QR simulation */}
-                        <div className="w-full h-full bg-slate-900 rounded flex flex-col items-center justify-center text-white text-[9px] font-mono leading-none">
-                          <span>UPI</span>
-                          <span className="text-[7px] text-amber-300">₹{plan.priceInInr}</span>
+                        <div className="w-full h-full bg-slate-900 rounded-lg flex flex-col items-center justify-center text-white text-[9px] font-mono leading-none">
+                          <span className="font-bold tracking-wider">UPI</span>
+                          <span className="text-[8px] text-amber-300 font-bold mt-1">₹{plan.priceInInr}</span>
                         </div>
                       </div>
                       <div className="flex-1 text-xs">
@@ -299,14 +316,46 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                         <div className="text-[11px] text-slate-500 mt-0.5">
                           Google Pay • PhonePe • Paytm • BHIM • Cred
                         </div>
-                        <div className="text-[10px] text-indigo-600 font-mono font-semibold mt-1">
-                          VPA: aspirantatlas@icici
+                        <div className="flex items-center space-x-2 mt-1.5">
+                          <span className="text-[11px] text-indigo-700 font-mono font-bold bg-indigo-50 border border-indigo-200/80 px-2 py-0.5 rounded-lg">
+                            aspirantatlas@oksbi
+                          </span>
+                          <button
+                            type="button"
+                            onClick={handleCopyUpi}
+                            className={`btn-tactile px-2 py-0.5 rounded-lg text-[10px] font-bold flex items-center space-x-1 border transition-all ${
+                              isCopied
+                                ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                                : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                            }`}
+                          >
+                            {isCopied ? (
+                              <>
+                                <Check className="w-3 h-3 text-emerald-600" />
+                                <span>Copied!</span>
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="w-3 h-3 text-slate-500" />
+                                <span>Copy ID</span>
+                              </>
+                            )}
+                          </button>
                         </div>
                       </div>
                     </div>
 
+                    {/* Mobile 1-Tap UPI Launch Trigger */}
+                    <a
+                      href={`upi://pay?pa=aspirantatlas@oksbi&pn=AspirantAtlas&am=${plan.priceInInr}&cu=INR&tn=${encodeURIComponent(plan.name)}`}
+                      className="sm:hidden btn-tactile w-full py-2 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold flex items-center justify-center space-x-1.5 shadow-xs"
+                    >
+                      <Zap className="w-3.5 h-3.5 text-amber-400" />
+                      <span>1-Tap Pay via Installed UPI App</span>
+                    </a>
+
                     <div>
-                      <label className="block text-[11px] font-semibold text-slate-600 mb-1">Or enter UPI ID:</label>
+                      <label className="block text-[11px] font-semibold text-slate-600 mb-1">Or your UPI ID handle:</label>
                       <input
                         type="text"
                         value={upiHandle}

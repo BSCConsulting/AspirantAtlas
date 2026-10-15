@@ -23,6 +23,8 @@ import {
   Target,
   Zap
 } from 'lucide-react';
+import confetti from 'canvas-confetti';
+import { playChime, playClick } from '../services/soundService';
 
 interface MockTestSimulatorProps {
   showTelugu: boolean;
@@ -164,6 +166,7 @@ export const MockTestSimulator: React.FC<MockTestSimulatorProps> = ({
   };
 
   const handleSelectOption = (optionIndex: number) => {
+    playClick();
     setSelectedAnswers((prev) => ({
       ...prev,
       [currentQuestionIndex]: optionIndex
@@ -247,6 +250,22 @@ export const MockTestSimulator: React.FC<MockTestSimulatorProps> = ({
     saveAttempt(res);
     localStorage.removeItem('aspirant_active_test_draft');
     setActiveDraft(null);
+
+    // Audio & celebratory visual feedback
+    if (res.accuracy >= 60 || res.score >= (res.maxScore * 0.4)) {
+      playChime();
+      try {
+        confetti({
+          particleCount: 90,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+      } catch {
+        // ignore
+      }
+    } else {
+      playClick();
+    }
   };
 
   const handleManualSubmit = () => {

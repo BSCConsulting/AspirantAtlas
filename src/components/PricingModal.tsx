@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   X, 
   Check, 
@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { SUBSCRIPTION_PLANS, SubscriptionPlan } from '../services/subscriptionService';
 import { AspirantUser } from '../services/authService';
+import { playClick } from '../services/soundService';
 
 interface PricingModalProps {
   isOpen: boolean;
@@ -29,6 +30,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
   currentUser,
   onSelectPlan
 }) => {
+  const [billingCycle, setBillingCycle] = useState<'all' | 'annual' | 'sprint'>('all');
   if (!isOpen) return null;
 
   return (
@@ -67,8 +69,53 @@ export const PricingModal: React.FC<PricingModalProps> = ({
 
         {/* Modal Body / Pricing Cards */}
         <div className="p-6 overflow-y-auto space-y-6">
+          {/* Plan Duration Filter / Savings Banner */}
+          <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
+            <div className="flex items-center space-x-1 p-1 bg-white border border-slate-200 rounded-xl shadow-2xs">
+              <button
+                type="button"
+                onClick={() => { setBillingCycle('all'); playClick(); }}
+                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+                  billingCycle === 'all' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                All Passes
+              </button>
+              <button
+                type="button"
+                onClick={() => { setBillingCycle('sprint'); playClick(); }}
+                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+                  billingCycle === 'sprint' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                90-Day Sprint (₹499)
+              </button>
+              <button
+                type="button"
+                onClick={() => { setBillingCycle('annual'); playClick(); }}
+                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center space-x-1.5 ${
+                  billingCycle === 'annual' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <span>Annual Topper (₹1,499)</span>
+                <span className="text-[10px] font-black uppercase bg-amber-400 text-slate-950 px-1.5 py-0.2 rounded-full">
+                  Save 40%
+                </span>
+              </button>
+            </div>
+            
+            <div className="text-xs text-slate-500 font-medium flex items-center space-x-1.5">
+              <ShieldCheck className="w-4 h-4 text-emerald-600" />
+              <span>Full GST Tax Deduction Invoice Provided</span>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {SUBSCRIPTION_PLANS.map((plan) => {
+            {SUBSCRIPTION_PLANS.filter(p => {
+              if (billingCycle === 'sprint') return p.id === 'sprint' || p.id === 'free';
+              if (billingCycle === 'annual') return p.id === 'topper' || p.id === 'free';
+              return true;
+            }).map((plan) => {
               const isCurrentPlan = currentUser?.plan === plan.id || (!currentUser?.plan && plan.id === 'free');
               const isTopper = plan.id === 'topper';
 
@@ -163,6 +210,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
                       <button
                         type="button"
                         onClick={() => {
+                          playClick();
                           onClose();
                           onSelectPlan(plan);
                         }}

@@ -23,6 +23,9 @@ import { LeadCaptureModal } from './components/LeadCaptureModal';
 import { AdminVisitorInsightsModal } from './components/AdminVisitorInsightsModal';
 import { PricingModal } from './components/PricingModal';
 import { CheckoutModal } from './components/CheckoutModal';
+import { CommunityActivityToast } from './components/CommunityActivityToast';
+import { safeGetJSON, safeSetJSON, safeGetString, safeSetString } from './utils/storageHelper';
+import { playStreakBell, playChime, playClick } from './services/soundService';
 import { SubscriptionPlan } from './services/subscriptionService';
 import { AspirantUser, getCurrentUser } from './services/authService';
 import { initVisitorTracker, recordPageView } from './services/visitorTracker';
@@ -51,65 +54,57 @@ export function App() {
   );
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [aspirantStage, setAspirantStage] = useState<AspirantStage>(() => {
-    return (localStorage.getItem('aspirant_stage') as AspirantStage) || 'beginner';
+    return safeGetString('aspirant_stage', 'beginner') as AspirantStage;
   });
 
   const [selectedExam, setSelectedExam] = useState<ExamId>(() => {
-    return (localStorage.getItem('aspirant_selected_exam') as ExamId) || 'appsc';
+    return safeGetString('aspirant_selected_exam', 'appsc') as ExamId;
   });
 
   const [completedNodeIds, setCompletedNodeIds] = useState<string[]>(() => {
-    try {
-      const saved = localStorage.getItem('aspirant_completed_nodes');
-      return saved ? JSON.parse(saved) : ['polity-constitution-framework'];
-    } catch {
-      return ['polity-constitution-framework'];
-    }
+    return safeGetJSON<string[]>('aspirant_completed_nodes', ['polity-constitution-framework']);
   });
 
   const [quizScores, setQuizScores] = useState<Record<string, { score: number; total: number }>>(() => {
-    try {
-      const saved = localStorage.getItem('aspirant_quiz_scores');
-      return saved ? JSON.parse(saved) : {};
-    } catch {
-      return {};
-    }
+    return safeGetJSON<Record<string, { score: number; total: number }>>('aspirant_quiz_scores', {});
   });
 
   const [streakDays, setStreakDays] = useState<number>(() => {
-    return parseInt(localStorage.getItem('aspirant_streak_days') || '3', 10);
+    return parseInt(safeGetString('aspirant_streak_days', '3'), 10);
   });
 
   const [showTelugu, setShowTelugu] = useState<boolean>(() => {
-    return localStorage.getItem('aspirant_show_telugu') === 'true';
+    return safeGetString('aspirant_show_telugu', 'false') === 'true';
   });
 
   const [activeTab, setActiveTab] = useState<ActiveNavTab>(() => {
-    return (localStorage.getItem('aspirant_active_tab') as ActiveNavTab) || 'roadmap';
+    return safeGetString('aspirant_active_tab', 'roadmap') as ActiveNavTab;
   });
 
   const [navHistory, setNavHistory] = useState<ActiveNavTab[]>([]);
 
   const handleNavigateTab = (newTab: ActiveNavTab) => {
     if (newTab !== activeTab) {
+      playClick();
       setNavHistory((prev) => [...prev, activeTab]);
       setActiveTab(newTab);
-      localStorage.setItem('aspirant_active_tab', newTab);
+      safeSetString('aspirant_active_tab', newTab);
       recordPageView(newTab);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   const handleGoBack = () => {
+    playClick();
     if (navHistory.length > 0) {
       const prevTab = navHistory[navHistory.length - 1];
       setNavHistory((prev) => prev.slice(0, prev.length - 1));
       setActiveTab(prevTab);
-      localStorage.setItem('aspirant_active_tab', prevTab);
+      safeSetString('aspirant_active_tab', prevTab);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       setActiveTab('roadmap');
-      localStorage.setItem('aspirant_active_tab', 'roadmap');
+      safeSetString('aspirant_active_tab', 'roadmap');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
@@ -136,23 +131,23 @@ export function App() {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('aspirant_selected_exam', selectedExam);
+    safeSetString('aspirant_selected_exam', selectedExam);
   }, [selectedExam]);
 
   useEffect(() => {
-    localStorage.setItem('aspirant_completed_nodes', JSON.stringify(completedNodeIds));
+    safeSetJSON('aspirant_completed_nodes', completedNodeIds);
   }, [completedNodeIds]);
 
   useEffect(() => {
-    localStorage.setItem('aspirant_quiz_scores', JSON.stringify(quizScores));
+    safeSetJSON('aspirant_quiz_scores', quizScores);
   }, [quizScores]);
 
   useEffect(() => {
-    localStorage.setItem('aspirant_streak_days', streakDays.toString());
+    safeSetString('aspirant_streak_days', streakDays.toString());
   }, [streakDays]);
 
   useEffect(() => {
-    localStorage.setItem('aspirant_show_telugu', showTelugu.toString());
+    safeSetString('aspirant_show_telugu', showTelugu.toString());
   }, [showTelugu]);
 
   useEffect(() => {
@@ -190,6 +185,7 @@ export function App() {
   }, [activeSession]);
 
   const handleStartSession = (goal: string) => {
+    playStreakBell();
     const userId = currentUser?.id || 'default-aspirant';
     const sess = startCheckIn(userId, goal);
     setActiveSession(sess);
@@ -197,6 +193,7 @@ export function App() {
   };
 
   const handleEndSession = (rating: number, notes?: string) => {
+    playClick();
     const userId = currentUser?.id || 'default-aspirant';
     endCheckOut(userId, rating, notes);
     setActiveSession(null);
@@ -206,15 +203,16 @@ export function App() {
   const handleCompleteOnboarding = (profile: AspirantProfile) => {
     setSelectedExam(profile.targetExam);
     setAspirantStage(profile.stage);
-    localStorage.setItem('aspirant_onboarded', 'true');
-    localStorage.setItem('aspirant_stage', profile.stage);
-    localStorage.setItem('aspirant_study_horizon', profile.horizon);
-    localStorage.setItem('aspirant_selected_exam', profile.targetExam);
+    safeSetString('aspirant_onboarded', 'true');
+    safeSetString('aspirant_stage', profile.stage);
+    safeSetString('aspirant_study_horizon', profile.horizon);
+    safeSetString('aspirant_selected_exam', profile.targetExam);
     setIsOnboardingOpen(false);
     setActiveTab('roadmap');
   };
 
   const handleToggleComplete = (nodeId: string) => {
+    playClick();
     setCompletedNodeIds(prev => {
       const willBeDone = !prev.includes(nodeId);
       if (willBeDone) {
@@ -235,6 +233,7 @@ export function App() {
   };
 
   const handleDrillCompleted = () => {
+    playChime();
     setStreakDays(prev => prev + 1);
     const userId = currentUser?.id || 'default-aspirant';
     recordSessionActivity(userId, 'mcq', { attempted: 5, correct: 5 });
@@ -264,7 +263,7 @@ export function App() {
   const completedExamNodesCount = currentExamNodes.filter(n => completedNodeIds.includes(n.id)).length;
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans">
+    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans ambient-glow-indigo relative">
       <Header
         selectedExam={selectedExam}
         onSelectExam={setSelectedExam}
@@ -599,6 +598,9 @@ export function App() {
           </div>
         </div>
       </footer>
+
+      {/* Live Preparation Social Proof & Activity Toast */}
+      <CommunityActivityToast />
 
       {/* Native Mobile Sticky Bottom Navigation Bar (<768px viewports) */}
       <MobileBottomNav

@@ -14,7 +14,9 @@ import {
   ArrowRight,
   CheckCircle2,
   Sparkles,
-  BookOpen
+  BookOpen,
+  Key,
+  Phone
 } from 'lucide-react';
 import { 
   AspirantUser, 
@@ -35,6 +37,7 @@ interface ProfileDrawerProps {
   currentUser: AspirantUser | null;
   onUserChanged: (user: AspirantUser | null) => void;
   onOpenSessionModal?: () => void;
+  onOpenGeminiKey?: () => void;
 }
 
 export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
@@ -42,12 +45,14 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
   onClose,
   currentUser,
   onUserChanged,
-  onOpenSessionModal
+  onOpenSessionModal,
+  onOpenGeminiKey
 }) => {
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncStatusMsg, setSyncStatusMsg] = useState('');
   const [emailName, setEmailName] = useState('');
   const [emailAddress, setEmailAddress] = useState('');
+  const [mobileNumber, setMobileNumber] = useState('');
   const [selectedExam, setSelectedExam] = useState<ExamId>('upsc');
   const [isEmailFormOpen, setIsEmailFormOpen] = useState(false);
 
@@ -312,6 +317,34 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
                   </label>
                 </div>
               </div>
+
+              {/* AI Evaluation Engine & Key Config */}
+              <div className="p-4 rounded-2xl border border-slate-200 bg-white space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <div className="text-xs font-bold text-slate-800 flex items-center space-x-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+                    <span>Mains AI Evaluation Engine</span>
+                  </div>
+                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                    Gemini Flash Ready
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-500 leading-relaxed">
+                  Powers OCR handwriting transcription, question grading, and model benchmarks.
+                </p>
+                {onOpenGeminiKey && (
+                  <button
+                    onClick={() => {
+                      onClose();
+                      onOpenGeminiKey();
+                    }}
+                    className="btn-tactile w-full py-2 px-3 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 flex items-center justify-center space-x-1.5"
+                  >
+                    <Key className="w-3.5 h-3.5 text-slate-500" />
+                    <span>Configure Custom API Key</span>
+                  </button>
+                )}
+              </div>
             </div>
           ) : (
             /* --- GUEST / SIGN-IN VIEW --- */
@@ -400,6 +433,21 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
                       />
                     </div>
                     <div>
+                      <label className="block text-[11px] font-bold text-slate-600 mb-1">
+                        WhatsApp / Mobile <span className="text-[10px] text-slate-400 font-normal">(for daily study reminders)</span>
+                      </label>
+                      <div className="relative">
+                        <Phone className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
+                        <input
+                          type="tel"
+                          placeholder="+91 98765 43210"
+                          value={mobileNumber}
+                          onChange={(e) => setMobileNumber(e.target.value)}
+                          className="w-full pl-8 pr-3 py-2 rounded-xl text-xs bg-white border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                        />
+                      </div>
+                    </div>
+                    <div>
                       <label className="block text-[11px] font-bold text-slate-600 mb-1">Target Exam</label>
                       <div className="grid grid-cols-3 gap-1.5">
                         {(['upsc', 'appsc', 'tspsc'] as ExamId[]).map((e) => (
@@ -434,6 +482,34 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
                       </button>
                     </div>
                   </form>
+                )}
+              </div>
+
+              {/* AI Evaluation Engine & Key Config for Guests */}
+              <div className="p-4 rounded-2xl border border-slate-200 bg-white space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <div className="text-xs font-bold text-slate-800 flex items-center space-x-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+                    <span>Mains AI Evaluation Engine</span>
+                  </div>
+                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                    Gemini Flash Ready
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-500 leading-relaxed">
+                  Evaluate handwritten answers, question grading, and model benchmarks.
+                </p>
+                {onOpenGeminiKey && (
+                  <button
+                    onClick={() => {
+                      onClose();
+                      onOpenGeminiKey();
+                    }}
+                    className="btn-tactile w-full py-2 px-3 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 flex items-center justify-center space-x-1.5"
+                  >
+                    <Key className="w-3.5 h-3.5 text-slate-500" />
+                    <span>Configure Custom API Key</span>
+                  </button>
                 )}
               </div>
             </div>

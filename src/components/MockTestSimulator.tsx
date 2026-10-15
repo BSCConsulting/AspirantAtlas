@@ -31,6 +31,15 @@ interface MockTestSimulatorProps {
   onTestCompleted?: (attempted: number, correct: number) => void;
 }
 
+interface ActiveTestDraft {
+  test: MockTest;
+  currentQuestionIndex: number;
+  selectedAnswers: Record<number, number>;
+  markedForReview: number[];
+  timeRemainingSeconds: number;
+  savedAt: string;
+}
+
 export const MockTestSimulator: React.FC<MockTestSimulatorProps> = ({
   showTelugu,
   selectedExam,
@@ -47,6 +56,16 @@ export const MockTestSimulator: React.FC<MockTestSimulatorProps> = ({
   const [attemptResult, setAttemptResult] = useState<TestAttemptResult | null>(null);
   const [filterExam, setFilterExam] = useState<ExamId | 'all'>('all');
   
+  // In-progress test draft state
+  const [activeDraft, setActiveDraft] = useState<ActiveTestDraft | null>(() => {
+    try {
+      const saved = localStorage.getItem('aspirant_active_test_draft');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+
   // Custom Drill Studio State
   const [isDrillStudioOpen, setIsDrillStudioOpen] = useState<boolean>(false);
   const [drillSubject, setDrillSubject] = useState<string>('All');
@@ -62,6 +81,22 @@ export const MockTestSimulator: React.FC<MockTestSimulatorProps> = ({
     }
   });
 
+  // Auto-save active test in-progress draft
+  useEffect(() => {
+    if (isTestActive && activeTest) {
+      const draft: ActiveTestDraft = {
+        test: activeTest,
+        currentQuestionIndex,
+        selectedAnswers,
+        markedForReview,
+        timeRemainingSeconds,
+        savedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+      localStorage.setItem('aspirant_active_test_draft', JSON.stringify(draft));
+      setActiveDraft(draft);
+    }
+  }, [isTestActive, activeTest, currentQuestionIndex, selectedAnswers, markedForReview, timeRemainingSeconds]);
+
   const handleStartCustomDrill = () => {
     const customTest = generateCustomDrill({
       subject: drillSubject === 'All' ? undefined : drillSubject,
@@ -69,6 +104,34 @@ export const MockTestSimulator: React.FC<MockTestSimulatorProps> = ({
       count: drillCount
     });
     startTest(customTest);
+  };
+
+  const handleResumeDraft = () => {
+    if (!activeDraft) return;
+    setActiveTest(activeDraft.test);
+    setCurrentQuestionIndex(activeDraft.currentQuestionIndex || 0);
+    setSelectedAnswers(activeDraft.selectedAnswers || {});
+    setMarkedForReview(activeDraft.markedForReview || []);
+    setTimeRemainingSeconds(activeDraft.timeRemainingSeconds);
+    setIsTestActive(true);
+    setAttemptResult(null);
+  };
+
+  const handleDiscardDraft = () => {
+    if (window.confirm(showTelugu 
+      ? 'మీరు ఖచ్చితంగా ఈ అసంపూర్ణ టెస్ట్ డ్రాఫ్ట్‌ను తొలగించాలనుకుంటున్నారా?' 
+      : 'Are you sure you want to discard this unfinished test draft?')) {
+      localStorage.removeItem('aspirant_active_test_draft');
+      setActiveDraft(null);
+    }
+  };
+
+  const handlePauseAndExit = () => {
+    if (window.confirm(showTelugu
+      ? 'మీ సమాధానాలు మరియు మిగిలిన సమయం స్వయంచాలకంగా సేవ్ చేయబడ్డాయి. మీరు ఎప్పుడైనా మళ్ళీ కొనసాగించవచ్చు. ఇప్పుడు నిష్క్రమించాలనుకుంటున్నారా?'
+      : 'Your answers and remaining time are auto-saved. You can resume anytime from the Prelims Mocks screen. Pause and exit now?')) {
+      setIsTestActive(false);
+    }
   };
 
   // Timer countdown
@@ -182,6 +245,8 @@ export const MockTestSimulator: React.FC<MockTestSimulatorProps> = ({
     setIsTestActive(false);
     setAttemptResult(res);
     saveAttempt(res);
+    localStorage.removeItem('aspirant_active_test_draft');
+    setActiveDraft(null);
   };
 
   const handleManualSubmit = () => {
@@ -224,14 +289,30 @@ export const MockTestSimulator: React.FC<MockTestSimulatorProps> = ({
     return (
       <div className="space-y-6 max-w-6xl mx-auto animate-fadeIn">
         {/* Test Header Bar */}
-        <div className="glass-nav backdrop-blur-md rounded-2xl border border-slate-200/80 shadow-elevation-2 p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4 sticky top-24 z-20 transition-all">
-          <div>
-            <div className="text-[10px] font-extrabold uppercase tracking-widest text-sky-600">
-              {activeTest.subject} • {activeTest.type === 'sectional' ? 'Sectional Simulator' : 'Full Length Mock'}
+        <div className="glass-nav backdrop-blur-md rounded-2xl border border-slate-200/80 shadow-elevation-2 p-3.5 sm:p-5 flex flex-wrap items-center justify-between gap-3 sticky top-20 sm:top-24 z-20 transition-all">
+          <div className="flex items-center space-x-2.5 sm:space-x-3.5">
+            <button
+              onClick={handlePauseAndExit}
+              className="btn-tactile px-3 py-2 rounded-xl text-xs font-bold border border-slate-200/90 text-slate-700 bg-white hover:bg-slate-50 flex items-center space-x-1.5 shadow-2xs"
+              title="Pause and save test progress"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 text-slate-500" />
+              <span className="hidden xs:inline">Pause & Exit</span>
+              <span className="xs:hidden">Exit</span>
+            </button>
+
+            <div>
+              <div className="text-[10px] font-extrabold uppercase tracking-widest text-sky-600 flex items-center space-x-1.5">
+                <span>{activeTest.subject}</span>
+                <span>•</span>
+                <span className="text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200/60">
+                  Auto-Saved
+                </span>
+              </div>
+              <h2 className="text-sm sm:text-base md:text-lg font-black text-slate-900 tracking-tight line-clamp-1 mt-0.5">
+                {showTelugu && activeTest.titleTelugu ? activeTest.titleTelugu : activeTest.title}
+              </h2>
             </div>
-            <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight line-clamp-1 mt-0.5">
-              {showTelugu && activeTest.titleTelugu ? activeTest.titleTelugu : activeTest.title}
-            </h2>
           </div>
 
           <div className="flex items-center space-x-4">
@@ -413,7 +494,7 @@ export const MockTestSimulator: React.FC<MockTestSimulatorProps> = ({
             </div>
 
             {/* Bubble Grid */}
-            <div className="grid grid-cols-5 gap-2 max-h-72 overflow-y-auto pr-1">
+            <div className="grid grid-cols-4 sm:grid-cols-5 gap-1.5 sm:gap-2 max-h-72 overflow-y-auto pr-1">
               {activeTest.questions.map((_, idx) => {
                 const answered = selectedAnswers[idx] !== undefined;
                 const reviewed = markedForReview.includes(idx);
@@ -821,6 +902,47 @@ export const MockTestSimulator: React.FC<MockTestSimulatorProps> = ({
   // ==========================================
   return (
     <div className="space-y-8 animate-fadeIn">
+      {/* In-Progress Test Resume Recovery Banner */}
+      {activeDraft && (
+        <div className="bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border-2 border-amber-400/80 rounded-3xl p-5 sm:p-6 shadow-elevation-2 flex flex-col md:flex-row md:items-center justify-between gap-4 animate-scaleUp">
+          <div className="flex items-start space-x-3.5">
+            <div className="w-10 h-10 rounded-2xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-sm shadow-amber-500/30">
+              <Clock className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center space-x-2">
+                <span className="text-[10px] font-black uppercase tracking-wider text-amber-800 bg-amber-100 border border-amber-200 px-2 py-0.5 rounded-full">
+                  Unfinished Test Saved
+                </span>
+                <span className="text-xs text-slate-500 font-medium">Auto-Saved at {activeDraft.savedAt}</span>
+              </div>
+              <h3 className="text-base sm:text-lg font-black text-slate-900 mt-1">
+                {activeDraft.test.title}
+              </h3>
+              <p className="text-xs text-slate-600 mt-0.5">
+                Progress: <strong className="text-slate-900">{Object.keys(activeDraft.selectedAnswers).length}</strong> of {activeDraft.test.questions.length} answered • <strong className="text-slate-900">{Math.ceil(activeDraft.timeRemainingSeconds / 60)} mins</strong> remaining.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-2.5 shrink-0 self-end md:self-center">
+            <button
+              onClick={handleDiscardDraft}
+              className="btn-tactile px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-200/60 border border-slate-200"
+            >
+              Discard
+            </button>
+            <button
+              onClick={handleResumeDraft}
+              className="btn-tactile px-5 py-2.5 rounded-xl text-xs font-black bg-amber-600 hover:bg-amber-500 text-white shadow-elevation-1 flex items-center space-x-2"
+            >
+              <span>Resume Test</span>
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Catalog Hero Banner */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-sky-950 p-7 sm:p-9 text-white shadow-elevation-3 border border-sky-900/40">
         {/* Ambient atmospheric mesh glows */}

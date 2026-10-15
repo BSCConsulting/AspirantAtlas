@@ -92,7 +92,7 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
 
             <div className="flex items-center space-x-1.5 sm:space-x-2">
-              <span className="font-black text-base sm:text-lg tracking-tight text-slate-900 leading-none">
+              <span className="font-black text-sm sm:text-base md:text-lg tracking-tight text-slate-900 leading-none truncate max-w-[105px] xs:max-w-none">
                 AspirantAtlas
               </span>
               <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200">
@@ -101,11 +101,11 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
 
             {/* Mobile Compact Exam Selector Dropdown */}
-            <div className="md:hidden ml-1">
+            <div className="md:hidden ml-0.5">
               <select
                 value={selectedExam}
                 onChange={(e) => onSelectExam(e.target.value as ExamId)}
-                className="bg-slate-100 hover:bg-slate-200/80 border border-slate-200/90 text-[11px] font-black text-slate-800 rounded-lg py-1 px-1.5 focus:outline-none transition-all cursor-pointer"
+                className="bg-slate-100 hover:bg-slate-200/80 border border-slate-200/90 text-[10px] sm:text-[11px] font-black text-slate-800 rounded-lg py-1 px-1 focus:outline-none transition-all cursor-pointer"
               >
                 <option value="upsc">UPSC</option>
                 <option value="appsc">APPSC</option>
@@ -252,23 +252,6 @@ export const Header: React.FC<HeaderProps> = ({
                       >
                         <Compass className="w-4 h-4 text-sky-600" />
                         <span>Compass Guide</span>
-                      </button>
-                    )}
-
-                    {/* Gemini AI Key Config */}
-                    {onOpenGeminiKey && (
-                      <button
-                        onClick={() => {
-                          setIsToolsOpen(false);
-                          onOpenGeminiKey();
-                        }}
-                        className="w-full px-3 py-2 rounded-xl text-xs font-bold text-slate-800 hover:bg-slate-100 flex items-center justify-between transition-colors"
-                      >
-                        <div className="flex items-center space-x-2">
-                          <Key className="w-4 h-4 text-slate-600" />
-                          <span>Gemini API Key</span>
-                        </div>
-                        <span className="text-[10px] text-slate-400 font-mono">Config</span>
                       </button>
                     )}
                   </div>

@@ -244,28 +244,483 @@ export const DynamicGeoAtlas: React.FC<DynamicGeoAtlasProps> = ({
             )}
           </div>
 
-          {/* Interactive Geographic Map Visualization Viewport */}
-          <div className="relative bg-gradient-to-b from-slate-900 via-slate-950 to-indigo-950 rounded-2xl p-4 sm:p-6 border border-slate-800 overflow-hidden min-h-[460px] flex flex-col justify-between">
+          {/* Interactive Geographic Map Visualization Viewport with Authentic SVG Vector Canvas */}
+          <div className="relative bg-gradient-to-b from-slate-950 via-slate-900 to-indigo-950 rounded-2xl p-3 sm:p-5 border border-slate-800 overflow-hidden min-h-[500px] flex flex-col justify-between shadow-2xl">
+            {/* Background Map Atmosphere Grid & Topographic lines */}
             <div className="absolute inset-0 bg-grid-dots opacity-20 pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
             
-            {/* Map Top Status Pill */}
-            <div className="relative z-10 flex items-center justify-between text-xs text-slate-400">
+            {/* Map Top Status Pill & Dynamic Live Coordinates HUD */}
+            <div className="relative z-10 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400 pb-2 border-b border-slate-800/80">
               <span className="flex items-center space-x-1.5 font-bold">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-radar" />
-                <span className="text-slate-300">
-                  {activeMap === 'india' ? 'Interactive India Cadre Grid' : activeMap === 'telangana' ? 'Telangana 33 Districts Cluster' : 'Andhra Pradesh 26 Districts Coastal Arc'}
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-radar" />
+                <span className="text-slate-200 font-extrabold tracking-wide">
+                  {activeMap === 'india' ? '🇮🇳 Spatial India Cadre Vector Map' : activeMap === 'telangana' ? '🏛️ Telangana 33 Districts Spatial Vector Map' : '🌊 Andhra Pradesh 26 Districts Coastal Arc Vector Map'}
                 </span>
               </span>
-              <span className="text-[10px] text-slate-400 bg-slate-800/80 px-2 py-0.5 rounded-full border border-slate-700">
-                Click any region to inspect details
-              </span>
+              <div className="flex items-center space-x-2">
+                <span className="text-[10px] text-amber-300 font-mono bg-amber-950/60 border border-amber-800/50 px-2 py-0.5 rounded-md flex items-center gap-1">
+                  <Compass className="w-3 h-3 text-amber-400" />
+                  <span>Interactive Spatial GIS</span>
+                </span>
+                <span className="text-[10px] text-slate-400 bg-slate-800/80 px-2 py-0.5 rounded-full border border-slate-700">
+                  Hover or tap any territory
+                </span>
+              </div>
             </div>
 
-            {/* 3D-styled Visual Districts/States Interactive Grid */}
-            <div className="relative z-10 my-4 flex-1 flex items-center justify-center">
-              {activeMap === 'india' && (
-                <div className="w-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 max-h-[420px] overflow-y-auto pr-1">
-                  {filteredIndiaStates.map((s) => {
+            {/* Dynamic Floating HUD Overlay Card (Appears dynamically as user hovers/scrolls) */}
+            <div className="relative z-20 my-2">
+              <div className="bg-slate-900/90 backdrop-blur-md border border-indigo-500/40 rounded-xl p-2.5 sm:p-3 text-white shadow-xl flex items-center justify-between gap-3 transition-all animate-fadeIn">
+                <div className="flex items-center space-x-3 min-w-0">
+                  <div className="w-8 h-8 rounded-lg bg-indigo-600/30 border border-indigo-400/40 flex items-center justify-center text-sm font-black text-indigo-300 shrink-0">
+                    📍
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center space-x-2">
+                      <span className="font-black text-sm text-amber-300 truncate">
+                        {activeMap === 'india' 
+                          ? selectedIndiaState.name 
+                          : activeMap === 'telangana' 
+                          ? selectedTgDistrict.name 
+                          : selectedApDistrict.name}
+                      </span>
+                      {showTelugu && (
+                        <span className="text-xs text-slate-300 font-sans truncate">
+                          ({activeMap === 'india' 
+                            ? selectedIndiaState.nameTelugu 
+                            : activeMap === 'telangana' 
+                            ? selectedTgDistrict.nameTelugu 
+                            : selectedApDistrict.nameTelugu})
+                        </span>
+                      )}
+                      <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-400/30 shrink-0">
+                        {activeMap === 'india' 
+                          ? selectedIndiaState.code 
+                          : activeMap === 'telangana' 
+                          ? (selectedTgDistrict.zone || 'TS') 
+                          : (selectedApDistrict.region || 'AP')}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-300 truncate">
+                      {activeMap === 'india'
+                        ? `Capital: ${selectedIndiaState.capital} • PSC: ${selectedIndiaState.psc} • Cadre: ${selectedIndiaState.cadre}`
+                        : activeMap === 'telangana'
+                        ? `HQ: ${selectedTgDistrict.hq} • Rivers: ${selectedTgDistrict.majorRivers.join(', ')} • Area: ${selectedTgDistrict.areaKm2} km²`
+                        : `HQ: ${selectedApDistrict.hq} • Coastline: ${selectedApDistrict.coastlineKm || 0} km • Rivers: ${selectedApDistrict.majorRivers.join(', ')}`}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="hidden sm:flex items-center space-x-2 shrink-0">
+                  <span className="text-[10px] text-emerald-400 bg-emerald-950/60 border border-emerald-800/40 px-2 py-1 rounded-lg font-bold">
+                    {activeMap === 'india' ? 'UPSC / State PSC' : activeMap === 'telangana' ? 'TGPSC Paper-II & VI' : 'APPSC Paper-II & III'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Authentic Vector SVG Spatial Geographic Canvas */}
+            <div className="relative z-10 flex-1 flex items-center justify-center p-1 sm:p-2 overflow-hidden">
+              <svg
+                viewBox="120 90 600 600"
+                className="w-full h-auto max-h-[420px] select-none transition-all drop-shadow-2xl"
+                preserveAspectRatio="xMidYMid meet"
+              >
+                <defs>
+                  {/* Glowing Filter for Selected / Hovered Territory */}
+                  <filter id="svgGlow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="4" result="blur" />
+                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                  </filter>
+                  <filter id="radarPulse" x="-30%" y="-30%" width="160%" height="160%">
+                    <feGaussianBlur stdDeviation="6" result="blur" />
+                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                  </filter>
+                  <linearGradient id="godavariGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.8" />
+                    <stop offset="100%" stopColor="#0284c7" stopOpacity="0.3" />
+                  </linearGradient>
+                  <linearGradient id="krishnaGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#2dd4bf" stopOpacity="0.8" />
+                    <stop offset="100%" stopColor="#0d9488" stopOpacity="0.3" />
+                  </linearGradient>
+                </defs>
+
+                {/* Topographic Background Graticule Lines */}
+                <g opacity="0.12" stroke="#94a3b8" strokeDasharray="3 6" strokeWidth="0.8">
+                  <line x1="120" y1="200" x2="720" y2="200" />
+                  <line x1="120" y1="350" x2="720" y2="350" />
+                  <line x1="120" y1="500" x2="720" y2="500" />
+                  <line x1="120" y1="650" x2="720" y2="650" />
+                  <line x1="250" y1="90" x2="250" y2="690" />
+                  <line x1="400" y1="90" x2="400" y2="690" />
+                  <line x1="550" y1="90" x2="550" y2="690" />
+                </g>
+
+                {/* Animated Major River System Lines (Physical Geography Overlay) */}
+                {activeMap === 'telangana' && (
+                  <g className="rivers-overlay pointer-events-none">
+                    {/* Godavari River Flow Path (North-West to South-East) */}
+                    <path
+                      d="M 280 270 Q 380 230 460 250 T 560 310 T 640 450 T 680 500"
+                      fill="none"
+                      stroke="url(#godavariGradient)"
+                      strokeWidth="3.5"
+                      strokeDasharray="6 3"
+                      className="animate-pulse"
+                    />
+                    <text x="590" y="380" fill="#38bdf8" fontSize="10" fontWeight="bold" opacity="0.7">
+                      🌊 Godavari River
+                    </text>
+
+                    {/* Krishna River Flow Path (South-West to South-East) */}
+                    <path
+                      d="M 260 560 Q 330 580 400 590 T 500 580 T 580 540"
+                      fill="none"
+                      stroke="url(#krishnaGradient)"
+                      strokeWidth="3.5"
+                      strokeDasharray="6 3"
+                      className="animate-pulse"
+                    />
+                    <text x="360" y="615" fill="#2dd4bf" fontSize="10" fontWeight="bold" opacity="0.7">
+                      🌊 Krishna River
+                    </text>
+
+                    {/* Musi River Tributary */}
+                    <path
+                      d="M 370 470 Q 430 470 515 520"
+                      fill="none"
+                      stroke="#93c5fd"
+                      strokeWidth="2"
+                      strokeDasharray="4 2"
+                      opacity="0.6"
+                    />
+                    <text x="440" y="475" fill="#93c5fd" fontSize="8" fontWeight="bold" opacity="0.6">
+                      Musi River
+                    </text>
+                  </g>
+                )}
+
+                {activeMap === 'andhra' && (
+                  <g className="rivers-overlay pointer-events-none">
+                    {/* Bay of Bengal Coastline Oceanic Glow Arc */}
+                    <path
+                      d="M 720 100 Q 640 220 560 320 T 450 440 T 360 580 T 350 740"
+                      fill="none"
+                      stroke="#38bdf8"
+                      strokeWidth="12"
+                      strokeOpacity="0.15"
+                    />
+                    <path
+                      d="M 710 105 Q 635 220 555 320 T 445 440 T 355 580 T 345 735"
+                      fill="none"
+                      stroke="#0284c7"
+                      strokeWidth="2.5"
+                      strokeDasharray="5 3"
+                    />
+                    <text x="580" y="480" fill="#38bdf8" fontSize="12" fontWeight="black" opacity="0.6" letterSpacing="2">
+                      BAY OF BENGAL 🌊
+                    </text>
+
+                    {/* Godavari & Krishna Deltas */}
+                    <path
+                      d="M 460 320 Q 510 340 540 380"
+                      fill="none"
+                      stroke="#38bdf8"
+                      strokeWidth="3"
+                      strokeDasharray="4 2"
+                    />
+                    <text x="490" y="325" fill="#38bdf8" fontSize="9" fontWeight="bold" opacity="0.8">
+                      Godavari Delta (Konaseema)
+                    </text>
+
+                    <path
+                      d="M 360 460 Q 400 440 430 460"
+                      fill="none"
+                      stroke="#2dd4bf"
+                      strokeWidth="3"
+                      strokeDasharray="4 2"
+                    />
+                    <text x="360" y="435" fill="#2dd4bf" fontSize="9" fontWeight="bold" opacity="0.8">
+                      Krishna Delta (Prakasam Barrage)
+                    </text>
+                  </g>
+                )}
+
+                {/* 1. TELANGANA 33 DISTRICTS SPATIAL VECTOR MAP */}
+                {activeMap === 'telangana' && (
+                  <g className="telangana-districts-spatial">
+                    {filteredTgDistricts.map((d) => {
+                      const isSelected = selectedTgDistrict.id === d.id;
+                      // Color based on Zone
+                      const isNorth = d.zone?.includes('Kaleshwaram') || d.zone?.includes('Basara');
+                      const isCentral = d.zone?.includes('Charminar') || d.zone?.includes('Yadadri');
+                      const fillColor = isSelected
+                        ? '#10b981' // Bright Emerald when selected
+                        : isNorth
+                        ? '#064e3b' // Deep Emerald for North
+                        : isCentral
+                        ? '#1e1b4b' // Deep Indigo for Central
+                        : '#3b0764'; // Deep Purple for South
+
+                      const strokeColor = isSelected
+                        ? '#34d399'
+                        : isNorth
+                        ? '#059669'
+                        : isCentral
+                        ? '#6366f1'
+                        : '#a855f7';
+
+                      return (
+                        <g
+                          key={d.id}
+                          className="cursor-pointer transition-all duration-300 group"
+                          onClick={() => {
+                            playClick();
+                            setSelectedTgDistrict(d);
+                          }}
+                          onMouseEnter={() => setSelectedTgDistrict(d)}
+                          filter={isSelected ? 'url(#svgGlow)' : undefined}
+                        >
+                          {/* Animated radar beacon wave for selected territory */}
+                          {isSelected && (
+                            <circle
+                              cx={d.x + d.w / 2}
+                              cy={d.y + d.h / 2}
+                              r={Math.max(d.w, d.h) / 1.1}
+                              fill="#10b981"
+                              opacity="0.25"
+                              className="animate-ping pointer-events-none"
+                            />
+                          )}
+
+                          {/* Territorial Polygon Cell */}
+                          <rect
+                            x={d.x}
+                            y={d.y}
+                            width={d.w}
+                            height={d.h}
+                            rx="10"
+                            fill={fillColor}
+                            stroke={strokeColor}
+                            strokeWidth={isSelected ? '2.5' : '1.2'}
+                            className="transition-all duration-200 group-hover:stroke-white group-hover:brightness-125"
+                          />
+
+                          {/* District Label Text */}
+                          <text
+                            x={d.x + d.w / 2}
+                            y={d.y + d.h / 2 - 2}
+                            textAnchor="middle"
+                            fill={isSelected ? '#ffffff' : '#f1f5f9'}
+                            fontSize={d.w < 55 ? '8.5' : '10'}
+                            fontWeight="900"
+                            className="pointer-events-none select-none tracking-tight"
+                          >
+                            {d.name.length > 12 ? d.name.slice(0, 10) + '..' : d.name}
+                          </text>
+
+                          {/* HQ Subtitle / River Marker */}
+                          <text
+                            x={d.x + d.w / 2}
+                            y={d.y + d.h / 2 + 10}
+                            textAnchor="middle"
+                            fill={isSelected ? '#a7f3d0' : '#94a3b8'}
+                            fontSize="7.5"
+                            fontWeight="bold"
+                            className="pointer-events-none select-none"
+                          >
+                            HQ: {d.hq}
+                          </text>
+                        </g>
+                      );
+                    })}
+                  </g>
+                )}
+
+                {/* 2. ANDHRA PRADESH 26 DISTRICTS SPATIAL VECTOR MAP */}
+                {activeMap === 'andhra' && (
+                  <g className="andhra-districts-spatial">
+                    {filteredApDistricts.map((d) => {
+                      const isSelected = selectedApDistrict.id === d.id;
+                      const isCoastal = d.region === 'Coastal Andhra';
+                      const isUttar = d.region === 'Uttarandhra';
+                      const fillColor = isSelected
+                        ? '#0284c7' // Bright Sky Blue when selected
+                        : isUttar
+                        ? '#064e3b' // Emerald for Uttarandhra
+                        : isCoastal
+                        ? '#0c4a6e' // Deep Ocean Blue for Coastal
+                        : '#78350f'; // Warm Amber for Rayalaseema
+
+                      const strokeColor = isSelected
+                        ? '#38bdf8'
+                        : isUttar
+                        ? '#10b981'
+                        : isCoastal
+                        ? '#0284c7'
+                        : '#f59e0b';
+
+                      return (
+                        <g
+                          key={d.id}
+                          className="cursor-pointer transition-all duration-300 group"
+                          onClick={() => {
+                            playClick();
+                            setSelectedApDistrict(d);
+                          }}
+                          onMouseEnter={() => setSelectedApDistrict(d)}
+                          filter={isSelected ? 'url(#svgGlow)' : undefined}
+                        >
+                          {isSelected && (
+                            <circle
+                              cx={d.x + d.w / 2}
+                              cy={d.y + d.h / 2}
+                              r={Math.max(d.w, d.h) / 1.1}
+                              fill="#0284c7"
+                              opacity="0.25"
+                              className="animate-ping pointer-events-none"
+                            />
+                          )}
+
+                          <rect
+                            x={d.x}
+                            y={d.y}
+                            width={d.w}
+                            height={d.h}
+                            rx="10"
+                            fill={fillColor}
+                            stroke={strokeColor}
+                            strokeWidth={isSelected ? '2.5' : '1.2'}
+                            className="transition-all duration-200 group-hover:stroke-white group-hover:brightness-125"
+                          />
+
+                          <text
+                            x={d.x + d.w / 2}
+                            y={d.y + d.h / 2 - 2}
+                            textAnchor="middle"
+                            fill={isSelected ? '#ffffff' : '#f8fafc'}
+                            fontSize={d.w < 55 ? '8.5' : '10'}
+                            fontWeight="900"
+                            className="pointer-events-none select-none tracking-tight"
+                          >
+                            {d.name.length > 13 ? d.name.slice(0, 11) + '..' : d.name}
+                          </text>
+
+                          <text
+                            x={d.x + d.w / 2}
+                            y={d.y + d.h / 2 + 10}
+                            textAnchor="middle"
+                            fill={isSelected ? '#bae6fd' : '#cbd5e1'}
+                            fontSize="7.5"
+                            fontWeight="bold"
+                            className="pointer-events-none select-none"
+                          >
+                            {d.coastlineKm ? `🌊 ${d.coastlineKm}km` : `⛰️ ${d.hq}`}
+                          </text>
+                        </g>
+                      );
+                    })}
+                  </g>
+                )}
+
+                {/* 3. INDIA NATIONAL CADRE SPATIAL VECTOR MAP */}
+                {activeMap === 'india' && (
+                  <g className="india-states-spatial">
+                    {filteredIndiaStates.map((s) => {
+                      const isSelected = selectedIndiaState.id === s.id;
+                      const fillColor = isSelected
+                        ? '#4f46e5' // Bright Indigo when selected
+                        : '#1e1b4b'; // Midnight Indigo default
+
+                      const strokeColor = isSelected ? '#818cf8' : '#4338ca';
+
+                      return (
+                        <g
+                          key={s.id}
+                          className="cursor-pointer transition-all duration-300 group"
+                          onClick={() => {
+                            playClick();
+                            setSelectedIndiaState(s);
+                          }}
+                          onMouseEnter={() => setSelectedIndiaState(s)}
+                          filter={isSelected ? 'url(#svgGlow)' : undefined}
+                        >
+                          {isSelected && (
+                            <circle
+                              cx={s.x + s.w / 2}
+                              cy={s.y + s.h / 2}
+                              r={Math.max(s.w, s.h) / 1.2}
+                              fill="#4f46e5"
+                              opacity="0.25"
+                              className="animate-ping pointer-events-none"
+                            />
+                          )}
+
+                          <rect
+                            x={s.x}
+                            y={s.y}
+                            width={s.w}
+                            height={s.h}
+                            rx="12"
+                            fill={fillColor}
+                            stroke={strokeColor}
+                            strokeWidth={isSelected ? '2.5' : '1.2'}
+                            className="transition-all duration-200 group-hover:stroke-white group-hover:brightness-125"
+                          />
+
+                          <text
+                            x={s.x + s.w / 2}
+                            y={s.y + s.h / 2 - 4}
+                            textAnchor="middle"
+                            fill="#ffffff"
+                            fontSize="11"
+                            fontWeight="900"
+                            className="pointer-events-none select-none"
+                          >
+                            {s.code}
+                          </text>
+
+                          <text
+                            x={s.x + s.w / 2}
+                            y={s.y + s.h / 2 + 10}
+                            textAnchor="middle"
+                            fill={isSelected ? '#c7d2fe' : '#94a3b8'}
+                            fontSize="8"
+                            fontWeight="bold"
+                            className="pointer-events-none select-none"
+                          >
+                            {s.name.length > 11 ? s.name.slice(0, 9) + '..' : s.name}
+                          </text>
+                        </g>
+                      );
+                    })}
+                  </g>
+                )}
+              </svg>
+            </div>
+
+            {/* Dynamic Interactive Territory Scroll Reel (Scroll across districts dynamically) */}
+            <div className="relative z-10 pt-3 border-t border-slate-800/80 space-y-2">
+              <div className="flex items-center justify-between text-[11px] text-slate-400">
+                <span className="font-bold flex items-center space-x-1 text-slate-300">
+                  <span>📜 Territory Navigation Reel:</span>
+                  <span className="text-indigo-400 font-normal">Scroll horizontally or click to focus map</span>
+                </span>
+                <span className="font-mono text-amber-300">
+                  {activeMap === 'india' 
+                    ? `${filteredIndiaStates.length} States` 
+                    : activeMap === 'telangana' 
+                    ? `${filteredTgDistricts.length} Districts` 
+                    : `${filteredApDistricts.length} Districts`}
+                </span>
+              </div>
+
+              {/* Horizontal Scroll Reel */}
+              <div className="flex items-center space-x-2 overflow-x-auto pb-1 scrollbar-thin">
+                {activeMap === 'india' && (
+                  filteredIndiaStates.map((s) => {
                     const active = selectedIndiaState.id === s.id;
                     return (
                       <button
@@ -274,35 +729,21 @@ export const DynamicGeoAtlas: React.FC<DynamicGeoAtlasProps> = ({
                           playClick();
                           setSelectedIndiaState(s);
                         }}
-                        className={`btn-tactile p-3 rounded-xl border text-left transition-all relative overflow-hidden flex flex-col justify-between ${
+                        className={`px-3 py-1.5 rounded-xl border text-xs whitespace-nowrap transition-all shrink-0 flex items-center space-x-1.5 ${
                           active
-                            ? 'bg-gradient-to-br from-indigo-600 to-indigo-800 border-indigo-400 text-white shadow-lg ring-2 ring-indigo-400/50 scale-[1.02]'
-                            : 'bg-slate-800/80 hover:bg-slate-800 border-slate-700/80 text-slate-300 hover:border-slate-500'
+                            ? 'bg-indigo-600 border-indigo-400 text-white font-black shadow-md'
+                            : 'bg-slate-800/80 border-slate-700/80 text-slate-300 hover:bg-slate-800 hover:text-white'
                         }`}
                       >
-                        <div className="flex items-center justify-between w-full">
-                          <span className={`text-[10px] font-black px-1.5 py-0.2 rounded ${
-                            active ? 'bg-white/20 text-white' : 'bg-slate-700 text-slate-300'
-                          }`}>
-                            {s.code}
-                          </span>
-                          <span className="text-xs">📍</span>
-                        </div>
-                        <div className="mt-2">
-                          <div className="font-extrabold text-xs tracking-tight truncate">{s.name}</div>
-                          <div className={`text-[10px] font-medium truncate ${active ? 'text-indigo-200' : 'text-slate-400'}`}>
-                            {showTelugu ? s.nameTelugu : s.capital}
-                          </div>
-                        </div>
+                        <span className="text-[10px] bg-slate-900/60 px-1.5 py-0.2 rounded font-black">{s.code}</span>
+                        <span>{s.name}</span>
                       </button>
                     );
-                  })}
-                </div>
-              )}
+                  })
+                )}
 
-              {activeMap === 'telangana' && (
-                <div className="w-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 max-h-[420px] overflow-y-auto pr-1">
-                  {filteredTgDistricts.map((d) => {
+                {activeMap === 'telangana' && (
+                  filteredTgDistricts.map((d) => {
                     const active = selectedTgDistrict.id === d.id;
                     return (
                       <button
@@ -311,35 +752,22 @@ export const DynamicGeoAtlas: React.FC<DynamicGeoAtlasProps> = ({
                           playClick();
                           setSelectedTgDistrict(d);
                         }}
-                        className={`btn-tactile p-2.5 rounded-xl border text-left transition-all relative overflow-hidden flex flex-col justify-between ${
+                        className={`px-2.5 py-1.5 rounded-xl border text-xs whitespace-nowrap transition-all shrink-0 flex items-center space-x-1.5 ${
                           active
-                            ? 'bg-gradient-to-br from-emerald-600 to-teal-700 border-emerald-400 text-white shadow-lg ring-2 ring-emerald-400/50 scale-[1.02]'
-                            : 'bg-slate-800/80 hover:bg-slate-800 border-slate-700/80 text-slate-300 hover:border-slate-500'
+                            ? 'bg-emerald-600 border-emerald-400 text-white font-black shadow-md'
+                            : 'bg-slate-800/80 border-slate-700/80 text-slate-300 hover:bg-slate-800 hover:text-white'
                         }`}
                       >
-                        <div className="flex items-center justify-between w-full">
-                          <span className={`text-[9px] font-black px-1.5 py-0.2 rounded ${
-                            active ? 'bg-white/20 text-white' : 'bg-slate-700 text-slate-300'
-                          }`}>
-                            HQ: {d.hq}
-                          </span>
-                          <span className="text-[10px] text-emerald-400">🏛️</span>
-                        </div>
-                        <div className="mt-2">
-                          <div className="font-extrabold text-xs tracking-tight truncate">{d.name}</div>
-                          <div className={`text-[10px] font-medium truncate ${active ? 'text-emerald-200' : 'text-slate-400'}`}>
-                            {showTelugu ? d.nameTelugu : d.majorRivers[0]}
-                          </div>
-                        </div>
+                        <span className="text-[10px] text-emerald-400 font-black">🏛️</span>
+                        <span>{d.name}</span>
+                        <span className="text-[9px] text-slate-400">({d.hq})</span>
                       </button>
                     );
-                  })}
-                </div>
-              )}
+                  })
+                )}
 
-              {activeMap === 'andhra' && (
-                <div className="w-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 max-h-[420px] overflow-y-auto pr-1">
-                  {filteredApDistricts.map((d) => {
+                {activeMap === 'andhra' && (
+                  filteredApDistricts.map((d) => {
                     const active = selectedApDistrict.id === d.id;
                     return (
                       <button
@@ -348,46 +776,20 @@ export const DynamicGeoAtlas: React.FC<DynamicGeoAtlasProps> = ({
                           playClick();
                           setSelectedApDistrict(d);
                         }}
-                        className={`btn-tactile p-2.5 rounded-xl border text-left transition-all relative overflow-hidden flex flex-col justify-between ${
+                        className={`px-2.5 py-1.5 rounded-xl border text-xs whitespace-nowrap transition-all shrink-0 flex items-center space-x-1.5 ${
                           active
-                            ? 'bg-gradient-to-br from-sky-600 to-blue-700 border-sky-400 text-white shadow-lg ring-2 ring-sky-400/50 scale-[1.02]'
-                            : 'bg-slate-800/80 hover:bg-slate-800 border-slate-700/80 text-slate-300 hover:border-slate-500'
+                            ? 'bg-sky-600 border-sky-400 text-white font-black shadow-md'
+                            : 'bg-slate-800/80 border-slate-700/80 text-slate-300 hover:bg-slate-800 hover:text-white'
                         }`}
                       >
-                        <div className="flex items-center justify-between w-full">
-                          <span className={`text-[9px] font-black px-1.5 py-0.2 rounded ${
-                            active ? 'bg-white/20 text-white' : 'bg-slate-700 text-slate-300'
-                          }`}>
-                            {d.region || 'AP'}
-                          </span>
-                          <span className="text-[10px] text-sky-400">{d.coastlineKm ? '🌊' : '⛰️'}</span>
-                        </div>
-                        <div className="mt-2">
-                          <div className="font-extrabold text-xs tracking-tight truncate">{d.name}</div>
-                          <div className={`text-[10px] font-medium truncate ${active ? 'text-sky-200' : 'text-slate-400'}`}>
-                            {showTelugu ? d.nameTelugu : (d.coastlineKm ? `${d.coastlineKm}km Coast` : d.hq)}
-                          </div>
-                        </div>
+                        <span className="text-[10px] text-sky-400">{d.coastlineKm ? '🌊' : '⛰️'}</span>
+                        <span>{d.name}</span>
+                        <span className="text-[9px] text-slate-400">({d.hq})</span>
                       </button>
                     );
-                  })}
-                </div>
-              )}
-            </div>
-
-            {/* Map Canvas Footer Navigation Tips */}
-            <div className="relative z-10 pt-3 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
-              <span className="flex items-center space-x-1">
-                <Compass className="w-3.5 h-3.5 text-indigo-400" />
-                <span>Geographic coordinate precision aligned to Survey of India standards</span>
-              </span>
-              <span className="font-bold text-slate-300">
-                {activeMap === 'india' 
-                  ? `${filteredIndiaStates.length} States Shown` 
-                  : activeMap === 'telangana' 
-                  ? `${filteredTgDistricts.length} Districts Shown` 
-                  : `${filteredApDistricts.length} Districts Shown`}
-              </span>
+                  })
+                )}
+              </div>
             </div>
           </div>
         </div>

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { ExamId } from '../types';
+import React, { useState, useRef, useEffect } from 'react';
+import { ExamId, TrackScope, TRACK_CONFIGS } from '../types';
 import { 
   BookOpen, 
   Sparkles, 
@@ -20,7 +20,8 @@ import {
   Crown,
   Volume2,
   VolumeX,
-  MapPin
+  MapPin,
+  Check
 } from 'lucide-react';
 import { AspirantUser } from '../services/authService';
 import { StudySession } from '../services/studySessionService';
@@ -31,6 +32,8 @@ export type ActiveNavTab = 'roadmap' | 'mock-tests' | 'mains-evaluator' | 'curre
 interface HeaderProps {
   selectedExam: ExamId;
   onSelectExam: (exam: ExamId) => void;
+  selectedTrack?: TrackScope;
+  onSelectTrack?: (track: TrackScope) => void;
   activeTab: ActiveNavTab;
   setActiveTab: (tab: ActiveNavTab) => void;
   streakDays: number;
@@ -55,6 +58,8 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({
   selectedExam,
   onSelectExam,
+  selectedTrack = 'tspsc_paper_2_6',
+  onSelectTrack,
   activeTab,
   setActiveTab,
   streakDays,
@@ -74,7 +79,19 @@ export const Header: React.FC<HeaderProps> = ({
   elapsedSeconds = 0
 }) => {
   const [isToolsOpen, setIsToolsOpen] = useState(false);
+  const [isTrackDropdownOpen, setIsTrackDropdownOpen] = useState(false);
   const [soundOn, setSoundOn] = useState(() => isSoundEnabled());
+  const trackDropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (trackDropdownRef.current && !trackDropdownRef.current.contains(e.target as Node)) {
+        setIsTrackDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const toggleSound = () => {
     const next = !soundOn;
@@ -84,6 +101,20 @@ export const Header: React.FC<HeaderProps> = ({
       playChime();
     } else {
       playClick();
+    }
+  };
+
+  const currentTrackConfig = TRACK_CONFIGS.find(t => t.id === selectedTrack) || TRACK_CONFIGS[0];
+
+  const handleSelectTrackInternal = (trackId: TrackScope) => {
+    playClick();
+    setIsTrackDropdownOpen(false);
+    if (onSelectTrack) {
+      onSelectTrack(trackId);
+    }
+    const config = TRACK_CONFIGS.find(t => t.id === trackId);
+    if (config) {
+      onSelectExam(config.baseExam);
     }
   };
 
@@ -125,42 +156,161 @@ export const Header: React.FC<HeaderProps> = ({
               </span>
             </div>
 
-            {/* Mobile Compact Exam Selector Dropdown */}
+            {/* Mobile Granular Track & Scheme Selector Dropdown */}
             <div className="md:hidden ml-1 shrink-0">
               <select
-                value={selectedExam}
-                onChange={(e) => onSelectExam(e.target.value as ExamId)}
-                aria-label="Target Exam Scope"
-                className="bg-slate-100 hover:bg-slate-200/80 border border-slate-200/90 text-[10px] font-black text-slate-800 rounded-lg py-1 px-1.5 focus:outline-none transition-all cursor-pointer"
+                value={selectedTrack}
+                onChange={(e) => handleSelectTrackInternal(e.target.value as TrackScope)}
+                aria-label="Target Exam & Scheme Track"
+                className="bg-slate-100 hover:bg-slate-200/80 border border-slate-200/90 text-[10px] font-black text-slate-800 rounded-lg py-1 px-1.5 focus:outline-none transition-all cursor-pointer max-w-[130px] truncate"
               >
-                <option value="upsc">UPSC</option>
-                <option value="appsc">APPSC</option>
-                <option value="tspsc">TSPSC</option>
+                <optgroup label="Single Exam Pure Tracks">
+                  <option value="upsc_pure">🏛️ UPSC CSE Pure</option>
+                  <option value="tspsc_pure">🏛️ TSPSC Group 1 & 2</option>
+                  <option value="appsc_pure">🌊 APPSC Group 1 & 2</option>
+                </optgroup>
+                <optgroup label="Specialized Paper Focus">
+                  <option value="tspsc_paper_2_6">🎯 TSPSC Paper-II & VI (300M)</option>
+                  <option value="appsc_group_1_2_core">🎯 APPSC State Core</option>
+                </optgroup>
+                <optgroup label="Dual Track Schemes">
+                  <option value="dual_upsc_tspsc">🔄 Dual: UPSC + TSPSC</option>
+                  <option value="dual_upsc_appsc">🔄 Dual: UPSC + APPSC</option>
+                </optgroup>
               </select>
             </div>
           </div>
 
-          {/* 2. Center: Sleek, Single-Line Segmented Exam Control (Desktop) */}
-          <div className="hidden md:inline-flex items-center bg-slate-100/90 p-1 rounded-xl border border-slate-200/70 shadow-xs shrink-0">
-            {(['upsc', 'appsc', 'tspsc'] as ExamId[]).map((exam) => {
-              const active = selectedExam === exam;
-              return (
-                <button
-                  key={exam}
-                  onClick={() => onSelectExam(exam)}
-                  className={`btn-tactile px-2.5 lg:px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap flex items-center space-x-1.5 ${
-                    active
-                      ? 'bg-white text-slate-900 shadow-sm font-black border border-slate-200/80'
-                      : 'text-slate-500 hover:text-slate-900 hover:bg-white/50'
-                  }`}
-                >
-                  <span>{examTitles[exam].short}</span>
-                  <span className="hidden xl:inline text-[10px] text-slate-400 font-medium">
-                    {showTelugu ? examTitles[exam].telugu : examTitles[exam].full}
-                  </span>
-                </button>
-              );
-            })}
+          {/* 2. Center: Sleek Track Scheme Switcher & Popover Control (Desktop) */}
+          <div className="hidden md:flex items-center space-x-2 shrink-0" ref={trackDropdownRef}>
+            <div className="relative">
+              <button
+                onClick={() => setIsTrackDropdownOpen(!isTrackDropdownOpen)}
+                className="btn-tactile h-9 px-3 bg-gradient-to-r from-slate-900 to-indigo-950 text-white rounded-xl text-xs font-black flex items-center space-x-2 border border-indigo-700/60 shadow-sm hover:border-indigo-400 transition-all group"
+                title="Change Preparation Scheme & Paper Track"
+              >
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="font-extrabold tracking-tight truncate max-w-[210px]">
+                  {showTelugu ? currentTrackConfig.labelTelugu : currentTrackConfig.label}
+                </span>
+                <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-indigo-500/30 text-indigo-300 border border-indigo-400/30">
+                  {currentTrackConfig.badge}
+                </span>
+                <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform ${isTrackDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {/* Dynamic Track Scheme Popover Menu */}
+              {isTrackDropdownOpen && (
+                <div className="absolute left-0 mt-2 w-84 bg-white rounded-2xl shadow-2xl border border-slate-200/90 p-2 z-50 animate-fadeIn text-slate-800">
+                  <div className="px-3 py-2 border-b border-slate-100 flex items-center justify-between">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                      Personalized Exam Scheme
+                    </span>
+                    <span className="text-[10px] text-indigo-600 font-bold">
+                      Filters All Content
+                    </span>
+                  </div>
+
+                  <div className="py-1 max-h-[360px] overflow-y-auto space-y-1">
+                    {/* Single Exam Tracks */}
+                    <div className="px-2 pt-1.5 pb-0.5 text-[9px] font-black uppercase text-slate-400 tracking-wider">
+                      Single Exam Tracks
+                    </div>
+                    {TRACK_CONFIGS.filter(t => t.category === 'single').map((track) => {
+                      const isSelected = selectedTrack === track.id;
+                      return (
+                        <button
+                          key={track.id}
+                          onClick={() => handleSelectTrackInternal(track.id)}
+                          className={`w-full text-left p-2 rounded-xl text-xs flex items-start justify-between transition-all ${
+                            isSelected 
+                              ? 'bg-indigo-50 text-indigo-900 font-black border border-indigo-200' 
+                              : 'hover:bg-slate-50 text-slate-700'
+                          }`}
+                        >
+                          <div>
+                            <div className="font-bold flex items-center space-x-1.5">
+                              <span>{showTelugu ? track.labelTelugu : track.label}</span>
+                              <span className="text-[9px] px-1.5 py-0.2 rounded bg-slate-100 text-slate-600">
+                                {track.badge}
+                              </span>
+                            </div>
+                            <div className="text-[10px] text-slate-400 mt-0.5 font-normal leading-tight">
+                              {track.description}
+                            </div>
+                          </div>
+                          {isSelected && <Check className="w-4 h-4 text-indigo-600 shrink-0 ml-2 mt-0.5" />}
+                        </button>
+                      );
+                    })}
+
+                    {/* Specialized Paper Focus */}
+                    <div className="px-2 pt-2 pb-0.5 text-[9px] font-black uppercase text-amber-600 tracking-wider">
+                      Specialized High-Yield Paper Tracks
+                    </div>
+                    {TRACK_CONFIGS.filter(t => t.category === 'focused').map((track) => {
+                      const isSelected = selectedTrack === track.id;
+                      return (
+                        <button
+                          key={track.id}
+                          onClick={() => handleSelectTrackInternal(track.id)}
+                          className={`w-full text-left p-2 rounded-xl text-xs flex items-start justify-between transition-all ${
+                            isSelected 
+                              ? 'bg-amber-50 text-amber-950 font-black border border-amber-300' 
+                              : 'hover:bg-slate-50 text-slate-700'
+                          }`}
+                        >
+                          <div>
+                            <div className="font-bold flex items-center space-x-1.5">
+                              <span>{showTelugu ? track.labelTelugu : track.label}</span>
+                              <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-100 text-amber-800">
+                                {track.badge}
+                              </span>
+                            </div>
+                            <div className="text-[10px] text-slate-500 mt-0.5 font-normal leading-tight">
+                              {track.description}
+                            </div>
+                          </div>
+                          {isSelected && <Check className="w-4 h-4 text-amber-600 shrink-0 ml-2 mt-0.5" />}
+                        </button>
+                      );
+                    })}
+
+                    {/* Dual Track Schemes */}
+                    <div className="px-2 pt-2 pb-0.5 text-[9px] font-black uppercase text-emerald-600 tracking-wider">
+                      Dual Track Synchronization
+                    </div>
+                    {TRACK_CONFIGS.filter(t => t.category === 'dual').map((track) => {
+                      const isSelected = selectedTrack === track.id;
+                      return (
+                        <button
+                          key={track.id}
+                          onClick={() => handleSelectTrackInternal(track.id)}
+                          className={`w-full text-left p-2 rounded-xl text-xs flex items-start justify-between transition-all ${
+                            isSelected 
+                              ? 'bg-emerald-50 text-emerald-950 font-black border border-emerald-300' 
+                              : 'hover:bg-slate-50 text-slate-700'
+                          }`}
+                        >
+                          <div>
+                            <div className="font-bold flex items-center space-x-1.5">
+                              <span>{showTelugu ? track.labelTelugu : track.label}</span>
+                              <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800">
+                                {track.badge}
+                              </span>
+                            </div>
+                            <div className="text-[10px] text-slate-500 mt-0.5 font-normal leading-tight">
+                              {track.description}
+                            </div>
+                          </div>
+                          {isSelected && <Check className="w-4 h-4 text-emerald-600 shrink-0 ml-2 mt-0.5" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* 3. Right: Consolidated Action Controls (All consistent 36px height) */}

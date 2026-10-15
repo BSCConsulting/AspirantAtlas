@@ -1,5 +1,25 @@
 export type ExamId = 'upsc' | 'appsc' | 'tspsc';
 
+export type TrackScope = 
+  | 'upsc_pure'            // Pure UPSC CSE (GS 1-4, CSAT, Essay)
+  | 'tspsc_pure'           // Pure TSPSC Group 1 & 2
+  | 'appsc_pure'           // Pure APPSC Group 1 & 2
+  | 'tspsc_paper_2_6'      // TSPSC Special Track: Paper-II (History/Polity/Society) & Paper-VI (Telangana Movement)
+  | 'appsc_group_1_2_core' // APPSC Special Track: Group 1 & 2 Core (AP History & Economy Focus)
+  | 'dual_upsc_tspsc'      // Dual Track: UPSC + TSPSC Synchronized
+  | 'dual_upsc_appsc';     // Dual Track: UPSC + APPSC Synchronized
+
+export interface TrackConfig {
+  id: TrackScope;
+  baseExam: ExamId;
+  label: string;
+  labelTelugu: string;
+  badge: string;
+  category: 'single' | 'focused' | 'dual';
+  description: string;
+  papersIncluded: string[];
+}
+
 export type PhaseId = 'phase1' | 'phase2' | 'phase3';
 
 export type NodeStatus = 'not_started' | 'in_progress' | 'completed';
@@ -283,8 +303,82 @@ export type AspirantStage = 'beginner' | 'intermediate' | 'mains-focused';
 
 export interface AspirantProfile {
   targetExam: ExamId;
+  targetTrack?: TrackScope;
   horizon: TimelineHorizon;
   stage: AspirantStage;
   onboardedAt: string;
 }
+
+export const TRACK_CONFIGS: TrackConfig[] = [
+  {
+    id: 'upsc_pure',
+    baseExam: 'upsc',
+    label: 'UPSC CSE Pure',
+    labelTelugu: 'యూపీఎస్సీ సివిల్స్ ప్రత్యేకం',
+    badge: 'IAS / IPS / IFS',
+    category: 'single',
+    description: 'Strict focus on UPSC Prelims GS 1-2 & Mains GS 1-4 with Essay and optional orientation.',
+    papersIncluded: ['Prelims Paper 1 & 2', 'Mains GS 1, 2, 3, 4', 'Essay']
+  },
+  {
+    id: 'tspsc_pure',
+    baseExam: 'tspsc',
+    label: 'TSPSC Group 1 & 2',
+    labelTelugu: 'టీఎస్‌పీఎస్సీ గ్రూప్ 1 & 2',
+    badge: 'Telangana Cadre',
+    category: 'single',
+    description: 'Complete Telangana State Public Service Commission curriculum (Prelims & Mains Papers 1-6).',
+    papersIncluded: ['Prelims GS', 'Paper-I General Essay', 'Paper-II History/Polity/Society', 'Paper-III Economy', 'Paper-IV Science & Tech', 'Paper-V Data Interpretation', 'Paper-VI Telangana Movement']
+  },
+  {
+    id: 'appsc_pure',
+    baseExam: 'appsc',
+    label: 'APPSC Group 1 & 2',
+    labelTelugu: 'ఏపీపీఎస్సీ గ్రూప్ 1 & 2',
+    badge: 'Andhra Cadre',
+    category: 'single',
+    description: 'Comprehensive APPSC syllabus including AP Bifurcation Act, AP History, and AP Economy.',
+    papersIncluded: ['Screening Test', 'Mains Paper-I General Essay', 'Paper-II AP History & Constitution', 'Paper-III Indian & AP Economy', 'Paper-IV Science & Tech', 'Paper-V Data Interpretation']
+  },
+  {
+    id: 'tspsc_paper_2_6',
+    baseExam: 'tspsc',
+    label: 'TSPSC Paper-II & VI Focus',
+    labelTelugu: 'తెలంగాణ మూవ్‌మెంట్ & పేపర్-2, 6 స్పెషల్',
+    badge: 'High Weightage (300M)',
+    category: 'focused',
+    description: 'Decisive scoring track: Telangana History, Indian Constitution, Society (Paper-II) and Telangana Movement & State Formation (Paper-VI).',
+    papersIncluded: ['Paper-II Section 1: History & Culture of India & Telangana', 'Paper-II Section 2: Indian Constitution', 'Paper-II Section 3: Society & Issues', 'Paper-VI Telangana Movement & State Formation (3 Phases)']
+  },
+  {
+    id: 'appsc_group_1_2_core',
+    baseExam: 'appsc',
+    label: 'APPSC Group 1 & 2 Core Focus',
+    labelTelugu: 'ఏపీ హిస్టరీ & ఎకానమీ కోర్ ఫోకస్',
+    badge: 'AP State Core',
+    category: 'focused',
+    description: 'High-yield state-specific topics: Socio-Economic History of AP, Bifurcation Act 2014, and AP Budget & Schemes.',
+    papersIncluded: ['Mains Paper-II AP History & Social Reforms', 'Mains Paper-III AP Economy & Bifurcation Challenges', 'Group-2 Paper-II Specifics']
+  },
+  {
+    id: 'dual_upsc_tspsc',
+    baseExam: 'tspsc',
+    label: 'Dual Track: UPSC + TSPSC',
+    labelTelugu: 'యూపీఎస్సీ + టీఎస్‌పీఎస్సీ డ్యూయల్ ట్రాక్',
+    badge: 'Dual Aspirant',
+    category: 'dual',
+    description: 'Synchronized syllabus covering overlapping national GS topics while dedicating state study blocks for Telangana.',
+    papersIncluded: ['UPSC GS 1-4', 'TSPSC Papers 1-6 with Movement sync']
+  },
+  {
+    id: 'dual_upsc_appsc',
+    baseExam: 'appsc',
+    label: 'Dual Track: UPSC + APPSC',
+    labelTelugu: 'యూపీఎస్సీ + ఏపీపీఎస్సీ డ్యూయల్ ట్రాక్',
+    badge: 'Dual Aspirant',
+    category: 'dual',
+    description: 'Harmonized syllabus mapping standard NCERT/UPSC foundation to AP State specifics.',
+    papersIncluded: ['UPSC GS 1-4', 'APPSC Mains Papers 1-5 with AP History sync']
+  }
+];
 

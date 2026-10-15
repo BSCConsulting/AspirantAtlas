@@ -32,6 +32,7 @@ interface MainsEvaluatorProps {
   onNavigateToNode?: (nodeId: string) => void;
   customQuestionPrompt?: { question: string; topic: string } | null;
   onEvaluationCompleted?: (score: number) => void;
+  onOpenPricing?: () => void;
 }
 
 interface QuestionPrompt {
@@ -222,7 +223,8 @@ const QUESTION_BANK: QuestionPrompt[] = [
 export const MainsEvaluatorView: React.FC<MainsEvaluatorProps> = ({ 
   showTelugu,
   customQuestionPrompt,
-  onEvaluationCompleted
+  onEvaluationCompleted,
+  onOpenPricing
 }) => {
   const [selectedQuestion, setSelectedQuestion] = useState<QuestionPrompt>(() => {
     if (customQuestionPrompt) {
@@ -334,6 +336,17 @@ export const MainsEvaluatorView: React.FC<MainsEvaluatorProps> = ({
       return;
     }
 
+    // Value-Momentum Freemium Guard: Prompt user to upgrade after 2 free evaluations
+    if (pastReports.length >= 2 && onOpenPricing) {
+      const wantsUpgrade = confirm(showTelugu
+        ? 'మీరు 2 ఉచిత మెయిన్స్ మూల్యాంకనాలను పూర్తి చేశారు! అపరిమిత చేతిరాత మూల్యాంకనాలు, రూబ్రిక్ స్కోరింగ్ మరియు టాపర్ మోడల్ ఆన్సర్స్ కోసం ప్రో (PRO) ప్లాన్‌ను చూడాలనుకుంటున్నారా?'
+        : 'You have completed your 2 free AI answer evaluations! Would you like to view AspirantAtlas PRO for unlimited evaluations, rubric scoring, and model answers?');
+      if (wantsUpgrade) {
+        onOpenPricing();
+        return;
+      }
+    }
+
     setIsEvaluating(true);
     setIsTimerRunning(false);
 
@@ -417,6 +430,25 @@ export const MainsEvaluatorView: React.FC<MainsEvaluatorProps> = ({
               {hasGeminiKey ? 'Semantic Chief Examiner Grading Enabled' : 'Offline Heuristic Mode Active'}
             </span>
           </div>
+        </div>
+
+        {/* Value-Momentum Freemium Evaluation Ticker Banner */}
+        <div className="relative z-10 mt-5 pt-4 border-t border-indigo-800/60 flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div className="flex items-center space-x-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
+            <span className="text-slate-200">
+              Free Tier AI Evaluations: <strong className="text-amber-300 font-mono font-black">{Math.max(0, 2 - pastReports.length)} of 2</strong> free trial evaluations remaining
+            </span>
+          </div>
+          {onOpenPricing && (
+            <button
+              onClick={onOpenPricing}
+              className="btn-tactile px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs shadow-md flex items-center space-x-1.5 transition-all"
+            >
+              <span>⭐ Upgrade to PRO for Unlimited Evaluations</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
       </div>
 

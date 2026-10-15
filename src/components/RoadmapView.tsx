@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
-import { SyllabusNode, ExamId, PhaseId, AspirantStage } from '../types';
+import { SyllabusNode, ExamId, PhaseId, AspirantStage, TrackScope, TRACK_CONFIGS } from '../types';
 import { 
   CheckCircle, Clock, Search, Sparkles, Filter, 
   ArrowRight, Shield, Layers, BookOpen, Compass, Check,
-  Zap, Award, TrendingUp
+  Zap, Award, TrendingUp, SlidersHorizontal
 } from 'lucide-react';
 import { SmartCompassBanner } from './SmartCompassBanner';
 
 interface RoadmapViewProps {
   nodes: SyllabusNode[];
   selectedExam: ExamId;
+  selectedTrack?: TrackScope;
+  onSelectTrack?: (track: TrackScope) => void;
   completedNodeIds: string[];
   onToggleComplete: (nodeId: string) => void;
   onOpenTopic: (node: SyllabusNode) => void;
@@ -22,6 +24,8 @@ interface RoadmapViewProps {
 export const RoadmapView: React.FC<RoadmapViewProps> = ({
   nodes,
   selectedExam,
+  selectedTrack = 'tspsc_paper_2_6',
+  onSelectTrack,
   completedNodeIds,
   onToggleComplete,
   onOpenTopic,
@@ -34,8 +38,38 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [isCoreFocusOnly, setIsCoreFocusOnly] = useState<boolean>(aspirantStage === 'beginner');
 
-  // Filter nodes by selected exam
-  const examFilteredNodes = nodes.filter(n => n.examScope.includes(selectedExam));
+  // Filter nodes dynamically according to the user's selected track scheme
+  const examFilteredNodes = nodes.filter(n => {
+    if (selectedTrack === 'upsc_pure') {
+      return n.examScope.includes('upsc') && !n.isStateExclusive;
+    }
+    if (selectedTrack === 'tspsc_pure') {
+      return n.examScope.includes('tspsc');
+    }
+    if (selectedTrack === 'appsc_pure') {
+      return n.examScope.includes('appsc');
+    }
+    if (selectedTrack === 'tspsc_paper_2_6') {
+      const lowerSub = n.subject.toLowerCase();
+      const lowerTitle = n.title.toLowerCase();
+      const isPaper2 = lowerSub.includes('polity') || lowerSub.includes('constitution') || lowerSub.includes('history') || lowerSub.includes('society');
+      const isPaper6 = lowerTitle.includes('telangana movement') || lowerTitle.includes('state formation') || lowerSub.includes('telangana') || n.id.includes('tg-') || n.isStateExclusive;
+      return n.examScope.includes('tspsc') && (isPaper2 || isPaper6);
+    }
+    if (selectedTrack === 'appsc_group_1_2_core') {
+      const lowerSub = n.subject.toLowerCase();
+      const lowerTitle = n.title.toLowerCase();
+      const isApCore = lowerSub.includes('andhra') || lowerTitle.includes('andhra') || lowerTitle.includes('bifurcation') || n.id.includes('ap-') || n.isStateExclusive;
+      return n.examScope.includes('appsc') && (isApCore || lowerSub.includes('history') || lowerSub.includes('economy'));
+    }
+    if (selectedTrack === 'dual_upsc_tspsc') {
+      return n.examScope.includes('upsc') || n.examScope.includes('tspsc');
+    }
+    if (selectedTrack === 'dual_upsc_appsc') {
+      return n.examScope.includes('upsc') || n.examScope.includes('appsc');
+    }
+    return n.examScope.includes(selectedExam);
+  });
 
   // Filter by phase and core focus mode
   const phaseFilteredNodes = isCoreFocusOnly

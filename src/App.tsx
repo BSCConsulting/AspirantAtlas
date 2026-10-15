@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ExamId, SyllabusNode, AspirantProfile, AspirantStage } from './types';
+import { ExamId, SyllabusNode, AspirantProfile, AspirantStage, TrackScope, TRACK_CONFIGS } from './types';
 import { SYLLABUS_NODES } from './data/curriculum';
 import { TOPIC_CONTENT_MAP } from './data/contentModules';
 import { Header, ActiveNavTab } from './components/Header';
@@ -59,8 +59,37 @@ export function App() {
   });
 
   const [selectedExam, setSelectedExam] = useState<ExamId>(() => {
-    return safeGetString('aspirant_selected_exam', 'appsc') as ExamId;
+    return safeGetString('aspirant_selected_exam', 'tspsc') as ExamId;
   });
+
+  const [selectedTrack, setSelectedTrack] = useState<TrackScope>(() => {
+    return safeGetString('aspirant_selected_track', 'tspsc_paper_2_6') as TrackScope;
+  });
+
+  const handleSelectTrack = (track: TrackScope) => {
+    setSelectedTrack(track);
+    safeSetString('aspirant_selected_track', track);
+    const config = TRACK_CONFIGS.find(t => t.id === track);
+    if (config) {
+      setSelectedExam(config.baseExam);
+      safeSetString('aspirant_selected_exam', config.baseExam);
+    }
+  };
+
+  const handleSelectExam = (exam: ExamId) => {
+    setSelectedExam(exam);
+    safeSetString('aspirant_selected_exam', exam);
+    if (exam === 'upsc') {
+      setSelectedTrack('upsc_pure');
+      safeSetString('aspirant_selected_track', 'upsc_pure');
+    } else if (exam === 'tspsc') {
+      setSelectedTrack('tspsc_pure');
+      safeSetString('aspirant_selected_track', 'tspsc_pure');
+    } else if (exam === 'appsc') {
+      setSelectedTrack('appsc_pure');
+      safeSetString('aspirant_selected_track', 'appsc_pure');
+    }
+  };
 
   const [completedNodeIds, setCompletedNodeIds] = useState<string[]>(() => {
     return safeGetJSON<string[]>('aspirant_completed_nodes', ['polity-constitution-framework']);
@@ -278,7 +307,9 @@ export function App() {
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans ambient-glow-indigo relative">
       <Header
         selectedExam={selectedExam}
-        onSelectExam={setSelectedExam}
+        onSelectExam={handleSelectExam}
+        selectedTrack={selectedTrack}
+        onSelectTrack={handleSelectTrack}
         activeTab={activeTab}
         setActiveTab={handleNavigateTab}
         streakDays={streakDays}
@@ -376,6 +407,8 @@ export function App() {
           <RoadmapView
             nodes={SYLLABUS_NODES}
             selectedExam={selectedExam}
+            selectedTrack={selectedTrack}
+            onSelectTrack={handleSelectTrack}
             completedNodeIds={completedNodeIds}
             onToggleComplete={handleToggleComplete}
             onOpenTopic={(node) => setSelectedNode(node)}
@@ -403,6 +436,7 @@ export function App() {
             showTelugu={showTelugu}
             onNavigateToNode={handleOpenTopicById}
             customQuestionPrompt={customMainsPrompt}
+            onOpenPricing={() => setIsPricingOpen(true)}
             onEvaluationCompleted={(score) => {
               const userId = currentUser?.id || 'default-aspirant';
               recordSessionActivity(userId, 'mains', { mainsScore: score });

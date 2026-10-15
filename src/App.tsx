@@ -11,6 +11,7 @@ import { MockTestSimulator } from './components/MockTestSimulator';
 import { MainsEvaluatorView } from './components/MainsEvaluatorView';
 import { CurrentAffairsBridge } from './components/CurrentAffairsBridge';
 import { StudyPlannerView } from './components/StudyPlannerView';
+import { DynamicGeoAtlas } from './components/DynamicGeoAtlas';
 import { OmnisearchModal } from './components/OmnisearchModal';
 import { AuthModal } from './components/AuthModal';
 import { ProfileDrawer } from './components/ProfileDrawer';
@@ -433,7 +434,16 @@ export function App() {
         )}
 
         {activeTab === 'vault' && (
-          <ResourceVault showTelugu={showTelugu} />
+          <ResourceVault showTelugu={showTelugu} onNavigateMaps={() => handleNavigateTab('maps')} />
+        )}
+
+        {activeTab === 'maps' && (
+          <DynamicGeoAtlas
+            showTelugu={showTelugu}
+            selectedExam={selectedExam}
+            onSelectExam={setSelectedExam}
+            onNavigateVault={() => handleNavigateTab('vault')}
+          />
         )}
       </main>
 

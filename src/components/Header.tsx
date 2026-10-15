@@ -19,13 +19,14 @@ import {
   Gift,
   Crown,
   Volume2,
-  VolumeX
+  VolumeX,
+  MapPin
 } from 'lucide-react';
 import { AspirantUser } from '../services/authService';
 import { StudySession } from '../services/studySessionService';
 import { isSoundEnabled, setSoundEnabled, playChime, playClick } from '../services/soundService';
 
-export type ActiveNavTab = 'roadmap' | 'mock-tests' | 'mains-evaluator' | 'current-affairs' | 'study-planner' | 'vault';
+export type ActiveNavTab = 'roadmap' | 'mock-tests' | 'mains-evaluator' | 'current-affairs' | 'study-planner' | 'vault' | 'maps';
 
 interface HeaderProps {
   selectedExam: ExamId;
@@ -98,7 +99,8 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'mains-evaluator', label: 'Mains Studio', telugu: 'మెయిన్స్ ఎవాల్యుయేటర్', icon: <Award className="w-3.5 h-3.5" />, badge: 'AI' },
     { id: 'current-affairs', label: 'Editorial Bridge', telugu: 'సమకాలీన అంశాలు', icon: <Scale className="w-3.5 h-3.5" /> },
     { id: 'study-planner', label: 'Adaptive Planner', telugu: 'అడాప్టివ్ ప్రణాళిక', icon: <Calendar className="w-3.5 h-3.5" /> },
-    { id: 'vault', label: 'Resource Vault', telugu: 'రీసోర్స్ వాల్ట్', icon: <BookOpen className="w-3.5 h-3.5" /> }
+    { id: 'vault', label: 'Resource Vault', telugu: 'రీసోర్స్ వాల్ట్', icon: <BookOpen className="w-3.5 h-3.5" /> },
+    { id: 'maps', label: 'GeoAtlas Maps', telugu: 'జియో అట్లాస్', icon: <MapPin className="w-3.5 h-3.5 text-rose-500" />, badge: '3D GIS' }
   ];
 
   return (
@@ -273,11 +275,29 @@ export const Header: React.FC<HeaderProps> = ({
               {/* Quick Tools Popover Dropdown */}
               {isToolsOpen && (
                 <>
-                  <div className="fixed inset-0 z-40" onClick={() => setIsToolsOpen(false)} />
-                  <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl border border-slate-200/90 shadow-2xl p-2 z-50 animate-scaleUp space-y-1">
-                    <div className="px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-slate-400 border-b border-slate-100">
-                      Aspirant Utilities
+                  <div className="fixed inset-0 z-40 bg-slate-900/15 backdrop-blur-[1px]" onClick={() => setIsToolsOpen(false)} />
+                  <div className="absolute right-0 sm:right-1 mt-2 w-72 max-w-[calc(100vw-1.5rem)] bg-white/98 backdrop-blur-xl rounded-2xl border border-slate-200/90 shadow-2xl p-2.5 z-50 animate-scaleUp space-y-1 ring-1 ring-slate-900/5">
+                    <div className="px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-slate-400 border-b border-slate-100 flex items-center justify-between">
+                      <span>Aspirant Utilities</span>
+                      <span className="text-emerald-600 font-extrabold">Live Active</span>
                     </div>
+
+                    {/* GeoAtlas Maps Shortcut */}
+                    <button
+                      onClick={() => {
+                        setIsToolsOpen(false);
+                        setActiveTab('maps');
+                      }}
+                      className="w-full px-3 py-2 rounded-xl text-xs font-bold text-slate-800 hover:bg-rose-50 hover:text-rose-900 flex items-center justify-between transition-colors"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <MapPin className="w-4 h-4 text-rose-500" />
+                        <span>Dynamic Maps (India, TS, AP)</span>
+                      </div>
+                      <span className="text-[10px] bg-rose-100 text-rose-800 font-extrabold px-1.5 py-0.2 rounded">
+                        GIS
+                      </span>
+                    </button>
 
                     {/* Performance Dashboard */}
                     {onOpenDashboard && (

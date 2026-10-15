@@ -15,15 +15,19 @@ import {
   CheckCircle2,
   Library,
   Building2,
-  Calendar
+  Calendar,
+  ChevronRight,
+  TrendingUp,
+  MapPin
 } from 'lucide-react';
 import { exportDocumentPdfPrint } from '../utils/documentPdfExporter';
 
 interface ResourceVaultProps {
   showTelugu: boolean;
+  onNavigateMaps?: () => void;
 }
 
-export const ResourceVault: React.FC<ResourceVaultProps> = ({ showTelugu }) => {
+export const ResourceVault: React.FC<ResourceVaultProps> = ({ showTelugu, onNavigateMaps }) => {
   const [viewingDocument, setViewingDocument] = useState<DocumentDetail | null>(null);
   const [selectedSubject, setSelectedSubject] = useState<ResourceSubjectKey>('all');
   const [selectedClass, setSelectedClass] = useState<string>('all');
@@ -205,6 +209,77 @@ export const ResourceVault: React.FC<ResourceVaultProps> = ({ showTelugu }) => {
         </div>
       </div>
 
+      {/* Dynamic GeoAtlas Map Launcher Bar */}
+      <div className="bg-gradient-to-r from-rose-950 via-slate-900 to-indigo-950 rounded-2xl p-4 sm:p-5 text-white border border-rose-800/60 shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative overflow-hidden">
+        <div className="flex items-center space-x-3.5">
+          <div className="w-11 h-11 rounded-2xl bg-rose-500/20 border border-rose-400/40 flex items-center justify-center text-rose-300 text-xl shrink-0 shadow-inner">
+            🗺️
+          </div>
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="font-black text-sm text-white">Dynamic Civil Services GeoAtlas</span>
+              <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-400/30 flex items-center space-x-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
+                <span>Interactive 3D GIS</span>
+              </span>
+            </div>
+            <p className="text-xs text-rose-200/80 mt-0.5 max-w-2xl leading-relaxed">
+              Explore Dynamic India (28 States), Telangana (33 Districts), and Andhra Pradesh (26 Districts) with rivers, monuments, and civil services notes.
+            </p>
+          </div>
+        </div>
+
+        {onNavigateMaps && (
+          <button
+            onClick={onNavigateMaps}
+            className="btn-tactile px-4 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white text-xs font-black transition-all flex items-center space-x-1.5 shadow-md shrink-0 cursor-pointer"
+          >
+            <MapPin className="w-3.5 h-3.5 text-rose-200" />
+            <span>Open Dynamic Maps</span>
+            <ChevronRight className="w-4 h-4 text-rose-200" />
+          </button>
+        )}
+      </div>
+
+      {/* Infographics Breakdown Bar (Motion & Stats) */}
+      <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs space-y-3.5">
+        <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+          <span className="font-black text-slate-800 uppercase tracking-wider flex items-center space-x-1.5">
+            <TrendingUp className="w-4 h-4 text-emerald-600" />
+            <span>Curated Vault Distribution (117 Academic Volumes)</span>
+          </span>
+          <span className="text-slate-500 font-bold bg-slate-100 px-2.5 py-0.5 rounded-full">
+            100% Free Public Digital Library
+          </span>
+        </div>
+
+        {/* Multi-segment Animated Visual Progress Bar */}
+        <div className="w-full h-3 rounded-full bg-slate-100 overflow-hidden flex shadow-inner">
+          <div style={{ width: '39.3%' }} className="h-full bg-emerald-500 transition-all duration-1000" title="46 Statutory Acts & Commission Reports (39.3%)" />
+          <div style={{ width: '30.8%' }} className="h-full bg-sky-500 transition-all duration-1000" title="36 NCERT Canonical Textbooks (30.8%)" />
+          <div style={{ width: '29.9%' }} className="h-full bg-indigo-500 transition-all duration-1000" title="35 Standard Reference Treatises (29.9%)" />
+        </div>
+
+        {/* Legend Chips with Motion Pulsing Dots */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs pt-0.5">
+          <div className="flex items-center space-x-2 bg-emerald-50/80 p-2.5 rounded-xl border border-emerald-100">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+            <span className="font-bold text-emerald-950">46 Gazette Acts & Reports</span>
+            <span className="text-[10px] text-emerald-700 ml-auto font-extrabold">39%</span>
+          </div>
+          <div className="flex items-center space-x-2 bg-sky-50/80 p-2.5 rounded-xl border border-sky-100">
+            <span className="w-2.5 h-2.5 rounded-full bg-sky-500 animate-pulse shrink-0" />
+            <span className="font-bold text-sky-950">36 NCERT Books (Class 7-12)</span>
+            <span className="text-[10px] text-sky-700 ml-auto font-extrabold">31%</span>
+          </div>
+          <div className="flex items-center space-x-2 bg-indigo-50/80 p-2.5 rounded-xl border border-indigo-100">
+            <span className="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse shrink-0" />
+            <span className="font-bold text-indigo-950">35 Standard Reference Works</span>
+            <span className="text-[10px] text-indigo-700 ml-auto font-extrabold">30%</span>
+          </div>
+        </div>
+      </div>
+
       {/* Search & Subject Filter Bar */}
       <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs space-y-4">
         
@@ -322,19 +397,19 @@ export const ResourceVault: React.FC<ResourceVaultProps> = ({ showTelugu }) => {
                 <p className="text-xs text-slate-500 mt-0.5">{cat.description}</p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
                 {cat.items.map((item) => (
                   <div
                     key={item.id}
-                    className="p-4 rounded-xl border border-slate-200/90 bg-slate-50/50 hover:bg-white hover:border-emerald-300 hover:shadow-md transition-all flex flex-col justify-between"
+                    className="p-4 sm:p-5 rounded-2xl border border-slate-200/90 bg-white hover:border-emerald-400 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group overflow-hidden min-w-0 transform hover:-translate-y-1"
                   >
                     <div>
                       {/* Badge Strip */}
-                      <div className="flex items-center justify-between gap-1 mb-2">
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-200">
+                      <div className="flex flex-wrap items-center justify-between gap-1.5 mb-2.5">
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-200 shrink-0">
                           {item.badge}
                         </span>
-                        <div className="flex items-center space-x-1">
+                        <div className="flex items-center space-x-1 shrink-0">
                           {item.targetExams.map((exam) => (
                             <span
                               key={exam}
@@ -347,7 +422,7 @@ export const ResourceVault: React.FC<ResourceVaultProps> = ({ showTelugu }) => {
                       </div>
 
                       {/* Title */}
-                      <h4 className="font-bold text-xs sm:text-[13px] text-slate-900 leading-snug">
+                      <h4 className="font-bold text-xs sm:text-[13px] text-slate-900 leading-snug break-words">
                         {showTelugu && item.titleTelugu ? item.titleTelugu : item.title}
                       </h4>
 

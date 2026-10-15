@@ -14,7 +14,8 @@ import {
   Globe, 
   Key, 
   Flame,
-  User
+  User,
+  MapPin
 } from 'lucide-react';
 import { ActiveNavTab } from './Header';
 import { StudySession } from '../services/studySessionService';
@@ -225,6 +226,20 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                 <BookOpen className="w-5 h-5 text-indigo-600" />
                 <div className="text-xs font-extrabold text-slate-900">Resource Vault</div>
                 <div className="text-[10px] text-slate-400">Gazettes & Laws</div>
+              </button>
+
+              <button
+                onClick={() => {
+                  setActiveTab('maps');
+                  setIsMoreMenuOpen(false);
+                }}
+                className={`p-3 rounded-2xl border text-left space-y-1 transition-all ${
+                  activeTab === 'maps' ? 'bg-rose-50 border-rose-300 font-bold' : 'bg-white border-slate-200'
+                }`}
+              >
+                <MapPin className="w-5 h-5 text-rose-600" />
+                <div className="text-xs font-extrabold text-slate-900">GeoAtlas Maps</div>
+                <div className="text-[10px] text-slate-400">India, TS & AP GIS</div>
               </button>
 
               {onOpenSearch && (

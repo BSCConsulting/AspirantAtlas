@@ -270,7 +270,7 @@ export interface OmnisearchItem {
   titleTelugu?: string;
   category: string;
   snippet: string;
-  targetTab: 'roadmap' | 'mock-tests' | 'mains-evaluator' | 'current-affairs' | 'study-planner' | 'vault';
+  targetTab: 'roadmap' | 'mock-tests' | 'mains-evaluator' | 'current-affairs' | 'study-planner' | 'vault' | 'maps';
   nodeId?: string;
   documentId?: string;
   testId?: string;

@@ -16,7 +16,7 @@ export interface ResourceVaultItem {
   title: string;
   titleTelugu?: string;
   description: string;
-  type: 'Official Gazette' | 'NCERT Book' | 'Government Report' | 'PYQ Archive' | 'Statutory Act';
+  type: 'Official Gazette' | 'NCERT Book' | 'Government Report' | 'PYQ Archive' | 'Statutory Act' | 'Standard Reference';
   subjectKey: ResourceSubjectKey;
   targetExams: ('upsc' | 'appsc' | 'tspsc')[];
   url: string;
@@ -195,6 +195,66 @@ export const RESOURCE_VAULT: ResourceCategory[] = [
         fileSize: 'Official Report',
         issuingAuthority: "Ministry of Education, Government of India",
         year: "July 2020 (Kasturirangan Committee)"
+      },
+      {
+        id: 'rv-laxmikanth-indian-polity',
+        docId: 'laxmikanth-indian-polity',
+        title: 'Indian Polity: Comprehensive Standard Reference & Conceptual Digest (M. Laxmikanth)',
+        titleTelugu: 'భారత రాజ్యాంగం & రాజకీయ వ్యవస్థ (ఎం. లక్ష్మీకాంత్ ప్రామాణిక గ్రంథం)',
+        description: 'Universally acclaimed benchmark reference for Indian Polity across UPSC, APPSC, and TSPSC. In-depth coverage across 80 chapters: Fundamental Rights, DPSP, Parliament, Executive, Judiciary, Centre-State Relations, Emergency Provisions, and Constitutional Bodies.',
+        type: 'Standard Reference',
+        subjectKey: 'polity',
+        targetExams: ['upsc', 'appsc', 'tspsc'],
+        url: 'https://archive.org',
+        badge: 'Standard Reference',
+        fileSize: 'Standard Work (80 Ch)',
+        issuingAuthority: 'M. Laxmikanth / McGraw-Hill Education',
+        year: '7th Edition (Standard)'
+      },
+      {
+        id: 'rv-dd-basu-constitution-india',
+        docId: 'dd-basu-constitution-india',
+        title: 'Introduction to the Constitution of India (Dr. D.D. Basu)',
+        titleTelugu: 'భారత రాజ్యాంగ పరిచయం (డా. దుర్గా దాస్ బసు ప్రామాణిక గ్రంథం)',
+        description: 'Pioneering juristic commentary on constitutional law, comparative jurisprudence, fundamental liberties, and judicial review doctrine by eminent jurist Dr. Durga Das Basu.',
+        type: 'Standard Reference',
+        subjectKey: 'polity',
+        targetExams: ['upsc', 'appsc', 'tspsc'],
+        url: 'https://archive.org',
+        badge: 'Jurisprudence Classic',
+        fileSize: 'Juristic Authority',
+        issuingAuthority: 'LexisNexis / Dr. D.D. Basu',
+        year: '26th Edition Classic'
+      },
+      {
+        id: 'rv-subhash-kashyap-our-parliament',
+        docId: 'subhash-kashyap-our-parliament',
+        title: 'Our Constitution & Our Parliament (Dr. Subhash C. Kashyap)',
+        titleTelugu: 'మన రాజ్యాంగం & మన పార్లమెంట్ (డా. సుభాష్ సి. కశ్యప్)',
+        description: 'Definitive institutional treatise on parliamentary procedures, motions, committees, legislative drafting, and constitutional conventions by former Secretary-General of Lok Sabha.',
+        type: 'Standard Reference',
+        subjectKey: 'polity',
+        targetExams: ['upsc', 'appsc', 'tspsc'],
+        url: 'https://www.nbtindia.gov.in',
+        badge: 'Parliamentary Authority',
+        fileSize: 'NBT Reference Work',
+        issuingAuthority: 'National Book Trust (NBT) / Dr. Subhash Kashyap',
+        year: 'National Book Trust Edition'
+      },
+      {
+        id: 'rv-granville-austin-cornerstone',
+        docId: 'granville-austin-cornerstone',
+        title: 'The Indian Constitution: Cornerstone of a Nation (Granville Austin)',
+        titleTelugu: 'భారత రాజ్యాంగం: ఒక జాతి మూలస్తంభం (గ్రాన్‌విల్ ఆస్టిన్)',
+        description: 'Seminal historiographical analysis of the Constituent Assembly, seamless web of rights, cooperative federalism, and social revolution through the Indian Constitution.',
+        type: 'Standard Reference',
+        subjectKey: 'polity',
+        targetExams: ['upsc', 'appsc', 'tspsc'],
+        url: 'https://archive.org',
+        badge: 'Constitutional Classic',
+        fileSize: 'Oxford Univ Press Classic',
+        issuingAuthority: 'Oxford University Press / Granville Austin',
+        year: 'OUP Classic Edition'
       }
     ]
   },
@@ -429,6 +489,81 @@ export const RESOURCE_VAULT: ResourceCategory[] = [
         fileSize: '3.5 MB',
         issuingAuthority: 'National Council of Educational Research and Training (NCERT)',
         year: 'National Curriculum'
+      },
+      {
+        id: 'rv-spectrum-modern-india-rajiv-ahir',
+        docId: 'spectrum-modern-india-rajiv-ahir',
+        title: 'A Brief History of Modern India (Rajiv Ahir / Spectrum Books)',
+        titleTelugu: 'ఆధునిక భారతదేశ సంక్షిప్త చరిత్ర (స్పెక్ట్రమ్ - రాజీవ్ అహిర్)',
+        description: 'Crucial chronological and analytical guide for modern Indian history from European advent to 1947 independence. Covers British administrative policies, tribal and peasant revolts, socio-religious reform movements, Indian National Congress phases, Gandhian mass movements, and constitutional milestones.',
+        type: 'Standard Reference',
+        subjectKey: 'history',
+        targetExams: ['upsc', 'appsc', 'tspsc'],
+        url: 'https://archive.org',
+        badge: 'Modern History Core',
+        fileSize: 'Standard Work (39 Ch)',
+        issuingAuthority: 'Spectrum Books / Rajiv Ahir IPS',
+        year: 'Updated Reference Edition'
+      },
+      {
+        id: 'rv-bipan-chandra-struggle-independence',
+        docId: 'bipan-chandra-struggle-independence',
+        title: "India's Struggle for Independence (Bipan Chandra, Mridula Mukherjee, Aditya Mukherjee)",
+        titleTelugu: 'భారత స్వాతంత్ర్య సంగ్రామం (బిపిన్ చంద్ర et al.)',
+        description: 'The definitive academic narrative on the national movement: socio-economic foundations of nationalism, early moderates, extremists, Non-Cooperation, Civil Disobedience, Quit India, Bhagat Singh, and INA trials.',
+        type: 'Standard Reference',
+        subjectKey: 'history',
+        targetExams: ['upsc', 'appsc', 'tspsc'],
+        url: 'https://archive.org',
+        badge: 'Nationalist Historiography',
+        fileSize: 'Penguin Classic (39 Ch)',
+        issuingAuthority: 'Penguin Random House / Prof. Bipan Chandra',
+        year: 'Academic Standard'
+      },
+      {
+        id: 'rv-sekhar-bandyopadhyay-plassey-partition',
+        docId: 'sekhar-bandyopadhyay-plassey-partition',
+        title: 'From Plassey to Partition and After: A History of Modern India (Sekhar Bandyopadhyay)',
+        titleTelugu: 'ప్లాసీ నుండి విభజన వరకు & తదుపరి (శేఖర్ బందోపాధ్యాయ)',
+        description: 'Nuanced historiographical review blending subaltern, regional, Dalit, and nationalist perspectives on the rise and consolidation of the Raj and the transfer of power.',
+        type: 'Standard Reference',
+        subjectKey: 'history',
+        targetExams: ['upsc', 'appsc', 'tspsc'],
+        url: 'https://archive.org',
+        badge: 'Subaltern & Modern',
+        fileSize: 'Orient BlackSwan Standard',
+        issuingAuthority: 'Orient BlackSwan / Prof. Sekhar Bandyopadhyay',
+        year: 'Standard Text'
+      },
+      {
+        id: 'rv-bipan-chandra-india-since-independence',
+        docId: 'bipan-chandra-india-since-independence',
+        title: 'India Since Independence (Bipan Chandra, Mridula Mukherjee, Aditya Mukherjee)',
+        titleTelugu: 'స్వాతంత్ర్యం తర్వాతి భారతదేశం (బిపిన్ చంద్ర et al.)',
+        description: 'Essential reference for GS Paper I Post-Independence Consolidation: princely states integration, linguistic reorganization of states, Nehruvian economic model, Green Revolution, 1975 Emergency, and economic liberalization.',
+        type: 'Standard Reference',
+        subjectKey: 'history',
+        targetExams: ['upsc', 'appsc', 'tspsc'],
+        url: 'https://archive.org',
+        badge: 'Post-Independence Core',
+        fileSize: 'Penguin Standard (37 Ch)',
+        issuingAuthority: 'Penguin Books / Bipan Chandra',
+        year: 'Post-Independence Classic'
+      },
+      {
+        id: 'rv-ramachandra-guha-india-after-gandhi',
+        docId: 'ramachandra-guha-india-after-gandhi',
+        title: 'India After Gandhi: The History of the World’s Largest Democracy (Ramachandra Guha)',
+        titleTelugu: 'గాంధీ తర్వాతి భారతదేశం (రామచంద్ర గుహా)',
+        description: 'Epic narrative history of modern India surviving religious, linguistic, caste, and political strife to forge the world’s most populous democracy.',
+        type: 'Standard Reference',
+        subjectKey: 'history',
+        targetExams: ['upsc', 'appsc', 'tspsc'],
+        url: 'https://archive.org',
+        badge: 'Contemporary History',
+        fileSize: 'HarperCollins Epic (900p)',
+        issuingAuthority: 'HarperCollins / Dr. Ramachandra Guha',
+        year: 'Revised 10th Anniversary'
       }
     ]
   },
